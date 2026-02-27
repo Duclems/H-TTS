@@ -9,10 +9,10 @@ let serverStarted = false;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1100,
-    height: 720,
-    minWidth: 900,
-    minHeight: 600,
+    width: 1000,
+    height: 650,
+    minWidth: 720,
+    minHeight: 480,
     title: "H-TTS - Twitch Desktop",
     backgroundColor: "#050816",
     webPreferences: {

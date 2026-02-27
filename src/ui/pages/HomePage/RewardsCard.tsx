@@ -260,17 +260,7 @@ export const RewardsCard = ({ token }: Props) => {
                 const img =
                   reward.image?.url_2x ?? reward.default_image?.url_2x ?? reward.default_image?.url_1x;
                 return (
-                  <div
-                    key={reward.id}
-                    style={{
-                      marginTop: "0.75rem",
-                      padding: "0.7rem 0.8rem",
-                      borderRadius: "0.9rem",
-                      background:
-                        "linear-gradient(135deg, rgba(15,15,30,0.95), rgba(15,15,35,0.9))",
-                      border: "1px solid rgba(255,255,255,0.05)"
-                    }}
-                  >
+                  <div key={reward.id} className="panel">
                     <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
                       <div
                         style={{

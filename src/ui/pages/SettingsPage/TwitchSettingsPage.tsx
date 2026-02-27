@@ -1,18 +1,18 @@
-import { TwitchLoginCard } from "./pages/HomePage/TwitchLoginCard";
-import { RewardsCard } from "./pages/HomePage/RewardsCard";
-import { getStoredToken } from "../twitchAuth";
 import { Link } from "react-router-dom";
-import { ThemeToggle } from "./ThemeToggle";
+import { TwitchLoginCard } from "../HomePage/TwitchLoginCard";
+import { AuthenticatedTokenCard } from "../HomePage/AuthenticatedTokenCard";
+import { getStoredToken } from "../../../twitchAuth";
+import { ThemeToggle } from "../../ThemeToggle";
 
-export const App = () => {
+export const TwitchSettingsPage = () => {
   const token = getStoredToken();
 
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header-main">
-          <div className="app-title">H-TTS · Dashboard</div>
-          <div className="app-subtitle">Historique des rewards et redemptions Twitch.</div>
+          <div className="app-title">Paramètres · Twitch</div>
+          <div className="app-subtitle">Connexion OAuth2 à Twitch et informations de session.</div>
           <nav className="app-header-nav">
             <Link to="/">
               <button type="button" className="nav-button">
@@ -35,7 +35,7 @@ export const App = () => {
       </header>
 
       {!token && <TwitchLoginCard />}
-      {token && <RewardsCard token={token} />}
+      {token && <AuthenticatedTokenCard token={token} />}
     </div>
   );
 };

@@ -45,15 +45,7 @@ export const ElevenLabsCard = () => {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk_..."
-            style={{
-              width: "100%",
-              padding: "0.5rem 0.6rem",
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(5,5,15,0.9)",
-              color: "#f5f5f5",
-              fontSize: "0.8rem"
-            }}
+            className="field"
           />
         </div>
 
@@ -70,15 +62,7 @@ export const ElevenLabsCard = () => {
             value={voiceId}
             onChange={(e) => setVoiceId(e.target.value)}
             placeholder="voice_id..."
-            style={{
-              width: "100%",
-              padding: "0.5rem 0.6rem",
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(5,5,15,0.9)",
-              color: "#f5f5f5",
-              fontSize: "0.8rem"
-            }}
+            className="field"
           />
         </div>
       </div>

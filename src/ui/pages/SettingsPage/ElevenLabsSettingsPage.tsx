@@ -1,18 +1,17 @@
-import { TwitchLoginCard } from "./pages/HomePage/TwitchLoginCard";
-import { RewardsCard } from "./pages/HomePage/RewardsCard";
-import { getStoredToken } from "../twitchAuth";
+import { ElevenLabsCard } from "../HomePage/ElevenLabsCard";
+import { ElevenLabsVoiceCard } from "../HomePage/ElevenLabsVoiceCard";
 import { Link } from "react-router-dom";
-import { ThemeToggle } from "./ThemeToggle";
+import { ThemeToggle } from "../../ThemeToggle";
 
-export const App = () => {
-  const token = getStoredToken();
-
+export const ElevenLabsSettingsPage = () => {
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header-main">
-          <div className="app-title">H-TTS · Dashboard</div>
-          <div className="app-subtitle">Historique des rewards et redemptions Twitch.</div>
+          <div className="app-title">Paramètres · ElevenLabs</div>
+          <div className="app-subtitle">
+            Configuration des clés API et des voix utilisées pour le TTS.
+          </div>
           <nav className="app-header-nav">
             <Link to="/">
               <button type="button" className="nav-button">
@@ -34,9 +33,10 @@ export const App = () => {
         <ThemeToggle />
       </header>
 
-      {!token && <TwitchLoginCard />}
-      {token && <RewardsCard token={token} />}
+      <ElevenLabsCard />
+      <ElevenLabsVoiceCard />
     </div>
   );
 };
+
 
