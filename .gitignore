@@ -5,7 +5,6 @@ Thumbs.db
 *.log
 *.tmp
 .env
-.env.*
 coverage
 *.tsbuildinfo
 .vite
