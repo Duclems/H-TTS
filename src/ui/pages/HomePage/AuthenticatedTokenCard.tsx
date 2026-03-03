@@ -31,8 +31,8 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
 
       <button
         type="button"
-        className="twitch-button"
-        style={{ marginTop: "0.9rem", background: "#ff4b6b" }}
+        className="twitch-button btn-danger"
+        style={{ marginTop: "0.9rem" }}
         onClick={handleLogout}
       >
         Déconnexion locale

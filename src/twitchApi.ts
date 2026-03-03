@@ -79,13 +79,19 @@ export async function fetchCurrentUser(accessToken: string): Promise<TwitchUser 
   return body.data[0] ?? null;
 }
 
+/**
+ * Récupère les custom rewards de la chaîne.
+ * @param onlyManageable - Si true (défaut), ne retourne que les rewards que ce client ID peut lire/gérer
+ * (créés via cette app). Si false, retourne tous les rewards de la chaîne.
+ */
 export async function fetchCustomRewards(
   accessToken: string,
-  broadcasterId: string
+  broadcasterId: string,
+  onlyManageable = true
 ): Promise<TwitchCustomReward[]> {
   const params = new URLSearchParams({
     broadcaster_id: broadcasterId,
-    only_manageable_rewards: "false"
+    only_manageable_rewards: onlyManageable ? "true" : "false"
   });
 
   const res = await fetch(
@@ -125,20 +131,6 @@ export async function fetchRewardRedemptions(
   return body.data;
 }
 
-const LAST_REWARD_ID_KEY = "h_tts_last_custom_reward_id";
-
-export function getLastCreatedRewardId(): string | null {
-  return localStorage.getItem(LAST_REWARD_ID_KEY);
-}
-
-export function storeLastCreatedRewardId(id: string): void {
-  localStorage.setItem(LAST_REWARD_ID_KEY, id);
-}
-
-export function clearLastCreatedRewardId(): void {
-  localStorage.removeItem(LAST_REWARD_ID_KEY);
-}
-
 export async function createCustomReward(
   accessToken: string,
   broadcasterId: string,
@@ -163,10 +155,6 @@ export async function createCustomReward(
   }
 
   const body = (await res.json()) as HelixResponse<TwitchCustomReward>;
-  const reward = body.data[0] ?? null;
-  if (reward) {
-    storeLastCreatedRewardId(reward.id);
-  }
-  return reward;
+  return body.data[0] ?? null;
 }
 

@@ -1,8 +1,5 @@
 import { ElevenLabsCard } from "../HomePage/ElevenLabsCard";
-import { ElevenLabsVoiceCard } from "../HomePage/ElevenLabsVoiceCard";
 import { Link } from "react-router-dom";
-import { ThemeToggle } from "../../ThemeToggle";
-
 export const ElevenLabsSettingsPage = () => {
   return (
     <div className="app-shell">
@@ -30,11 +27,9 @@ export const ElevenLabsSettingsPage = () => {
             </Link>
           </nav>
         </div>
-        <ThemeToggle />
       </header>
 
       <ElevenLabsCard />
-      <ElevenLabsVoiceCard />
     </div>
   );
 };

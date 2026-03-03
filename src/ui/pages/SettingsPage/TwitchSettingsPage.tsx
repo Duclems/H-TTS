@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { TwitchLoginCard } from "../HomePage/TwitchLoginCard";
 import { AuthenticatedTokenCard } from "../HomePage/AuthenticatedTokenCard";
 import { getStoredToken } from "../../../twitchAuth";
-import { ThemeToggle } from "../../ThemeToggle";
-
 export const TwitchSettingsPage = () => {
   const token = getStoredToken();
 
@@ -31,7 +29,6 @@ export const TwitchSettingsPage = () => {
             </Link>
           </nav>
         </div>
-        <ThemeToggle />
       </header>
 
       {!token && <TwitchLoginCard />}

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
 const express = require("express");
 
@@ -9,12 +9,14 @@ let serverStarted = false;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 650,
-    minWidth: 720,
-    minHeight: 480,
+    width: 450,
+    height: 450,
+    minWidth: 450,
+    minHeight: 450,
+    maxWidth: 450,
+    maxHeight:450,
     title: "H-TTS - Twitch Desktop",
-    backgroundColor: "#050816",
+    backgroundColor: "#1e130b",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true
@@ -23,6 +25,9 @@ function createWindow() {
 
   if (isDev) {
     win.loadURL(`http://localhost:${PORT}`);
+
+    // Ouvre les DevTools dans une fenêtre séparée en mode développement
+    win.webContents.openDevTools({ mode: "detach" });
   } else {
     if (!serverStarted) {
       const staticApp = express();
@@ -46,6 +51,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Supprime complètement la barre de menus (File / Edit / View / Window / Help)
+  Menu.setApplicationMenu(null);
+
   createWindow();
 
   app.on("activate", () => {
