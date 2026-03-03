@@ -80,8 +80,6 @@ export const ElevenLabsCard = () => {
 
   return (
     <section className="card">
-      <div className="card-title">Configuration ElevenLabs</div>
-
       {userInfo && (
         <div className="eleven-user-header">
           <div className="eleven-user-avatar">

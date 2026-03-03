@@ -8,16 +8,18 @@
 
 /* Thème centré sur #141414 */
 :root {
-  --bg: #141414;
-  --bg-raised: #1f1f1f;
-  --bg-hover: #262626;
-  --text: #fcfcfc;
-  --text-muted: rgba(252, 252, 252, 0.75);
-  --border: rgba(252, 252, 252, 0.12);
-  --accent: #c9a227;
-  --accent-soft: rgba(201, 162, 39, 0.25);
+  --bg: #030101;
+  --bg-raised: #0a0504;
+  --bg-hover: #1a0e09;
+  --text: #F3F0E7;
+  --text-muted: #f3f0e7a2;
+  --border: #28160e;
+  --border-main:#20120c;
+  --accent: #f6e6df;
+  --accent-soft: #1a0e09;
   --success: #6bc98c;
-  --danger: #d45a5a;
+  --danger: #280e0e;
+  --danger-hover: rgb(93, 26, 26);
   --overlay: rgba(0, 0, 0, 0.65);
 }
 
@@ -41,7 +43,7 @@ body {
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-main);
 }
 
 .app-main {
@@ -66,7 +68,7 @@ body {
   flex: 0 0 50px;
   padding: 0.75rem;
   background-color: var(--bg);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-main);
 }
 
 .header-settings-btn {
@@ -101,7 +103,6 @@ body {
 
 .header-settings-btn:hover {
   background-color: var(--bg-hover);
-  border-color: rgba(252, 252, 252, 0.2);
   color: var(--text);
 }
 
@@ -139,11 +140,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.15rem 0.3rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
-  background-color: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid rgba(201, 162, 39, 0.4);
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
   font-size: 0.75rem;
   white-space: nowrap;
 }
@@ -212,7 +213,6 @@ body {
 .twitch-button:hover {
   background-color: var(--bg-hover);
   color: var(--text);
-  border-color: rgba(252, 252, 252, 0.2);
 }
 
 .twitch-button:active {
@@ -227,8 +227,8 @@ body {
 }
 
 .twitch-button.btn-danger:hover {
-  background-color: #b84a4a;
-  border-color: #b84a4a;
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
   color: var(--text);
 }
 
@@ -275,9 +275,9 @@ body {
   font-size: 0.7rem;
   padding: 0.2rem 0.45rem;
   border-radius: 999px;
-  background-color: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid rgba(201, 162, 39, 0.35);
+  background-color: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .error-text {
@@ -412,7 +412,7 @@ body {
 
 .app-header-tab {
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-main);
   background-color: transparent;
   color: var(--text-muted);
   font-size: 0.8rem;
@@ -430,15 +430,25 @@ body {
 }
 
 .app-header-tab-active {
-  background-color: var(--accent-soft);
-  border-color: rgba(201, 162, 39, 0.4);
-  color: var(--accent);
+  background-color: var(--bg-hover);
+  color: var(--text);
 }
 
 .app-header-tab-icon img {
   width: 16px;
   height: 16px;
   display: block;
+  /* Icône alignée sur la couleur de texte de l’onglet (inactif = plus terne) */
+  filter: brightness(0) invert(0.6);
+}
+
+.app-header-tab-active .app-header-tab-icon img {
+  /* Quand l’onglet est actif, icône bien blanche comme le texte */
+  filter: brightness(0) invert(1);
+}
+
+.app-header-tab:hover .app-header-tab-icon img {
+  /* Au survol, l’icône suit la couleur du texte (blanc) */
   filter: brightness(0) invert(1);
 }
 
@@ -540,8 +550,8 @@ body {
 .eleven-user-header {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.4rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .eleven-user-avatar {
@@ -572,6 +582,13 @@ body {
   gap: 0.1rem;
 }
 
+.eleven-user-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
 .eleven-user-name {
   font-size: 0.85rem;
   font-weight: 600;
@@ -580,6 +597,58 @@ body {
 .eleven-user-credits {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.eleven-user-followers {
+  font-size: 0.75rem;
+  color: var(--text);
+}
+
+/* Skeletons */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-main),
+    transparent
+  );
+  animation: skeleton-shimmer 1.2s infinite;
+}
+
+.skeleton-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.skeleton-line {
+  border-radius: 999px;
+  height: var(--skeleton-line-height, 8px);
+}
+
+.skeleton-line-main {
+  width: 120px;
+  margin-bottom: 4px;
+}
+
+.skeleton-line-small {
+  width: 80px;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Scrollbars globaux */

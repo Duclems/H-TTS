@@ -4,6 +4,7 @@ export type TwitchUser = {
   id: string;
   login: string;
   display_name: string;
+  profile_image_url?: string;
 };
 
 export type TwitchCustomRewardImage = {
@@ -77,6 +78,28 @@ export async function fetchCurrentUser(accessToken: string): Promise<TwitchUser 
 
   const body = (await res.json()) as HelixResponse<TwitchUser>;
   return body.data[0] ?? null;
+}
+
+export async function fetchFollowersCount(
+  accessToken: string,
+  broadcasterId: string
+): Promise<number | null> {
+  const params = new URLSearchParams({
+    broadcaster_id: broadcasterId,
+    first: "1"
+  });
+
+  const res = await fetch(
+    `https://api.twitch.tv/helix/channels/followers?${params.toString()}`,
+    {
+      headers: buildAuthHeaders(accessToken)
+    }
+  );
+
+  if (!res.ok) return null;
+
+  const body = (await res.json()) as { total?: number };
+  return typeof body.total === "number" ? body.total : null;
 }
 
 /**

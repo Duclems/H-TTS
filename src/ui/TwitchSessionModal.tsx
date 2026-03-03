@@ -19,7 +19,7 @@ export const TwitchSessionModal = ({ onClose }: Props) => {
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="settings-modal-header">
           <h2 id="twitch-session-modal-title" className="card-title">
-            Session Twitch
+            Connexion Twitch
           </h2>
           <button
             type="button"

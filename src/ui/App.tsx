@@ -73,7 +73,7 @@ export const App = () => {
         {isTwitchConnected && rewardsTab === "history" && (
           <div className="app-header-main">
             <div className="app-header-main-top">
-              <div className="app-title">Historique des redeems</div>
+              <div className="app-title">Historique</div>
               {elevenCredits && (
                 <div className="app-header-credits">
                   Crédits restants :{" "}
