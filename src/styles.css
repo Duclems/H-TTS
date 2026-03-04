@@ -17,9 +17,13 @@
   --border-main:#20120c;
   --accent: #f6e6df;
   --accent-soft: #1a0e09;
-  --success: #6bc98c;
+  --success: rgb(35, 93, 26);
+  --saved: #11280e;
+  --saved-hover: rgb(35, 93, 26);
   --danger: #280e0e;
   --danger-hover: rgb(93, 26, 26);
+  --missing: #281a0e;
+  --missing-hover: rgb(93, 51, 26);
   --overlay: rgba(0, 0, 0, 0.65);
 }
 
@@ -110,6 +114,56 @@ body {
   background-color: var(--accent-soft);
   border-color: rgba(201, 162, 39, 0.4);
   color: var(--accent);
+}
+
+.header-settings-btn-eleven-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
+}
+
+.header-settings-btn-eleven-error:hover {
+  background-color: #b84a4a;
+  border-color: #b84a4a;
+}
+
+@keyframes eleven-error-pulse {
+  0% {
+    background-color: var(--danger);
+    box-shadow: 0 0 0 0 rgba(184, 74, 74, 0.0);
+  }
+  50% {
+    background-color: #b84a4a;
+    box-shadow: 0 0 0 6px rgba(184, 74, 74, 0.25);
+  }
+  100% {
+    background-color: var(--danger);
+    box-shadow: 0 0 0 0 rgba(184, 74, 74, 0.0);
+  }
+}
+
+.header-settings-btn-eleven-missing {
+  background-color: var(--missing);
+  animation: eleven-missing-pulse 1.4s ease-in-out infinite;
+}
+
+.header-settings-btn-eleven-missing:hover {
+  border-color: #b86f4a;
+}
+
+@keyframes eleven-missing-pulse {
+  0% {
+    background-color: var(--missing);
+    box-shadow: 0 0 0 0 rgba(184, 120, 74, 0);
+  }
+  50% {
+    background-color: #b86f4a;
+    box-shadow: 0 0 0 6px rgba(184, 114, 74, 0.25);
+  }
+  100% {
+    background-color: var(--missing);
+    box-shadow: 0 0 0 0 rgba(184, 118, 74, 0);
+  }
 }
 
 .app-header-main {
@@ -384,6 +438,14 @@ body {
   flex-shrink: 0;
 }
 
+.rewards-history-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
 .rewards-history-text {
   display: flex;
   flex-direction: column;
@@ -405,9 +467,22 @@ body {
   font-size: 0.8rem;
   color: var(--text);
 }
+
+.rewards-history-emotes {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.rewards-history-emotes img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
 .app-header-main-tabs {
   display: inline-flex;
-  gap: 0.25rem;
+  gap: 0.4rem;
 }
 
 .app-header-tab {
@@ -463,20 +538,40 @@ body {
 .field {
   width: 100%;
   padding: 0.5rem 0.6rem;
-  border-radius: 999px;
+  border-radius: 50px;
   background-color: var(--bg);
   color: var(--text);
   font-size: 0.8rem;
 }
 
-.field::placeholder {
-  color: var(--text-muted);
+#eleven-api-key.field {
+  padding: 0.7rem 0.9rem;
+  border-radius: 50px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-main);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
 }
 
-.field:focus {
-  outline: none;
-  border-color: rgba(201, 162, 39, 0.5);
+#eleven-api-key.field:focus {
+  border-color: var(--success);
 }
+
+.field-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+}
+
+#eleven-api-key.field.field-error {
+  border-color: var(--danger-hover);
+  background-color: var(--danger);
+}
+
+.field::placeholder {
+  color: var(--text-muted);
+}  
 
 /* Succès (messages sauvegardés, etc.) */
 .text-success {
@@ -538,7 +633,36 @@ body {
 
 .settings-modal-close:hover {
   background-color: var(--bg-hover);
-  border-color: rgba(252, 252, 252, 0.2);
+}
+
+.settings-modal-close-twitch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-modal-close-twitch:hover {
+  background: transparent;
+}
+
+.settings-modal-close-twitch img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: brightness(0) invert(1);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.settings-modal-close-twitch:hover img {
+  /* Légère atténuation pour le hover, sans fond */
+  filter: brightness(0.9) invert(1);
+  transform: scale(1.05);
 }
 
 .settings-modal-body {

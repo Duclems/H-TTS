@@ -20,11 +20,11 @@ export const SettingsModal = ({ onClose }: Props) => {
           </h2>
           <button
             type="button"
-            className="settings-modal-close"
+            className="settings-modal-close settings-modal-close-twitch"
             onClick={onClose}
             aria-label="Fermer"
           >
-            ✕
+            <img src="/cross.svg" alt="Fermer" />
           </button>
         </div>
 

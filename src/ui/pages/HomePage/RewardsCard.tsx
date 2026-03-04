@@ -6,8 +6,15 @@ import {
   fetchRewardRedemptions,
   type TwitchCustomReward,
   type TwitchRewardRedemption,
-  createCustomReward
+  createCustomReward,
+  fetchUserByLogin
 } from "../../../twitchApi";
+import {
+  startTwitchChatLogger,
+  addTwitchChatListener,
+  type ChatMessageWithEmotes,
+  type ParsedEmote
+} from "../../../twitchChat";
 import { speakWithElevenLabsFromText } from "../../../elevenLabsApi";
 import { loadRewardVoiceConfig } from "../../../rewardVoiceConfig";
 import { RewardVoiceModal } from "./RewardVoiceModal";
@@ -18,6 +25,7 @@ type Props = {
 };
 
 export const RewardsCard = ({ token, activeTab }: Props) => {
+  const EMOTES_CACHE_KEY = "h_tts_emotes_by_redemption";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -25,6 +33,11 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
   const [rewards, setRewards] = useState<TwitchCustomReward[]>([]);
   const [redemptions, setRedemptions] = useState<TwitchRewardRedemption[]>([]);
   const [settingsRewardId, setSettingsRewardId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessageWithEmotes[]>([]);
+  const [emoteMatches, setEmoteMatches] = useState<
+    Record<string, { chatText?: string; emotes: ParsedEmote[] }>
+  >({});
+  const [userAvatars, setUserAvatars] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +54,21 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
         }
 
         setBroadcasterId(user.id);
+
+        // Lance un logger minimal du chat IRC dans la console (uniquement les messages du chat)
+        startTwitchChatLogger({
+          channelLogin: user.login
+        });
+
+        addTwitchChatListener((msg) => {
+          setChatMessages((prev) => {
+            const next = [...prev, msg];
+            if (next.length > 200) {
+              next.shift();
+            }
+            return next;
+          });
+        });
 
         const rewardsData = await fetchCustomRewards(token.access_token, user.id);
         if (cancelled) return;
@@ -69,6 +97,20 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
       cancelled = true;
     };
   }, [token.access_token]);
+
+  // Chargement initial du cache d'emotes pour les redeems
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(EMOTES_CACHE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Record<string, { chatText?: string; emotes: ParsedEmote[] }>;
+      if (parsed && typeof parsed === "object") {
+        setEmoteMatches(parsed);
+      }
+    } catch {
+      // en cas d'erreur de parsing, on ignore simplement le cache
+    }
+  }, []);
 
   // Rafraîchissement périodique de tous les rewards et redemptions
   useEffect(() => {
@@ -120,14 +162,48 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
       // On ne déclenche que pour les redemptions apparues dans les 10 dernières secondes
       if (now - redeemedAt <= 10_000) {
         const voiceConfig = loadRewardVoiceConfig(redemption.reward.id);
+
+        // On nettoie le texte pour ElevenLabs : suppression des emotes
+        const { emotes, chatText } = getEmoteMatchForRedemption(redemption);
+        const baseText = (chatText ?? redemption.user_input ?? "").toString();
+
+        const cleanedText =
+          emotes.length === 0
+            ? baseText
+            : (() => {
+                let cursor = 0;
+                let result = "";
+
+                const sorted = [...emotes]
+                  .flatMap((e) => e.positions.map((p) => ({ start: p.start, end: p.end })))
+                  .sort((a, b) => a.start - b.start);
+
+                sorted.forEach(({ start, end }) => {
+                  if (start > cursor) {
+                    result += baseText.slice(cursor, start);
+                  }
+                  cursor = end + 1;
+                });
+
+                if (cursor < baseText.length) {
+                  result += baseText.slice(cursor);
+                }
+
+                return result.replace(/\s+/g, " ").trim();
+              })();
+
+        if (!cleanedText) continue;
+
         // eslint-disable-next-line no-console
         console.log("[H-TTS] Nouvelle redemption à lire via ElevenLabs", {
           id: redemption.id,
           rewardId: redemption.reward.id,
           user: redemption.user_display_name || redemption.user_login,
-          text: redemption.user_input
+          rawText: redemption.user_input,
+          cleanedText
         });
-        void speakWithElevenLabsFromText(redemption.user_input, voiceConfig);
+
+        void speakWithElevenLabsFromText(cleanedText, voiceConfig);
       }
 
       processed.add(redemption.id);
@@ -148,6 +224,148 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
       return tb - ta; // plus récents en premier
     })
     .slice(0, 5);
+
+  // Charge les avatars des utilisateurs présents dans les 5 derniers redemptions visibles
+  useEffect(() => {
+    const logins = Array.from(
+      new Set(visibleRedemptions.map((r) => r.user_login.toLowerCase()))
+    ).filter((login) => !(login in userAvatars));
+
+    if (logins.length === 0) return;
+
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        await Promise.all(
+          logins.map(async (login) => {
+            const user = await fetchUserByLogin(token.access_token, login);
+            if (cancelled) return;
+            setUserAvatars((prev) => ({
+              ...prev,
+              [login]: user?.profile_image_url ?? null
+            }));
+          })
+        );
+      } catch {
+        // en cas d'erreur API, on garde simplement les initiales
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleRedemptions, token.access_token, userAvatars]);
+
+  const getEmoteMatchForRedemption = (
+    redemption: TwitchRewardRedemption
+  ): { emotes: ParsedEmote[]; chatText?: string } => {
+    const cached = emoteMatches[redemption.id];
+    if (cached) return cached;
+
+    if (!chatMessages.length) return { emotes: [] };
+    const textRaw = (redemption.user_input ?? "").trim();
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    const text = normalize(textRaw);
+    const login = redemption.user_login.toLowerCase();
+    const display = redemption.user_display_name?.toLowerCase();
+    const rewardId = redemption.reward.id;
+    const redeemedAt = new Date(redemption.redeemed_at).getTime();
+
+    let bestEmotes: ParsedEmote[] = [];
+    let bestText: string | undefined;
+
+    for (let i = chatMessages.length - 1; i >= 0; i -= 1) {
+      const msg = chatMessages[i];
+      if (!msg.parsedEmotes.length) continue;
+      if (msg.rewardId !== rewardId) continue;
+      const msgTextRaw = msg.message ?? "";
+      const msgText = normalize(msgTextRaw);
+      if (msgText !== text) continue;
+
+      const msgUserLogin = msg.userLogin?.toLowerCase();
+      const msgUserDisplay = msg.userDisplayName?.toLowerCase();
+      if (
+        msgUserLogin !== login &&
+        msgUserDisplay !== login &&
+        msgUserLogin !== display &&
+        msgUserDisplay !== display
+      ) {
+        continue;
+      }
+
+      const dt = Math.abs(redeemedAt - msg.timestamp);
+      if (Number.isNaN(dt) || dt > 30_000) continue;
+
+      bestEmotes = msg.parsedEmotes;
+      bestText = msgTextRaw;
+      break;
+    }
+
+    const match = { emotes: bestEmotes, chatText: bestText };
+
+    if (bestEmotes.length > 0) {
+      setEmoteMatches((prev) => {
+        const next = { ...prev, [redemption.id]: match };
+        try {
+          localStorage.setItem(EMOTES_CACHE_KEY, JSON.stringify(next));
+        } catch {
+          // si le localStorage est plein ou indisponible, on ignore
+        }
+        return next;
+      });
+    }
+
+    return match;
+  };
+
+  const renderMessageWithEmotes = (text: string, emotes: ParsedEmote[]) => {
+    if (!text || emotes.length === 0) return text;
+
+    const segments: React.ReactNode[] = [];
+    let cursor = 0;
+
+    const sorted = [...emotes]
+      .flatMap((e) => e.positions.map((p) => ({ emote: e, start: p.start, end: p.end })))
+      .sort((a, b) => a.start - b.start);
+
+    sorted.forEach(({ emote, start, end }, index) => {
+      if (start > cursor) {
+        segments.push(text.slice(cursor, start));
+      }
+
+      const key = `${emote.id}-${index}-${start}`;
+      segments.push(
+        <img
+          key={key}
+          src={emote.urls["2x"]}
+          alt={emote.code}
+          title={emote.code}
+          style={{
+            width: 20,
+            height: 20,
+            verticalAlign: "middle",
+            margin: "0 2px",
+            borderRadius: 4
+          }}
+        />
+      );
+
+      cursor = end + 1;
+    });
+
+    if (cursor < text.length) {
+      segments.push(text.slice(cursor));
+    }
+
+    return segments;
+  };
 
   const buildUniqueRewardTitle = (baseTitle: string): string => {
     const existingTitles = rewards.map((r) => r.title);
@@ -289,36 +507,65 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
             </div>
           )}
 
-          {activeTab === "history" && visibleRedemptions.length > 0 && (
+          {activeTab === "history" && (
             <>
               <div className="rewards-history-container">
-                {visibleRedemptions.map((r) => {
-                  const date = new Date(r.redeemed_at);
-                  const user = r.user_display_name || r.user_login;
-                  const initial = user.charAt(0).toUpperCase();
-                  return (
-                    <div key={r.id} className="panel rewards-history-item">
-                      <div className="rewards-history-item-main">
-                        <div className="rewards-history-avatar">
-                          <span>{initial}</span>
-                        </div>
-                        <div className="rewards-history-text">
-                          <div className="rewards-history-title">
-                            {user} · {r.reward.title}
+                {loading && visibleRedemptions.length === 0 && (
+                  <>
+                    {[1, 2, 3].map((id) => (
+                      <div key={id} className="panel rewards-history-item">
+                        <div className="rewards-history-item-main">
+                          <div className="rewards-history-avatar">
+                            <div className="skeleton skeleton-avatar" />
                           </div>
-                          <div className="rewards-history-meta">
-                            {date.toLocaleDateString()} {date.toLocaleTimeString()}
+                          <div className="rewards-history-text">
+                            <div className="skeleton skeleton-line skeleton-line-main" />
+                            <div className="skeleton skeleton-line skeleton-line-small" />
                           </div>
                         </div>
-                      </div>
-                      {r.user_input && (
                         <p className="rewards-history-message">
-                          {r.user_input}
+                          <span className="skeleton skeleton-line skeleton-line-main" />
                         </p>
-                      )}
-                    </div>
-                  );
-                })}
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {!loading &&
+                  visibleRedemptions.length > 0 &&
+                  visibleRedemptions.map((r) => {
+                    const date = new Date(r.redeemed_at);
+                    const user = r.user_display_name || r.user_login;
+                    const initial = user.charAt(0).toUpperCase();
+                    const emotes = getEmoteMatchForRedemption(r);
+                    const loginKey = r.user_login.toLowerCase();
+                    const avatarUrl = userAvatars[loginKey] ?? null;
+                    return (
+                      <div key={r.id} className="panel rewards-history-item">
+                        <div className="rewards-history-item-main">
+                          <div className="rewards-history-avatar">
+                            {avatarUrl ? <img src={avatarUrl} alt={user} /> : <span>{initial}</span>}
+                          </div>
+                          <div className="rewards-history-text">
+                            <div className="rewards-history-title">
+                              {user} • {r.reward.title}
+                            </div>
+                            <div className="rewards-history-meta">
+                              {date.toLocaleDateString()} {date.toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </div>
+                        {r.user_input && (
+                          <p className="rewards-history-message">
+                            {renderMessageWithEmotes(
+                              emotes.chatText ?? r.user_input,
+                              emotes.emotes
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </>
           )}

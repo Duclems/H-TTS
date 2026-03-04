@@ -66,6 +66,15 @@ export const App = () => {
 
   const isTwitchConnected = !!token;
   const isFullyLinked = isTwitchConnected && !!isElevenValid;
+   const hasElevenKey = !!apiKey.trim();
+
+  const handleTabChange = (tab: "history" | "rewards") => {
+    setRewardsTab(tab);
+    const main = document.querySelector<HTMLElement>(".app-main");
+    if (main) {
+      main.scrollTo({ top: 0, behavior: "auto" });
+    }
+  };
 
   return (
     <div className="app-shell">
@@ -122,7 +131,7 @@ export const App = () => {
                   ? "app-header-tab app-header-tab-active"
                   : "app-header-tab"
               }
-              onClick={() => setRewardsTab("history")}
+              onClick={() => handleTabChange("history")}
             >
               <span className="app-header-tab-icon">
                 <img src="/house.svg" alt="" aria-hidden="true" />
@@ -136,7 +145,7 @@ export const App = () => {
                   ? "app-header-tab app-header-tab-active"
                   : "app-header-tab"
               }
-              onClick={() => setRewardsTab("rewards")}
+              onClick={() => handleTabChange("rewards")}
             >
               <span className="app-header-tab-icon">
                 <img src="/reward.svg" alt="" aria-hidden="true" />
@@ -156,12 +165,22 @@ export const App = () => {
             </button>
             <button
               type="button"
-              className="header-settings-btn"
+              className={
+                !hasElevenKey
+                  ? "header-settings-btn header-settings-btn-eleven-missing"
+                  : isElevenValid === false
+                    ? "header-settings-btn header-settings-btn-eleven-error"
+                    : "header-settings-btn"
+              }
               title="Paramètres ElevenLabs"
               aria-label={
                 isFullyLinked
                   ? "Paramètres connectés (Twitch et ElevenLabs configurés)"
-                  : "Paramètres ElevenLabs à compléter"
+                  : !hasElevenKey
+                    ? "Clé ElevenLabs manquante"
+                    : isElevenValid === false
+                      ? "Clé ElevenLabs invalide"
+                      : "Paramètres ElevenLabs à compléter"
               }
               onClick={() => setSettingsOpen(true)}
             >
@@ -173,11 +192,11 @@ export const App = () => {
             <button
               type="button"
               className="header-settings-btn"
-              title="À propos"
-              aria-label="Afficher les informations à propos"
+              title="Paramètres"
+              aria-label="Afficher les paramètres"
               onClick={() => setAboutOpen(true)}
             >
-              <img src="/settings.svg" alt="À propos" />
+              <img src="/settings.svg" alt="Paramètres" />
             </button>
           </div>
         </footer>

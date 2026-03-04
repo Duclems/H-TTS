@@ -90,7 +90,7 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
             ) : (
               typeof followersCount === "number" && (
                 <div className="eleven-user-followers">
-                  {followersCount.toLocaleString()} followers
+                • {followersCount.toLocaleString()} followers
                 </div>
               )
             )}

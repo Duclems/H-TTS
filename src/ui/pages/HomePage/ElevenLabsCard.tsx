@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../../elevenLabsConfig";
 import { fetchElevenUser } from "../../../elevenLabsApi";
 
@@ -13,6 +14,8 @@ export const ElevenLabsCard = () => {
   const [apiKey, setApiKey] = useState("");
   const [saved, setSaved] = useState(false);
   const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const cfg = loadElevenLabsConfig();
@@ -20,13 +23,28 @@ export const ElevenLabsCard = () => {
 
     if (!cfg.apiKey.trim()) {
       setUserInfo(null);
+      setLoadingUser(false);
+      setHasError(false);
+      return;
+    }
+
+    const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
+    if (invalidKey && invalidKey === cfg.apiKey) {
+      setUserInfo(null);
+      setLoadingUser(false);
+      setHasError(true);
       return;
     }
 
     void (async () => {
+      setLoadingUser(true);
+      setHasError(false);
       const user = await fetchElevenUser();
       if (!user) {
         setUserInfo(null);
+        setLoadingUser(false);
+        setHasError(true);
+        window.localStorage.setItem("h_tts_eleven_invalid_key", cfg.apiKey);
         return;
       }
 
@@ -43,6 +61,9 @@ export const ElevenLabsCard = () => {
         remainingCharacters: remaining,
         characterLimit: subscription?.character_limit ?? null
       });
+      setLoadingUser(false);
+      setHasError(false);
+      window.localStorage.removeItem("h_tts_eleven_invalid_key");
     })();
   }, []);
 
@@ -54,12 +75,29 @@ export const ElevenLabsCard = () => {
 
     if (!trimmed) {
       setUserInfo(null);
+      setLoadingUser(false);
+      setHasError(false);
+      window.localStorage.removeItem("h_tts_eleven_invalid_key");
       return;
     }
 
+    const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
+    if (invalidKey && invalidKey === trimmed) {
+      // On ne retente pas tant que la clé n'a pas changé
+      setUserInfo(null);
+      setLoadingUser(false);
+      setHasError(true);
+      return;
+    }
+
+    setLoadingUser(true);
+    setHasError(false);
     const user = await fetchElevenUser();
     if (!user) {
       setUserInfo(null);
+      setLoadingUser(false);
+      setHasError(true);
+      window.localStorage.setItem("h_tts_eleven_invalid_key", trimmed);
       return;
     }
 
@@ -76,10 +114,30 @@ export const ElevenLabsCard = () => {
       remainingCharacters: remaining,
       characterLimit: subscription?.character_limit ?? null
     });
+    setLoadingUser(false);
+    setHasError(false);
+    window.localStorage.removeItem("h_tts_eleven_invalid_key");
   };
 
   return (
     <section className="card">
+      {loadingUser && (
+        <div className="eleven-user-header">
+          <div className="eleven-user-avatar">
+            <div className="skeleton skeleton-avatar" />
+          </div>
+          <div className="eleven-user-meta">
+            <div
+              className="skeleton skeleton-line skeleton-line-main"
+              style={{ "--skeleton-line-height": "10px" } as CSSProperties}
+            />
+            <div
+              className="skeleton skeleton-line skeleton-line-small"
+              style={{ "--skeleton-line-height": "8px" } as CSSProperties}
+            />
+          </div>
+        </div>
+      )}
       {userInfo && (
         <div className="eleven-user-header">
           <div className="eleven-user-avatar">
@@ -102,9 +160,19 @@ export const ElevenLabsCard = () => {
         </div>
       )}
 
-      <p className="card-text" style={{ marginTop: userInfo ? "0.6rem" : 0 }}>
-        Renseigne ta clé API ElevenLabs. Elle est utilisée pour tous les TTS ; les voix et
-        paramètres se configurent par reward (bouton « Paramètres » sur chaque reward à l&apos;accueil).
+      <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
+        Renseigne ta clé API ElevenLabs. Elle est utilisée pour tous les TTS.
+        <br />
+        Tu peux la récupérer depuis{" "}
+        <a
+          href="https://elevenlabs.io/app/developers/api-keys"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "inherit", textDecoration: "underline dotted" }}
+        >
+          la page des clés API ElevenLabs
+        </a>
+        .
       </p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
@@ -121,7 +189,7 @@ export const ElevenLabsCard = () => {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk_..."
-            className="field"
+            className={hasError ? "field field-error" : "field"}
           />
         </div>
       </div>
@@ -132,7 +200,7 @@ export const ElevenLabsCard = () => {
         style={{ marginTop: "0.9rem" }}
         onClick={handleSave}
       >
-        Sauvegarder la clé API
+        Sauvegarder
       </button>
 
       {saved && (
