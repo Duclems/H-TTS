@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import {
   loadRewardVoiceConfig,
   saveRewardVoiceConfig,
@@ -80,6 +80,11 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
   const isV3Model = modelId === "eleven_v3";
 
+  const getRangeStyle = (value: number, min: number, max: number): CSSProperties =>
+    ({
+      "--range-fill": `${((value - min) / (max - min)) * 100}%`
+    } as CSSProperties);
+
   return (
     <div
       className="modal-overlay"
@@ -98,7 +103,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       >
         <div className="settings-modal-header">
           <h2 id="reward-voice-modal-title" className="card-title">
-            Voix TTS — {rewardTitle}
+            Voix TTS • {rewardTitle}
           </h2>
           <button
             type="button"
@@ -111,8 +116,8 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
         </div>
 
         <div className="reward-voice-modal-body">
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-            <div className="reward-voice-dropdown-wrap">
+          <div className="reward-voice-modal-fields">
+            <div className="reward-voice-dropdown-wrap reward-voice-field-first">
               <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
                 Voix ElevenLabs
               </label>
@@ -224,78 +229,85 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               )}
             </div>
 
-            <div>
-              <label htmlFor="rv-speed" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Vitesse ({speed.toFixed(2)})
-              </label>
-              <input
-                id="rv-speed"
-                type="range"
-                min={0.7}
-                max={1.2}
-                step={0.01}
-                value={speed}
-                onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                style={{ width: "100%" }}
-              />
+            <div className="reward-voice-range-grid">
+              <div className="reward-voice-range-item">
+                <label htmlFor="rv-speed" className="reward-voice-range-label">
+                  Vitesse ({speed.toFixed(2)})
+                </label>
+                <input
+                  id="rv-speed"
+                  type="range"
+                  min={0.7}
+                  max={1.2}
+                  step={0.01}
+                  value={speed}
+                  onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                  className="reward-voice-range"
+                  style={getRangeStyle(speed, 0.7, 1.2)}
+                />
+              </div>
+              <div className="reward-voice-range-item">
+                <label htmlFor="rv-stability" className="reward-voice-range-label">
+                  Stabilité ({(stability * 100).toFixed(0)}%)
+                </label>
+                <input
+                  id="rv-stability"
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={stability}
+                  onChange={(e) => setStability(parseFloat(e.target.value))}
+                  className="reward-voice-range"
+                  style={getRangeStyle(stability, 0, 1)}
+                />
+              </div>
+              <div className="reward-voice-range-item">
+                <label htmlFor="rv-similarity" className="reward-voice-range-label">
+                  Similarité ({(similarityBoost * 100).toFixed(0)}%)
+                </label>
+                <input
+                  id="rv-similarity"
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={similarityBoost}
+                  onChange={(e) => setSimilarityBoost(parseFloat(e.target.value))}
+                  className="reward-voice-range"
+                  style={getRangeStyle(similarityBoost, 0, 1)}
+                />
+              </div>
+              <div className="reward-voice-range-item">
+                <label htmlFor="rv-style" className="reward-voice-range-label">
+                  Style ({(style * 100).toFixed(0)}%)
+                </label>
+                <input
+                  id="rv-style"
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={style}
+                  onChange={(e) => setStyle(parseFloat(e.target.value))}
+                  className="reward-voice-range"
+                  style={getRangeStyle(style, 0, 1)}
+                />
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="rv-stability" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Stabilité ({(stability * 100).toFixed(0)}%)
-              </label>
-              <input
-                id="rv-stability"
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={stability}
-                onChange={(e) => setStability(parseFloat(e.target.value))}
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="rv-similarity" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Similarité ({(similarityBoost * 100).toFixed(0)}%)
-              </label>
-              <input
-                id="rv-similarity"
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={similarityBoost}
-                onChange={(e) => setSimilarityBoost(parseFloat(e.target.value))}
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="rv-style" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Style ({(style * 100).toFixed(0)}%)
-              </label>
-              <input
-                id="rv-style"
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={style}
-                onChange={(e) => setStyle(parseFloat(e.target.value))}
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}>
+            <label className="reward-voice-switch">
               <input
                 type="checkbox"
                 checked={useSpeakerBoost}
                 onChange={(e) => setUseSpeakerBoost(e.target.checked)}
                 disabled={isV3Model}
+                aria-describedby="rv-speaker-label"
               />
-              Speaker Boost {isV3Model && "(non dispo. pour Eleven v3)"}
+              <span className="reward-voice-switch-slider" aria-hidden />
+              <span id="rv-speaker-label" className="reward-voice-switch-label">
+                Speaker Boost {isV3Model && "(non dispo. pour Eleven v3)"}
+              </span>
             </label>
 
             <div>
@@ -308,7 +320,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                 value={testText}
                 onChange={(e) => setTestText(e.target.value)}
                 placeholder="Saisis un texte pour tester…"
-                className="field"
+                className="field reward-voice-input"
               />
               <button
                 type="button"
