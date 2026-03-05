@@ -105,6 +105,23 @@ body {
   margin-left: auto;
 }
 
+.app-header-icons .header-settings-btn:hover {
+  animation: header-btn-rotate 0.5s ease-in-out;
+}
+
+@keyframes header-btn-rotate {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
 .header-settings-btn:hover {
   background-color: var(--bg-hover);
   color: var(--text);
@@ -284,6 +301,17 @@ body {
   background-color: var(--danger-hover);
   border-color: var(--danger-hover);
   color: var(--text);
+}
+
+.twitch-button-voice-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
+}
+
+.twitch-button-voice-error:hover {
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
 }
 
 /* Pills / badges */
@@ -509,6 +537,12 @@ body {
   color: var(--text);
 }
 
+.app-header-tab-rewards-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
+}
+
 .app-header-tab-icon img {
   width: 16px;
   height: 16px;
@@ -525,6 +559,7 @@ body {
 .app-header-tab:hover .app-header-tab-icon img {
   /* Au survol, l’icône suit la couleur du texte (blanc) */
   filter: brightness(0) invert(1);
+  animation: header-btn-rotate 0.5s ease-in-out;
 }
 
 /* Panels et champs */

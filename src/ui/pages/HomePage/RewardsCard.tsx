@@ -22,9 +22,10 @@ import { RewardVoiceModal } from "./RewardVoiceModal";
 type Props = {
   token: TwitchTokenResponse;
   activeTab: "history" | "rewards";
+  onMissingRewardVoiceChange?: (hasMissing: boolean) => void;
 };
 
-export const RewardsCard = ({ token, activeTab }: Props) => {
+export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Props) => {
   const EMOTES_CACHE_KEY = "h_tts_emotes_by_redemption";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
   const [rewards, setRewards] = useState<TwitchCustomReward[]>([]);
   const [redemptions, setRedemptions] = useState<TwitchRewardRedemption[]>([]);
   const [settingsRewardId, setSettingsRewardId] = useState<string | null>(null);
+  const [rewardsMissingVoice, setRewardsMissingVoice] = useState<Record<string, boolean>>({});
   const [chatMessages, setChatMessages] = useState<ChatMessageWithEmotes[]>([]);
   const [emoteMatches, setEmoteMatches] = useState<
     Record<string, { chatText?: string; emotes: ParsedEmote[] }>
@@ -259,6 +261,29 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
     };
   }, [visibleRedemptions, token.access_token, userAvatars]);
 
+  // Vérifie quels rewards n'ont pas de voix configurée
+  useEffect(() => {
+    if (rewards.length === 0) {
+      setRewardsMissingVoice({});
+      if (onMissingRewardVoiceChange) {
+        onMissingRewardVoiceChange(false);
+      }
+      return;
+    }
+
+    const next: Record<string, boolean> = {};
+    for (const reward of rewards) {
+      const cfg = loadRewardVoiceConfig(reward.id);
+      const missing = !cfg || !cfg.voiceId || !cfg.voiceId.trim();
+      next[reward.id] = missing;
+    }
+    setRewardsMissingVoice(next);
+    if (onMissingRewardVoiceChange) {
+      const hasMissing = Object.values(next).some(Boolean);
+      onMissingRewardVoiceChange(hasMissing);
+    }
+  }, [rewards, settingsRewardId, onMissingRewardVoiceChange]);
+
   const getEmoteMatchForRedemption = (
     redemption: TwitchRewardRedemption
   ): { emotes: ParsedEmote[]; chatText?: string } => {
@@ -483,7 +508,11 @@ export const RewardsCard = ({ token, activeTab }: Props) => {
                       </div>
                       <button
                         type="button"
-                        className="twitch-button"
+                        className={
+                          rewardsMissingVoice[reward.id]
+                            ? "twitch-button twitch-button-voice-error"
+                            : "twitch-button"
+                        }
                         style={{
                           marginTop: 0,
                           width: "auto",

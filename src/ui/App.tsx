@@ -16,6 +16,7 @@ export const App = () => {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [isElevenValid, setIsElevenValid] = useState<boolean | null>(null);
   const [rewardsTab, setRewardsTab] = useState<"history" | "rewards">("history");
+  const [hasMissingRewardVoice, setHasMissingRewardVoice] = useState(false);
   const [elevenCredits, setElevenCredits] = useState<{ remaining: number; limit: number } | null>(
     null
   );
@@ -118,7 +119,13 @@ export const App = () => {
 
       <main className="app-main">
         {!token && <TwitchLoginCard />}
-        {token && <RewardsCard token={token} activeTab={rewardsTab} />}
+        {token && (
+          <RewardsCard
+            token={token}
+            activeTab={rewardsTab}
+            onMissingRewardVoiceChange={setHasMissingRewardVoice}
+          />
+        )}
       </main>
 
       {isTwitchConnected && (
@@ -140,11 +147,9 @@ export const App = () => {
             </button>
             <button
               type="button"
-              className={
-                rewardsTab === "rewards"
-                  ? "app-header-tab app-header-tab-active"
-                  : "app-header-tab"
-              }
+              className={`${rewardsTab === "rewards" ? "app-header-tab app-header-tab-active" : "app-header-tab"}${
+                hasMissingRewardVoice ? " app-header-tab-rewards-error" : ""
+              }`}
               onClick={() => handleTabChange("rewards")}
             >
               <span className="app-header-tab-icon">
