@@ -198,4 +198,3 @@ export async function createCustomReward(
   const body = (await res.json()) as HelixResponse<TwitchCustomReward>;
   return body.data[0] ?? null;
 }
-

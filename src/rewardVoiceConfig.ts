@@ -11,7 +11,7 @@ export type RewardVoiceConfig = {
   speed: number;
 };
 
-export const DEFAULT_REWARD_VOICE_CONFIG: RewardVoiceConfig = {
+const DEFAULT_REWARD_VOICE_CONFIG: RewardVoiceConfig = {
   voiceId: "",
   modelId: "eleven_turbo_v2_5",
   stability: 0.5,
@@ -53,11 +53,11 @@ export function getDefaultRewardVoiceConfig(): RewardVoiceConfig {
   return { ...DEFAULT_REWARD_VOICE_CONFIG };
 }
 
-export type ModelOption = { id: string; label: string; description: string };
+export type ModelOption = { id: string; label: string };
 
 export const MODEL_OPTIONS: ModelOption[] = [
-  { id: "eleven_v3", label: "Eleven v3 (multilingue, expressif)", description: "Modèle le plus riche émotionnellement, 70+ langues." },
-  { id: "eleven_multilingual_v2", label: "Eleven Multilingual v2", description: "Voix naturelle, 29 langues." },
-  { id: "eleven_flash_v2_5", label: "Eleven Flash v2.5", description: "Très faible latence, 32 langues." },
-  { id: "eleven_turbo_v2_5", label: "Eleven Turbo v2.5", description: "Bon compromis qualité / vitesse, 32 langues." }
+  { id: "eleven_v3", label: "Eleven v3 (multilingue, expressif)" },
+  { id: "eleven_multilingual_v2", label: "Eleven Multilingual v2" },
+  { id: "eleven_flash_v2_5", label: "Eleven Flash v2.5" },
+  { id: "eleven_turbo_v2_5", label: "Eleven Turbo v2.5" }
 ];

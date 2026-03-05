@@ -8,7 +8,7 @@ import { SettingsModal } from "./SettingsModal";
 import { TwitchSessionModal } from "./TwitchSessionModal";
 import { AboutModal } from "./AboutModal";
 
-const ELEVEN_CHECK_INTERVAL_MS = 5_000; // vérification des droits ElevenLabs toutes les 60 s
+const ELEVEN_CHECK_INTERVAL_MS = 10_000; // vérification des droits ElevenLabs toutes les 60 s
 
 export const App = () => {
   const token = getStoredToken();
