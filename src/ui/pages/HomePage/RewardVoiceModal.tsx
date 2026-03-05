@@ -25,6 +25,8 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const [useSpeakerBoost, setUseSpeakerBoost] = useState(false);
   const [testText, setTestText] = useState("");
   const [saved, setSaved] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
 
   useEffect(() => {
     const existing = loadRewardVoiceConfig(rewardId);
@@ -86,163 +88,242 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       aria-labelledby="reward-voice-modal-title"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="panel modal-content" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-          <h2 id="reward-voice-modal-title" className="card-title" style={{ margin: 0 }}>
+      <div
+        className="panel modal-content settings-modal-content reward-voice-modal"
+        onClick={(e) => {
+          e.stopPropagation();
+          setVoiceOpen(false);
+          setModelOpen(false);
+        }}
+      >
+        <div className="settings-modal-header">
+          <h2 id="reward-voice-modal-title" className="card-title">
             Voix TTS — {rewardTitle}
           </h2>
-          <button type="button" className="twitch-button" onClick={onClose} aria-label="Fermer">
-            ✕
+          <button
+            type="button"
+            className="settings-modal-close settings-modal-close-twitch"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            <img src="/cross.svg" alt="Fermer" />
           </button>
         </div>
-        <p className="card-text" style={{ marginBottom: "0.75rem" }}>
-          Configure la voix et les paramètres ElevenLabs pour ce reward. Les redemptions de ce reward
-          utiliseront cette config pour le TTS.
-        </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          <div>
-            <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Voix ElevenLabs
-            </label>
-            {voices.length > 0 ? (
-              <select
-                id="rv-voice-id"
-                value={voiceId}
-                onChange={(e) => setVoiceId(e.target.value)}
-                className="field"
+        <div className="reward-voice-modal-body">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            <div className="reward-voice-dropdown-wrap">
+              <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Voix ElevenLabs
+              </label>
+              {voices.length > 0 ? (
+                <>
+                  <button
+                    id="rv-voice-id"
+                    type="button"
+                    className="field reward-voice-dropdown-trigger"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setVoiceOpen((v) => !v);
+                      setModelOpen(false);
+                    }}
+                    aria-expanded={voiceOpen}
+                    aria-haspopup="listbox"
+                    aria-label="Choisir une voix"
+                  >
+                    {voices.find((v) => v.voice_id === voiceId)?.name ?? "Choisir une voix…"}
+                  </button>
+                  {voiceOpen && (
+                    <ul
+                      className="reward-voice-dropdown-list"
+                      role="listbox"
+                      aria-labelledby="rv-voice-id"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <li
+                        role="option"
+                        aria-selected={!voiceId}
+                        className="reward-voice-dropdown-option"
+                        onClick={() => {
+                          setVoiceId("");
+                          setVoiceOpen(false);
+                        }}
+                      >
+                        Choisir une voix…
+                      </li>
+                      {voices.map((v) => (
+                        <li
+                          key={v.voice_id}
+                          role="option"
+                          aria-selected={voiceId === v.voice_id}
+                          className="reward-voice-dropdown-option"
+                          onClick={() => {
+                            setVoiceId(v.voice_id);
+                            setVoiceOpen(false);
+                          }}
+                        >
+                          {v.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <input
+                  id="rv-voice-id"
+                  type="text"
+                  value={voiceId}
+                  onChange={(e) => setVoiceId(e.target.value)}
+                  placeholder="Choisir une voix…"
+                  className="field"
+                />
+              )}
+            </div>
+
+            <div className="reward-voice-dropdown-wrap">
+              <label htmlFor="rv-model" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Modèle
+              </label>
+              <button
+                id="rv-model"
+                type="button"
+                className="field reward-voice-dropdown-trigger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setModelOpen((v) => !v);
+                  setVoiceOpen(false);
+                }}
+                aria-expanded={modelOpen}
+                aria-haspopup="listbox"
+                aria-label="Choisir un modèle"
               >
-                <option value="">Choisir une voix…</option>
-                {voices.map((v) => (
-                  <option key={v.voice_id} value={v.voice_id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
+                {MODEL_OPTIONS.find((m) => m.id === modelId)?.label ?? modelId}
+              </button>
+              {modelOpen && (
+                <ul
+                  className="reward-voice-dropdown-list"
+                  role="listbox"
+                  aria-labelledby="rv-model"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {MODEL_OPTIONS.map((m) => (
+                    <li
+                      key={m.id}
+                      role="option"
+                      aria-selected={modelId === m.id}
+                      className="reward-voice-dropdown-option"
+                      onClick={() => {
+                        setModelId(m.id);
+                        setModelOpen(false);
+                      }}
+                    >
+                      {m.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="rv-speed" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Vitesse ({speed.toFixed(2)})
+              </label>
               <input
-                id="rv-voice-id"
+                id="rv-speed"
+                type="range"
+                min={0.7}
+                max={1.2}
+                step={0.01}
+                value={speed}
+                onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="rv-stability" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Stabilité ({(stability * 100).toFixed(0)}%)
+              </label>
+              <input
+                id="rv-stability"
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={stability}
+                onChange={(e) => setStability(parseFloat(e.target.value))}
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="rv-similarity" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Similarité ({(similarityBoost * 100).toFixed(0)}%)
+              </label>
+              <input
+                id="rv-similarity"
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={similarityBoost}
+                onChange={(e) => setSimilarityBoost(parseFloat(e.target.value))}
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="rv-style" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Style ({(style * 100).toFixed(0)}%)
+              </label>
+              <input
+                id="rv-style"
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={style}
+                onChange={(e) => setStyle(parseFloat(e.target.value))}
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}>
+              <input
+                type="checkbox"
+                checked={useSpeakerBoost}
+                onChange={(e) => setUseSpeakerBoost(e.target.checked)}
+                disabled={isV3Model}
+              />
+              Speaker Boost {isV3Model && "(non dispo. pour Eleven v3)"}
+            </label>
+
+            <div>
+              <label htmlFor="rv-test" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+                Texte de test
+              </label>
+              <input
+                id="rv-test"
                 type="text"
-                value={voiceId}
-                onChange={(e) => setVoiceId(e.target.value)}
-                placeholder="Choisir une voix…"
+                value={testText}
+                onChange={(e) => setTestText(e.target.value)}
+                placeholder="Saisis un texte pour tester…"
                 className="field"
               />
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="rv-model" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Modèle
-            </label>
-            <select id="rv-model" value={modelId} onChange={(e) => setModelId(e.target.value)} className="field">
-              {MODEL_OPTIONS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="rv-speed" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Vitesse ({speed.toFixed(2)})
-            </label>
-            <input
-              id="rv-speed"
-              type="range"
-              min={0.7}
-              max={1.2}
-              step={0.01}
-              value={speed}
-              onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              style={{ width: "100%" }}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="rv-stability" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Stabilité ({(stability * 100).toFixed(0)}%)
-            </label>
-            <input
-              id="rv-stability"
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={stability}
-              onChange={(e) => setStability(parseFloat(e.target.value))}
-              style={{ width: "100%" }}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="rv-similarity" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Similarité ({(similarityBoost * 100).toFixed(0)}%)
-            </label>
-            <input
-              id="rv-similarity"
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={similarityBoost}
-              onChange={(e) => setSimilarityBoost(parseFloat(e.target.value))}
-              style={{ width: "100%" }}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="rv-style" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Style ({(style * 100).toFixed(0)}%)
-            </label>
-            <input
-              id="rv-style"
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={style}
-              onChange={(e) => setStyle(parseFloat(e.target.value))}
-              style={{ width: "100%" }}
-            />
-          </div>
-
-          <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}>
-            <input
-              type="checkbox"
-              checked={useSpeakerBoost}
-              onChange={(e) => setUseSpeakerBoost(e.target.checked)}
-              disabled={isV3Model}
-            />
-            Speaker Boost {isV3Model && "(non dispo. pour Eleven v3)"}
-          </label>
-
-          <div>
-            <label htmlFor="rv-test" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-              Texte de test
-            </label>
-            <input
-              id="rv-test"
-              type="text"
-              value={testText}
-              onChange={(e) => setTestText(e.target.value)}
-              placeholder="Saisis un texte pour tester…"
-              className="field"
-            />
-            <button
-              type="button"
-              className="twitch-button"
-              style={{ marginTop: "0.4rem" }}
-              onClick={handleTest}
-              disabled={!voiceId.trim()}
-            >
-              Tester la voix
-            </button>
+              <button
+                type="button"
+                className="twitch-button"
+                style={{ marginTop: "0.4rem" }}
+                onClick={handleTest}
+                disabled={!voiceId.trim()}
+              >
+                Tester la voix
+              </button>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <div className="reward-voice-modal-footer">
           <button type="button" className="twitch-button" onClick={handleSave}>
             Enregistrer
           </button>

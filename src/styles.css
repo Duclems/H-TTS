@@ -594,6 +594,60 @@ body {
   border-color: var(--success);
 }
 
+#rv-voice-id.field,
+#rv-model.field {
+  padding: 0.7rem 0.9rem;
+  border-radius: 50px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-main);
+  font-size: 0.8rem;
+}
+
+#rv-voice-id.field:focus,
+#rv-model.field:focus,
+.reward-voice-dropdown-trigger.field:focus {
+  border-color: var(--border);
+  background-color: var(--bg-hover);
+}
+
+.reward-voice-dropdown-wrap {
+  position: relative;
+}
+
+.reward-voice-dropdown-trigger.field {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reward-voice-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 100px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-main);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.reward-voice-dropdown-option {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.reward-voice-dropdown-option:hover,
+.reward-voice-dropdown-option[aria-selected="true"] {
+  background-color: var(--bg-hover);
+}
+
 .field-error {
   border-color: var(--danger);
   background-color: var(--danger);
@@ -637,6 +691,30 @@ body {
 
 .settings-modal-content {
   max-width: 480px;
+}
+
+.reward-voice-modal {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reward-voice-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 -0.75rem -0.75rem -0.75rem;
+  padding: 0 0.75rem 0.75rem 0.75rem;
+  border-bottom: 1px solid var(--border-main);
+  border-top: 1px solid var(--border-main);
+}
+
+.reward-voice-modal-footer {
+  margin-top: 0.55rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .settings-modal-header {
