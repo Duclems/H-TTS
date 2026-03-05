@@ -8,7 +8,6 @@ export type RewardVoiceConfig = {
   stability: number;
   similarityBoost: number;
   style: number;
-  useSpeakerBoost: boolean;
   speed: number;
 };
 
@@ -18,7 +17,6 @@ export const DEFAULT_REWARD_VOICE_CONFIG: RewardVoiceConfig = {
   stability: 0.5,
   similarityBoost: 0.75,
   style: 0,
-  useSpeakerBoost: false,
   speed: 1
 };
 

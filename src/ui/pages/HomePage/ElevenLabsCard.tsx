@@ -1,7 +1,21 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../../elevenLabsConfig";
-import { fetchElevenUser } from "../../../elevenLabsApi";
+import { fetchElevenUser, checkElevenPermissions } from "../../../elevenLabsApi";
+
+const LAST_ALL_OK_KEY = "h_tts_eleven_last_all_ok";
+const LAST_USER_KEY = "h_tts_eleven_last_user";
+
+function getInitialApiKey(): string {
+  return loadElevenLabsConfig().apiKey ?? "";
+}
+
+function getInitialOptimisticAllOk(): boolean {
+  const cfg = loadElevenLabsConfig();
+  const key = cfg.apiKey?.trim();
+  if (!key) return false;
+  return window.localStorage.getItem(LAST_ALL_OK_KEY) === "true";
+}
 
 type ElevenUserInfo = {
   name: string;
@@ -10,12 +24,50 @@ type ElevenUserInfo = {
   characterLimit: number | null;
 };
 
+function saveLastUserInfo(info: ElevenUserInfo | null): void {
+  if (info) {
+    try {
+      window.localStorage.setItem(LAST_USER_KEY, JSON.stringify(info));
+    } catch {
+      window.localStorage.removeItem(LAST_USER_KEY);
+    }
+  } else {
+    window.localStorage.removeItem(LAST_USER_KEY);
+  }
+}
+
+function getInitialUserInfo(): ElevenUserInfo | null {
+  if (!getInitialApiKey().trim()) return null;
+  try {
+    const raw = window.localStorage.getItem(LAST_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ElevenUserInfo;
+    if (typeof parsed?.name !== "string") return null;
+    return {
+      name: parsed.name,
+      avatarUrl: typeof parsed.avatarUrl === "string" ? parsed.avatarUrl : null,
+      remainingCharacters:
+        typeof parsed.remainingCharacters === "number" ? parsed.remainingCharacters : null,
+      characterLimit: typeof parsed.characterLimit === "number" ? parsed.characterLimit : null
+    };
+  } catch {
+    return null;
+  }
+}
+
 export const ElevenLabsCard = () => {
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(getInitialApiKey);
   const [saved, setSaved] = useState(false);
-  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(getInitialUserInfo);
   const [loadingUser, setLoadingUser] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [permissionChecks, setPermissionChecks] = useState<{
+    user: boolean;
+    voices: boolean;
+    tts: boolean;
+  } | null>(null);
+  const [permissionChecksLoading, setPermissionChecksLoading] = useState(false);
+  const [optimisticAllOk, setOptimisticAllOk] = useState(getInitialOptimisticAllOk);
 
   useEffect(() => {
     const cfg = loadElevenLabsConfig();
@@ -23,16 +75,20 @@ export const ElevenLabsCard = () => {
 
     if (!cfg.apiKey.trim()) {
       setUserInfo(null);
+      saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(false);
+      window.localStorage.setItem(LAST_ALL_OK_KEY, "false");
       return;
     }
 
     const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
     if (invalidKey && invalidKey === cfg.apiKey) {
       setUserInfo(null);
+      saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(true);
+      window.localStorage.setItem(LAST_ALL_OK_KEY, "false");
       return;
     }
 
@@ -42,9 +98,12 @@ export const ElevenLabsCard = () => {
       const user = await fetchElevenUser();
       if (!user) {
         setUserInfo(null);
+        saveLastUserInfo(null);
         setLoadingUser(false);
         setHasError(true);
+        setOptimisticAllOk(false);
         window.localStorage.setItem("h_tts_eleven_invalid_key", cfg.apiKey);
+        window.localStorage.setItem(LAST_ALL_OK_KEY, "false");
         return;
       }
 
@@ -55,17 +114,34 @@ export const ElevenLabsCard = () => {
           ? subscription.character_limit - (subscription.character_count ?? 0)
           : null;
 
-      setUserInfo({
+      const info: ElevenUserInfo = {
         name: (user as any).first_name || "Compte ElevenLabs",
         avatarUrl,
         remainingCharacters: remaining,
         characterLimit: subscription?.character_limit ?? null
-      });
+      };
+      setUserInfo(info);
+      saveLastUserInfo(info);
       setLoadingUser(false);
       setHasError(false);
       window.localStorage.removeItem("h_tts_eleven_invalid_key");
     })();
   }, []);
+
+  useEffect(() => {
+    if (!userInfo) {
+      setPermissionChecks(null);
+      return;
+    }
+    setPermissionChecksLoading(true);
+    void checkElevenPermissions().then((checks) => {
+      const allOk = checks.user && checks.voices && checks.tts;
+      setPermissionChecks(checks);
+      setPermissionChecksLoading(false);
+      setOptimisticAllOk(allOk);
+      window.localStorage.setItem(LAST_ALL_OK_KEY, allOk ? "true" : "false");
+    });
+  }, [userInfo]);
 
   const handleSave = async () => {
     const trimmed = apiKey.trim();
@@ -75,9 +151,12 @@ export const ElevenLabsCard = () => {
 
     if (!trimmed) {
       setUserInfo(null);
+      saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(false);
+      setOptimisticAllOk(false);
       window.localStorage.removeItem("h_tts_eleven_invalid_key");
+      window.localStorage.setItem(LAST_ALL_OK_KEY, "false");
       return;
     }
 
@@ -85,8 +164,10 @@ export const ElevenLabsCard = () => {
     if (invalidKey && invalidKey === trimmed) {
       // On ne retente pas tant que la clé n'a pas changé
       setUserInfo(null);
+      saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(true);
+      setOptimisticAllOk(false);
       return;
     }
 
@@ -95,9 +176,12 @@ export const ElevenLabsCard = () => {
     const user = await fetchElevenUser();
     if (!user) {
       setUserInfo(null);
+      saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(true);
+      setOptimisticAllOk(false);
       window.localStorage.setItem("h_tts_eleven_invalid_key", trimmed);
+      window.localStorage.setItem(LAST_ALL_OK_KEY, "false");
       return;
     }
 
@@ -108,12 +192,14 @@ export const ElevenLabsCard = () => {
         ? subscription.character_limit - (subscription.character_count ?? 0)
         : null;
 
-    setUserInfo({
+    const info: ElevenUserInfo = {
       name: (user as any).first_name || "Compte ElevenLabs",
       avatarUrl,
       remainingCharacters: remaining,
       characterLimit: subscription?.character_limit ?? null
-    });
+    };
+    setUserInfo(info);
+    saveLastUserInfo(info);
     setLoadingUser(false);
     setHasError(false);
     window.localStorage.removeItem("h_tts_eleven_invalid_key");
@@ -121,7 +207,7 @@ export const ElevenLabsCard = () => {
 
   return (
     <section className="card">
-      {loadingUser && (
+      {loadingUser && !userInfo && (
         <div className="eleven-user-header">
           <div className="eleven-user-avatar">
             <div className="skeleton skeleton-avatar" />
@@ -160,20 +246,71 @@ export const ElevenLabsCard = () => {
         </div>
       )}
 
-      <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
-        Renseigne ta clé API ElevenLabs. Elle est utilisée pour tous les TTS.
-        <br />
-        Tu peux la récupérer depuis{" "}
-        <a
-          href="https://elevenlabs.io/app/developers/api-keys"
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "inherit", textDecoration: "underline dotted" }}
-        >
-          la page des clés API ElevenLabs
-        </a>
-        .
-      </p>
+      {!((optimisticAllOk && !hasError) || (userInfo && permissionChecks && permissionChecks.user && permissionChecks.voices && permissionChecks.tts)) && (
+        <>
+          <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
+            Récupère ta clé API ElevenLabs. Elle est utilisée pour tous les TTS.
+            <br />
+            Tu peux la récupérer depuis{" "}
+            <a
+              href="https://elevenlabs.io/app/developers/api-keys"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "inherit", textDecoration: "underline dotted" }}
+            >
+              la page des clés API ElevenLabs
+            </a>
+            .
+          </p>
+          <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
+            Sélectionne les champs suivants pour configurer le TTS :
+          </p>
+
+          {(userInfo || permissionChecksLoading || hasError || !apiKey.trim()) && (
+            <div className="token-chip-row" style={{ marginTop: "0.4rem" }}>
+              <span
+                className={
+                  hasError || !apiKey.trim()
+                    ? "token-chip token-chip-danger"
+                    : permissionChecksLoading
+                      ? "token-chip"
+                      : permissionChecks?.tts === false
+                        ? "token-chip token-chip-danger"
+                        : "token-chip"
+                }
+              >
+                Text to Speech
+              </span>
+              <span
+                className={
+                  hasError || !apiKey.trim()
+                    ? "token-chip token-chip-danger"
+                    : permissionChecksLoading
+                      ? "token-chip"
+                      : permissionChecks?.voices === false
+                        ? "token-chip token-chip-danger"
+                        : "token-chip"
+                }
+              >
+                Voix
+              </span>
+              <span
+                className={
+                  hasError || !apiKey.trim()
+                    ? "token-chip token-chip-danger"
+                    : permissionChecksLoading
+                      ? "token-chip"
+                      : permissionChecks?.user === false
+                        ? "token-chip token-chip-danger"
+                        : "token-chip"
+                }
+              >
+                Utilisateur
+              </span>
+            </div>
+          )}
+        </>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
         <div>
@@ -196,7 +333,16 @@ export const ElevenLabsCard = () => {
 
       <button
         type="button"
-        className="twitch-button"
+        className={
+          !apiKey.trim() ||
+          hasError ||
+          (permissionChecks &&
+            (permissionChecks.user === false ||
+              permissionChecks.voices === false ||
+              permissionChecks.tts === false))
+            ? "twitch-button btn-danger"
+            : "twitch-button"
+        }
         style={{ marginTop: "0.9rem" }}
         onClick={handleSave}
       >

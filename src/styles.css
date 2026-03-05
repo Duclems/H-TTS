@@ -353,7 +353,7 @@ body {
 .token-chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 0.75rem;
   margin-top: 0.3rem;
 }
 
@@ -364,6 +364,13 @@ body {
   background-color: var(--bg-raised);
   color: var(--text);
   border: 1px solid var(--border);
+}
+
+.token-chip.token-chip-danger {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  color: var(--text);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
 }
 
 .error-text {
@@ -671,77 +678,11 @@ body {
   border-color: var(--success);
 }
 
-/* Switch Speaker Boost */
-.reward-voice-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--text);
-  cursor: pointer;
-  user-select: none;
-}
-
-.reward-voice-switch input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.reward-voice-switch-slider {
-  flex-shrink: 0;
-  width: 2.25rem;
-  height: 1.2rem;
-  border-radius: 999px;
-  background-color: var(--border-main);
-  border: 1px solid var(--border);
-  transition: background-color 0.2s, border-color 0.2s;
-  position: relative;
-}
-
-.reward-voice-switch-slider::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: calc(1.2rem - 6px);
-  height: calc(1.2rem - 6px);
-  border-radius: 50%;
-  background-color: var(--text-muted);
-  transition: transform 0.2s;
-}
-
-.reward-voice-switch input:checked + .reward-voice-switch-slider {
-  background-color: var(--switch-main);
-  border-color: var(--switch-main);
-}
-
-.reward-voice-switch input:checked + .reward-voice-switch-slider::after {
-  transform: translateX(calc(2.25rem - 100% - 4px));
-  background-color: var(--text);
-}
-
-.reward-voice-switch input:focus-visible + .reward-voice-switch-slider {
-  box-shadow: 0 0 0 2px var(--switch-main);
-}
-
-.reward-voice-switch input:disabled + .reward-voice-switch-slider {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.reward-voice-switch input:disabled ~ .reward-voice-switch-label {
-  color: var(--text-muted);
-}
-
-.reward-voice-switch-label {
-  color: var(--text);
-}
-
-/* Input test même style que les selects */
+/* Input test même hauteur que le bouton Tester la voix */
 .reward-voice-input.field {
   padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  box-sizing: border-box;
   border-radius: 50px;
   background-color: var(--bg-raised);
   border: 1px solid var(--border-main);

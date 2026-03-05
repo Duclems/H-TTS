@@ -3,10 +3,12 @@ import { TwitchLoginCard } from "./pages/HomePage/TwitchLoginCard";
 import { RewardsCard } from "./pages/HomePage/RewardsCard";
 import { getStoredToken } from "../twitchAuth";
 import { loadElevenLabsConfig } from "../elevenLabsConfig";
-import { fetchElevenUser } from "../elevenLabsApi";
+import { fetchElevenUser, checkElevenPermissions } from "../elevenLabsApi";
 import { SettingsModal } from "./SettingsModal";
 import { TwitchSessionModal } from "./TwitchSessionModal";
 import { AboutModal } from "./AboutModal";
+
+const ELEVEN_CHECK_INTERVAL_MS = 5_000; // vérification des droits ElevenLabs toutes les 60 s
 
 export const App = () => {
   const token = getStoredToken();
@@ -15,6 +17,7 @@ export const App = () => {
   const [twitchOpen, setTwitchOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [isElevenValid, setIsElevenValid] = useState<boolean | null>(null);
+  const [elevenPermissionsOk, setElevenPermissionsOk] = useState<boolean | null>(null);
   const [rewardsTab, setRewardsTab] = useState<"history" | "rewards">("history");
   const [hasMissingRewardVoice, setHasMissingRewardVoice] = useState(false);
   const [elevenCredits, setElevenCredits] = useState<{ remaining: number; limit: number } | null>(
@@ -28,6 +31,7 @@ export const App = () => {
       const trimmed = apiKey.trim();
       if (!trimmed) {
         setIsElevenValid(false);
+        setElevenPermissionsOk(null);
         setElevenCredits(null);
         return;
       }
@@ -46,12 +50,26 @@ export const App = () => {
       } else {
         setElevenCredits(null);
       }
+
+      if (user) {
+        const checks = await checkElevenPermissions();
+        if (!cancelled) {
+          setElevenPermissionsOk(checks.user && checks.voices && checks.tts);
+        }
+      } else {
+        setElevenPermissionsOk(null);
+      }
     };
 
     void checkEleven();
 
+    const intervalId = setInterval(() => {
+      void checkEleven();
+    }, ELEVEN_CHECK_INTERVAL_MS);
+
     return () => {
       cancelled = true;
+      clearInterval(intervalId);
     };
   }, [apiKey]);
 
@@ -66,7 +84,8 @@ export const App = () => {
   };
 
   const isTwitchConnected = !!token;
-  const isFullyLinked = isTwitchConnected && !!isElevenValid;
+  const isFullyLinked =
+    isTwitchConnected && !!isElevenValid && elevenPermissionsOk !== false;
    const hasElevenKey = !!apiKey.trim();
 
   const handleTabChange = (tab: "history" | "rewards") => {
@@ -173,7 +192,7 @@ export const App = () => {
               className={
                 !hasElevenKey
                   ? "header-settings-btn header-settings-btn-eleven-missing"
-                  : isElevenValid === false
+                  : isElevenValid === false || elevenPermissionsOk === false
                     ? "header-settings-btn header-settings-btn-eleven-error"
                     : "header-settings-btn"
               }
@@ -183,8 +202,8 @@ export const App = () => {
                   ? "Paramètres connectés (Twitch et ElevenLabs configurés)"
                   : !hasElevenKey
                     ? "Clé ElevenLabs manquante"
-                    : isElevenValid === false
-                      ? "Clé ElevenLabs invalide"
+                    : isElevenValid === false || elevenPermissionsOk === false
+                      ? "Clé ElevenLabs invalide ou autorisations incomplètes"
                       : "Paramètres ElevenLabs à compléter"
               }
               onClick={() => setSettingsOpen(true)}

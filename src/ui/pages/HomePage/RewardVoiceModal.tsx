@@ -22,7 +22,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const [similarityBoost, setSimilarityBoost] = useState(0.75);
   const [style, setStyle] = useState(0);
   const [speed, setSpeed] = useState(1);
-  const [useSpeakerBoost, setUseSpeakerBoost] = useState(false);
   const [testText, setTestText] = useState("");
   const [saved, setSaved] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
@@ -37,7 +36,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       setSimilarityBoost(existing.similarityBoost);
       setStyle(existing.style);
       setSpeed(existing.speed);
-      setUseSpeakerBoost(existing.useSpeakerBoost);
     } else {
       const def = getDefaultRewardVoiceConfig();
       setVoiceId(def.voiceId);
@@ -46,7 +44,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       setSimilarityBoost(def.similarityBoost);
       setStyle(def.style);
       setSpeed(def.speed);
-      setUseSpeakerBoost(def.useSpeakerBoost);
     }
 
     void (async () => {
@@ -62,7 +59,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     stability,
     similarityBoost,
     style,
-    useSpeakerBoost,
     speed
   });
 
@@ -77,8 +73,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     if (!cfg.voiceId) return;
     void speakWithElevenLabsFromText(testText.trim() || "Test de la voix.", cfg);
   };
-
-  const isV3Model = modelId === "eleven_v3";
 
   const getRangeStyle = (value: number, min: number, max: number): CSSProperties =>
     ({
@@ -296,20 +290,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               </div>
             </div>
 
-            <label className="reward-voice-switch">
-              <input
-                type="checkbox"
-                checked={useSpeakerBoost}
-                onChange={(e) => setUseSpeakerBoost(e.target.checked)}
-                disabled={isV3Model}
-                aria-describedby="rv-speaker-label"
-              />
-              <span className="reward-voice-switch-slider" aria-hidden />
-              <span id="rv-speaker-label" className="reward-voice-switch-label">
-                Speaker Boost {isV3Model && "(non dispo. pour Eleven v3)"}
-              </span>
-            </label>
-
             <div>
               <label htmlFor="rv-test" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
                 Texte de test
@@ -325,7 +305,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               <button
                 type="button"
                 className="twitch-button"
-                style={{ marginTop: "0.4rem" }}
+                style={{ marginTop: "0.75rem" }}
                 onClick={handleTest}
                 disabled={!voiceId.trim()}
               >

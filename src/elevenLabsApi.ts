@@ -78,6 +78,78 @@ export async function fetchElevenVoices(): Promise<ElevenVoice[]> {
 }
 
 /**
+ * Teste la permission Text-to-Speech avec un appel minimal (sans lecture audio).
+ * Utilise la première voix disponible si voiceId non fourni.
+ */
+export async function checkElevenTtsPermission(voiceId?: string): Promise<boolean> {
+  const apiKey = getApiKey();
+  if (!apiKey) return false;
+
+  let vid = voiceId;
+  if (!vid) {
+    const voices = await fetchElevenVoices();
+    if (voices.length === 0) return false;
+    vid = voices[0].voice_id;
+  }
+
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg"
+      },
+      body: JSON.stringify({
+        text: "a",
+        model_id: "eleven_turbo_v2_5",
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    });
+    if (!res.ok) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Erreur HTTP TTS (permission)", res.status, res.statusText);
+      return false;
+    }
+    const blob = await res.blob();
+    return blob.size > 0;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log("[ElevenLabs] Erreur réseau TTS (permission)", e);
+    return false;
+  }
+}
+
+export type ElevenPermissionChecks = {
+  user: boolean;
+  voices: boolean;
+  tts: boolean;
+};
+
+/**
+ * Teste les trois autorisations ElevenLabs (Utilisateur, Voix, Text to Speech).
+ * On ne marque TTS comme invalide que si on a pu le tester (au moins une voix) et qu'il a échoué.
+ * Sans voix on ne peut pas tester le TTS, donc on ne le considère pas comme cassé.
+ */
+export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return { user: false, voices: false, tts: false };
+  }
+
+  const user = await fetchElevenUser();
+  const voices = await fetchElevenVoices();
+  const tts =
+    voices.length > 0 ? await checkElevenTtsPermission(voices[0].voice_id) : true;
+
+  return {
+    user: !!user,
+    voices: voices.length > 0,
+    tts
+  };
+}
+
+/**
  * Lance la synthèse TTS ElevenLabs avec la config voix fournie (par ex. celle du reward).
  * La clé API est toujours lue depuis la config globale (page ElevenLabs).
  */
@@ -101,8 +173,7 @@ export async function speakWithElevenLabsFromText(
     return;
   }
 
-  const { voiceId, modelId, stability, similarityBoost, style, useSpeakerBoost, speed } =
-    voiceConfig;
+  const { voiceId, modelId, stability, similarityBoost, style, speed } = voiceConfig;
 
   try {
     // eslint-disable-next-line no-console
@@ -124,8 +195,7 @@ export async function speakWithElevenLabsFromText(
         voice_settings: {
           stability,
           similarity_boost: similarityBoost,
-          style,
-          use_speaker_boost: useSpeakerBoost
+          style
         },
         generation_config: {
           speed
