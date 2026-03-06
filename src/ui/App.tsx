@@ -97,7 +97,7 @@ export const App = () => {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
       <div className="app-shell-header">
         {isTwitchConnected && rewardsTab === "history" && (
           <div className="app-header-main">
