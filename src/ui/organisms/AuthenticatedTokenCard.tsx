@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import type { TwitchTokenResponse } from "../../../twitchAuth";
-import { clearStoredToken } from "../../../twitchAuth";
-import { fetchCurrentUser, fetchFollowersCount, type TwitchUser } from "../../../twitchApi";
+import type { TwitchTokenResponse } from "../../twitchAuth";
+import { clearStoredToken } from "../../twitchAuth";
+import { fetchCurrentUser, fetchFollowersCount, type TwitchUser } from "../../twitchApi";
 
 const TWITCH_LAST_PROFILE_KEY = "h_tts_twitch_last_profile";
 
@@ -166,4 +166,3 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
     </section>
   );
 };
-

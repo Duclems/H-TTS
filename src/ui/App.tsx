@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { TwitchLoginCard } from "./pages/HomePage/TwitchLoginCard";
-import { RewardsCard } from "./pages/HomePage/RewardsCard";
+import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
+import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken } from "../twitchAuth";
 import { loadElevenLabsConfig } from "../elevenLabsConfig";
 import { fetchElevenUser, checkElevenPermissions } from "../elevenLabsApi";
-import { SettingsModal } from "./SettingsModal";
-import { TwitchSessionModal } from "./TwitchSessionModal";
-import { AboutModal } from "./AboutModal";
+import { SettingsModal } from "./organisms/SettingsModal";
+import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
+import { AboutModal } from "./organisms/AboutModal";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000; // vérification des droits ElevenLabs toutes les 60 s
 

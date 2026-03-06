@@ -1,4 +1,4 @@
-import { ElevenLabsCard } from "../HomePage/ElevenLabsCard";
+import { ElevenLabsCard } from "../../organisms/ElevenLabsCard";
 import { Link } from "react-router-dom";
 export const ElevenLabsSettingsPage = () => {
   return (

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import type { TwitchTokenResponse } from "../../../twitchAuth";
+﻿import { useEffect, useState } from "react";
+import type { TwitchTokenResponse } from "../../twitchAuth";
 import {
   fetchCurrentUser,
   fetchCustomRewards,
@@ -8,15 +8,15 @@ import {
   type TwitchRewardRedemption,
   createCustomReward,
   fetchUserByLogin
-} from "../../../twitchApi";
+} from "../../twitchApi";
 import {
   startTwitchChatLogger,
   addTwitchChatListener,
   type ChatMessageWithEmotes,
   type ParsedEmote
-} from "../../../twitchChat";
-import { speakWithElevenLabsFromText } from "../../../elevenLabsApi";
-import { loadRewardVoiceConfig } from "../../../rewardVoiceConfig";
+} from "../../twitchChat";
+import { speakWithElevenLabsFromText } from "../../elevenLabsApi";
+import { loadRewardVoiceConfig } from "../../rewardVoiceConfig";
 import { RewardVoiceModal } from "./RewardVoiceModal";
 
 type Props = {
@@ -143,7 +143,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
     };
   }, [token.access_token, broadcasterId]);
 
-  // Lecture audio via ElevenLabs des nouvelles redemptions (fenêtre de 10 secondes)
+  // Lecture audio via ElevenLabs des nouvelles redemptions (fenÃªtre de 10 secondes)
   useEffect(() => {
     if (redemptions.length === 0) return;
 
@@ -197,7 +197,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         if (!cleanedText) continue;
 
         // eslint-disable-next-line no-console
-        console.log("[H-TTS] Nouvelle redemption à lire via ElevenLabs", {
+        console.log("[H-TTS] Nouvelle redemption Ã  lire via ElevenLabs", {
           id: redemption.id,
           rewardId: redemption.reward.id,
           user: redemption.user_display_name || redemption.user_login,
@@ -449,7 +449,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
   return (
     <section className="card">
-      {loading && <p className="card-text">Chargement des rewards…</p>}
+      {loading && <p className="card-text">Chargement des rewards</p>}
       {error && <p className="error-text">{error}</p>}
 
       {!loading && (
@@ -463,7 +463,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                 onClick={handleCreateReward}
                 disabled={creating || !broadcasterId}
               >
-                {creating ? "Création du reward…" : "Créer un reward H-TTS"}
+                {creating ? "Création du reward" : "Créer un reward H-TTS"}
               </button>
               {rewards.map((reward) => {
                 const img =
@@ -577,7 +577,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                           </div>
                           <div className="rewards-history-text">
                             <div className="rewards-history-title">
-                              {user} • {r.reward.title}
+                              {user} a {r.reward.title}
                             </div>
                             <div className="rewards-history-meta">
                               {date.toLocaleDateString()} {date.toLocaleTimeString()}

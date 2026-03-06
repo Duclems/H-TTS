@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../../elevenLabsConfig";
-import { fetchElevenUser, checkElevenPermissions } from "../../../elevenLabsApi";
+import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../elevenLabsConfig";
+import { fetchElevenUser, checkElevenPermissions } from "../../elevenLabsApi";
 
 const LAST_ALL_OK_KEY = "h_tts_eleven_last_all_ok";
 const LAST_USER_KEY = "h_tts_eleven_last_user";
@@ -162,7 +162,6 @@ export const ElevenLabsCard = () => {
 
     const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
     if (invalidKey && invalidKey === trimmed) {
-      // On ne retente pas tant que la clé n'a pas changé
       setUserInfo(null);
       saveLastUserInfo(null);
       setLoadingUser(false);

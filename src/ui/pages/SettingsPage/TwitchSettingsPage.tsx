@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { TwitchLoginCard } from "../HomePage/TwitchLoginCard";
-import { AuthenticatedTokenCard } from "../HomePage/AuthenticatedTokenCard";
+import { TwitchLoginCard } from "../../organisms/TwitchLoginCard";
+import { AuthenticatedTokenCard } from "../../organisms/AuthenticatedTokenCard";
 import { getStoredToken } from "../../../twitchAuth";
 export const TwitchSettingsPage = () => {
   const token = getStoredToken();

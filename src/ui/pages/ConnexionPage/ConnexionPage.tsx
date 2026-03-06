@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { TwitchLoginCard } from "../HomePage/TwitchLoginCard";
-import { AuthenticatedTokenCard } from "../HomePage/AuthenticatedTokenCard";
-import { ElevenLabsCard } from "../HomePage/ElevenLabsCard";
+import { TwitchLoginCard } from "../../organisms/TwitchLoginCard";
+import { AuthenticatedTokenCard } from "../../organisms/AuthenticatedTokenCard";
+import { ElevenLabsCard } from "../../organisms/ElevenLabsCard";
 import { getStoredToken } from "../../../twitchAuth";
 
 export const ConnexionPage = () => {

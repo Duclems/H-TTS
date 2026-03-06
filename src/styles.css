@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap");
+/* Police avec support des accents français (à, é, è, œ, æ, etc.) */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%C3%A0%C3%A2%C3%A4%C3%A9%C3%A8%C3%AA%C3%AB%C3%AF%C3%AE%C3%B4%C3%B9%C3%BB%C3%BC%C3%A7%C3%A6%C5%93%C3%80%C3%82%C3%84%C3%89%C3%88%C3%8A%C3%8B%C3%8F%C3%8E%C3%94%C3%99%C3%9B%C3%9C%C3%87%C3%86%C5%92.%2C%3A%3B%21%3F%27%22-%2F%20");
 
 *,
 *::before,

@@ -1,4 +1,4 @@
-import { ElevenLabsCard } from "./pages/HomePage/ElevenLabsCard";
+import { ElevenLabsCard } from "./ElevenLabsCard";
 
 type Props = {
   onClose: () => void;

@@ -5,8 +5,8 @@ import {
   getDefaultRewardVoiceConfig,
   MODEL_OPTIONS,
   type RewardVoiceConfig
-} from "../../../rewardVoiceConfig";
-import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../../elevenLabsApi";
+} from "../../rewardVoiceConfig";
+import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../elevenLabsApi";
 
 type Props = {
   rewardId: string;

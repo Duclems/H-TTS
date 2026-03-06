@@ -1,5 +1,5 @@
-import { AuthenticatedTokenCard } from "./pages/HomePage/AuthenticatedTokenCard";
-import { getStoredToken } from "../twitchAuth";
+import { AuthenticatedTokenCard } from "./AuthenticatedTokenCard";
+import { getStoredToken } from "../../twitchAuth";
 
 type Props = {
   onClose: () => void;
@@ -38,4 +38,3 @@ export const TwitchSessionModal = ({ onClose }: Props) => {
     </div>
   );
 };
-

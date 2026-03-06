@@ -1,4 +1,4 @@
-import { buildTwitchAuthorizeUrl } from "../../../twitchAuth";
+import { buildTwitchAuthorizeUrl } from "../../twitchAuth";
 
 export const TwitchLoginCard = () => {
   const handleLogin = () => {
@@ -24,4 +24,3 @@ export const TwitchLoginCard = () => {
     </section>
   );
 };
-
