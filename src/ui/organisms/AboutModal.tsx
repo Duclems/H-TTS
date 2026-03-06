@@ -1,3 +1,5 @@
+import { ModalHeader } from "../molecules/ModalHeader";
+
 type Props = {
   onClose: () => void;
 };
@@ -12,19 +14,12 @@ export const AboutModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="settings-modal-header">
-          <h2 id="about-modal-title" className="card-title">
-            À propos
-          </h2>
-          <button
-            type="button"
-            className="settings-modal-close"
-            onClick={onClose}
-            aria-label="Fermer"
-          >
-            ✕
-          </button>
-        </div>
+        <ModalHeader
+          titleId="about-modal-title"
+          title="À propos"
+          onClose={onClose}
+          closeVariant="default"
+        />
 
         <div className="settings-modal-body">
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>

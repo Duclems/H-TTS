@@ -1,4 +1,5 @@
 import { ElevenLabsCard } from "./ElevenLabsCard";
+import { ModalHeader } from "../molecules/ModalHeader";
 
 type Props = {
   onClose: () => void;
@@ -14,19 +15,12 @@ export const SettingsModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="settings-modal-header">
-          <h2 id="settings-modal-title" className="card-title">
-            Paramètres ElevenLabs
-          </h2>
-          <button
-            type="button"
-            className="settings-modal-close settings-modal-close-twitch"
-            onClick={onClose}
-            aria-label="Fermer"
-          >
-            <img src="/cross.svg" alt="Fermer" />
-          </button>
-        </div>
+        <ModalHeader
+          titleId="settings-modal-title"
+          title="Paramètres ElevenLabs"
+          onClose={onClose}
+          closeVariant="twitch"
+        />
 
         <div className="settings-modal-body">
           <ElevenLabsCard />

@@ -3,6 +3,10 @@ import type { CSSProperties } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
 import { clearStoredToken } from "../../twitchAuth";
 import { fetchCurrentUser, fetchFollowersCount, type TwitchUser } from "../../twitchApi";
+import { Avatar } from "../atoms/Avatar";
+import { Button } from "../atoms/Button";
+import { Skeleton } from "../atoms/Skeleton";
+import { TokenChipRow } from "../molecules/TokenChipRow";
 
 const TWITCH_LAST_PROFILE_KEY = "h_tts_twitch_last_profile";
 
@@ -99,36 +103,35 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
     window.location.reload();
   };
 
+  const scopeChips = [
+    { label: `Type: ${token.token_type}` },
+    ...token.scope.map((s) => ({ label: s }))
+  ];
+
   return (
     <section className="card">
       {error && <p className="error-text">{error}</p>}
       <div className="eleven-user-header">
-        <div className="eleven-user-avatar">
-          {loading && !user ? (
-            <div className="skeleton skeleton-avatar" />
-          ) : user?.profile_image_url ? (
-            <img src={user.profile_image_url} alt={user.display_name || user.login} />
-          ) : user ? (
-            <span>{(user.display_name || user.login).charAt(0).toUpperCase()}</span>
-          ) : (
-            <div className="skeleton skeleton-avatar" />
-          )}
-        </div>
+        {!user ? (
+          <div className="eleven-user-avatar">
+            <Skeleton variant="avatar" />
+          </div>
+        ) : (
+          <Avatar
+            src={user.profile_image_url}
+            initial={user.display_name || user.login}
+            alt={user.display_name || user.login}
+          />
+        )}
         <div className="eleven-user-meta">
           <div className="eleven-user-name-row">
             {loading && !user ? (
-              <div
-                className="skeleton skeleton-line skeleton-line-main"
-                style={{ "--skeleton-line-height": "10px" } as CSSProperties}
-              />
+              <Skeleton variant="line" lineSize="main" style={{ "--skeleton-line-height": "10px" } as CSSProperties} />
             ) : user ? (
               <div className="eleven-user-name">{user.display_name || user.login}</div>
             ) : null}
             {loading && !user ? (
-              <div
-                className="skeleton skeleton-line skeleton-line-small"
-                style={{ "--skeleton-line-height": "8px" } as CSSProperties}
-              />
+              <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "8px" } as CSSProperties} />
             ) : user && typeof followersCount === "number" ? (
               <div className="eleven-user-followers">
                 • {followersCount.toLocaleString()} followers
@@ -136,33 +139,18 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
             ) : null}
           </div>
           {loading && !user ? (
-            <div
-              className="skeleton skeleton-line skeleton-line-small"
-              style={{ "--skeleton-line-height": "6px" } as CSSProperties}
-            />
+            <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "6px" } as CSSProperties} />
           ) : user ? (
             <div className="eleven-user-credits">@{user.login}</div>
           ) : null}
         </div>
       </div>
 
-      <div className="token-chip-row">
-        <span className="token-chip">Type: {token.token_type}</span>
-        {token.scope.map((s) => (
-          <span key={s} className="token-chip">
-            {s}
-          </span>
-        ))}
-      </div>
+      <TokenChipRow chips={scopeChips} />
 
-      <button
-        type="button"
-        className="twitch-button btn-danger"
-        style={{ marginTop: "0.9rem" }}
-        onClick={handleLogout}
-      >
+      <Button variant="danger" style={{ marginTop: "0.9rem" }} onClick={handleLogout}>
         Déconnexion
-      </button>
+      </Button>
     </section>
   );
 };

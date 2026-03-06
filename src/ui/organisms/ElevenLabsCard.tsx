@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../elevenLabsConfig";
 import { fetchElevenUser, checkElevenPermissions } from "../../elevenLabsApi";
+import { Avatar } from "../atoms/Avatar";
+import { Button } from "../atoms/Button";
+import { FormField } from "../molecules/FormField";
+import { Skeleton } from "../atoms/Skeleton";
+import { TokenChipRow } from "../molecules/TokenChipRow";
+import type { ChipItem } from "../molecules/TokenChipRow";
 
 const LAST_ALL_OK_KEY = "h_tts_eleven_last_all_ok";
 const LAST_USER_KEY = "h_tts_eleven_last_user";
@@ -204,34 +210,48 @@ export const ElevenLabsCard = () => {
     window.localStorage.removeItem("h_tts_eleven_invalid_key");
   };
 
+  const permissionChips: ChipItem[] =
+    userInfo || permissionChecksLoading || hasError || !apiKey.trim()
+      ? [
+          {
+            label: "Text to Speech",
+            danger: hasError || !apiKey.trim() || permissionChecks?.tts === false
+          },
+          {
+            label: "Voix",
+            danger: hasError || !apiKey.trim() || permissionChecks?.voices === false
+          },
+          {
+            label: "Utilisateur",
+            danger: hasError || !apiKey.trim() || permissionChecks?.user === false
+          }
+        ]
+      : [];
+
+  const saveButtonDanger =
+    !apiKey.trim() ||
+    hasError ||
+    (permissionChecks &&
+      (permissionChecks.user === false ||
+        permissionChecks.voices === false ||
+        permissionChecks.tts === false));
+
   return (
     <section className="card">
       {loadingUser && !userInfo && (
         <div className="eleven-user-header">
           <div className="eleven-user-avatar">
-            <div className="skeleton skeleton-avatar" />
+            <Skeleton variant="avatar" />
           </div>
           <div className="eleven-user-meta">
-            <div
-              className="skeleton skeleton-line skeleton-line-main"
-              style={{ "--skeleton-line-height": "10px" } as CSSProperties}
-            />
-            <div
-              className="skeleton skeleton-line skeleton-line-small"
-              style={{ "--skeleton-line-height": "8px" } as CSSProperties}
-            />
+            <Skeleton variant="line" lineSize="main" style={{ "--skeleton-line-height": "10px" } as CSSProperties} />
+            <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "8px" } as CSSProperties} />
           </div>
         </div>
       )}
       {userInfo && (
         <div className="eleven-user-header">
-          <div className="eleven-user-avatar">
-            {userInfo.avatarUrl ? (
-              <img src={userInfo.avatarUrl} alt={userInfo.name} />
-            ) : (
-              <span>{userInfo.name.charAt(0).toUpperCase()}</span>
-            )}
-          </div>
+          <Avatar src={userInfo.avatarUrl} initial={userInfo.name} alt={userInfo.name} />
           <div className="eleven-user-meta">
             <div className="eleven-user-name">{userInfo.name}</div>
             {userInfo.remainingCharacters != null && userInfo.characterLimit != null && (
@@ -265,88 +285,31 @@ export const ElevenLabsCard = () => {
             Sélectionne les champs suivants pour configurer le TTS :
           </p>
 
-          {(userInfo || permissionChecksLoading || hasError || !apiKey.trim()) && (
-            <div className="token-chip-row" style={{ marginTop: "0.4rem" }}>
-              <span
-                className={
-                  hasError || !apiKey.trim()
-                    ? "token-chip token-chip-danger"
-                    : permissionChecksLoading
-                      ? "token-chip"
-                      : permissionChecks?.tts === false
-                        ? "token-chip token-chip-danger"
-                        : "token-chip"
-                }
-              >
-                Text to Speech
-              </span>
-              <span
-                className={
-                  hasError || !apiKey.trim()
-                    ? "token-chip token-chip-danger"
-                    : permissionChecksLoading
-                      ? "token-chip"
-                      : permissionChecks?.voices === false
-                        ? "token-chip token-chip-danger"
-                        : "token-chip"
-                }
-              >
-                Voix
-              </span>
-              <span
-                className={
-                  hasError || !apiKey.trim()
-                    ? "token-chip token-chip-danger"
-                    : permissionChecksLoading
-                      ? "token-chip"
-                      : permissionChecks?.user === false
-                        ? "token-chip token-chip-danger"
-                        : "token-chip"
-                }
-              >
-                Utilisateur
-              </span>
-            </div>
+          {permissionChips.length > 0 && (
+            <TokenChipRow chips={permissionChips} style={{ marginTop: "0.4rem" }} />
           )}
         </>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
-        <div>
-          <label
-            htmlFor="eleven-api-key"
-            style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}
-          >
-            Clé API ElevenLabs
-          </label>
-          <input
-            id="eleven-api-key"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk_..."
-            className={hasError ? "field field-error" : "field"}
-          />
-        </div>
+        <FormField
+          id="eleven-api-key"
+          label="Clé API ElevenLabs"
+          type="password"
+          value={apiKey}
+          onChange={setApiKey}
+          placeholder="sk_..."
+          error={hasError}
+        />
       </div>
 
-      <button
-        type="button"
-        className={
-          !apiKey.trim() ||
-          hasError ||
-          (permissionChecks &&
-            (permissionChecks.user === false ||
-              permissionChecks.voices === false ||
-              permissionChecks.tts === false))
-            ? "twitch-button btn-danger"
-            : "twitch-button"
-        }
+      <Button
+        variant={saveButtonDanger ? "danger" : "primary"}
         style={{ marginTop: "0.9rem" }}
         onClick={handleSave}
       >
         Sauvegarder
-      </button>
+      </Button>
 
       {saved && (
         <p className="card-text text-success" style={{ marginTop: "0.4rem" }}>

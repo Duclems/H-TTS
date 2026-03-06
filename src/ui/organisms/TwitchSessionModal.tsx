@@ -1,5 +1,6 @@
 import { AuthenticatedTokenCard } from "./AuthenticatedTokenCard";
 import { getStoredToken } from "../../twitchAuth";
+import { ModalHeader } from "../molecules/ModalHeader";
 
 type Props = {
   onClose: () => void;
@@ -17,19 +18,12 @@ export const TwitchSessionModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="settings-modal-header">
-          <h2 id="twitch-session-modal-title" className="card-title">
-            Connexion Twitch
-          </h2>
-          <button
-            type="button"
-            className="settings-modal-close settings-modal-close-twitch"
-            onClick={onClose}
-            aria-label="Fermer"
-          >
-            <img src="/cross.svg" alt="Fermer" />
-          </button>
-        </div>
+        <ModalHeader
+          titleId="twitch-session-modal-title"
+          title="Connexion Twitch"
+          onClose={onClose}
+          closeVariant="twitch"
+        />
 
         <div className="settings-modal-body">
           {token && <AuthenticatedTokenCard token={token} />}

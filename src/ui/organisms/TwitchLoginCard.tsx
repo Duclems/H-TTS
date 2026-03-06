@@ -1,4 +1,6 @@
 import { buildTwitchAuthorizeUrl } from "../../twitchAuth";
+import { Button } from "../atoms/Button";
+import { CardTitle } from "../atoms/CardTitle";
 
 export const TwitchLoginCard = () => {
   const handleLogin = () => {
@@ -8,7 +10,7 @@ export const TwitchLoginCard = () => {
 
   return (
     <section className="card">
-      <div className="card-title">Connexion à Twitch</div>
+      <CardTitle>Connexion à Twitch</CardTitle>
       <p className="card-text">
         Cette application utilise le{" "}
         <span className="pill">
@@ -18,9 +20,9 @@ export const TwitchLoginCard = () => {
         de Twitch avec uniquement ton <code>client_id</code> (aucun secret côté client).
       </p>
 
-      <button type="button" className="twitch-button" onClick={handleLogin}>
+      <Button variant="primary" onClick={handleLogin}>
         Se connecter avec Twitch
-      </button>
+      </Button>
     </section>
   );
 };

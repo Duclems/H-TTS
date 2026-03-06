@@ -7,6 +7,8 @@ import {
   type RewardVoiceConfig
 } from "../../rewardVoiceConfig";
 import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../elevenLabsApi";
+import { Button } from "../atoms/Button";
+import { ModalHeader } from "../molecules/ModalHeader";
 
 type Props = {
   rewardId: string;
@@ -95,19 +97,12 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
           setModelOpen(false);
         }}
       >
-        <div className="settings-modal-header">
-          <h2 id="reward-voice-modal-title" className="card-title">
-            Voix TTS • {rewardTitle}
-          </h2>
-          <button
-            type="button"
-            className="settings-modal-close settings-modal-close-twitch"
-            onClick={onClose}
-            aria-label="Fermer"
-          >
-            <img src="/cross.svg" alt="Fermer" />
-          </button>
-        </div>
+        <ModalHeader
+          titleId="reward-voice-modal-title"
+          title={`Voix TTS • ${rewardTitle}`}
+          onClose={onClose}
+          closeVariant="twitch"
+        />
 
         <div className="reward-voice-modal-body">
           <div className="reward-voice-modal-fields">
@@ -302,23 +297,22 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                 placeholder="Saisis un texte pour tester…"
                 className="field reward-voice-input"
               />
-              <button
-                type="button"
-                className="twitch-button"
+              <Button
+                variant="primary"
                 style={{ marginTop: "0.75rem" }}
                 onClick={handleTest}
                 disabled={!voiceId.trim()}
               >
                 Tester la voix
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
         <div className="reward-voice-modal-footer">
-          <button type="button" className="twitch-button" onClick={handleSave}>
+          <Button variant="primary" onClick={handleSave}>
             Enregistrer
-          </button>
+          </Button>
           {saved && (
             <span className="card-text text-success">
               Enregistré.
