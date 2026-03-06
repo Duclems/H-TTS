@@ -1,0 +1,231 @@
+/* Atoms – éléments de base réutilisables */
+
+/* Cartes (titres / textes) */
+.card {
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Bouton principal (Twitch, CTA) */
+.twitch-button {
+  margin-top: 0.9rem;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-raised);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.twitch-button:hover {
+  background-color: var(--bg-hover);
+  color: var(--text);
+}
+
+.twitch-button:active {
+  background-color: var(--bg-hover);
+  color: var(--text);
+}
+
+.twitch-button.btn-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: var(--text);
+}
+
+.twitch-button.btn-danger:hover {
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
+  color: var(--text);
+}
+
+.twitch-button-voice-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
+}
+
+.twitch-button-voice-error:hover {
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+/* Pills / badges */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(201, 162, 39, 0.4);
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* Token chip (atome) */
+.token-chip {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background-color: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.token-chip.token-chip-danger {
+  border-color: var(--danger);
+  background-color: var(--danger);
+  color: var(--text);
+  animation: eleven-error-pulse 1.4s ease-in-out infinite;
+}
+
+.error-text {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.text-success {
+  color: var(--success);
+}
+
+/* Panels et champs (inputs) */
+.panel {
+  padding: 0.75rem 0.75rem;
+  border-radius: 0.9rem;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border);
+}
+
+.field {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: 50px;
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+#eleven-api-key.field {
+  padding: 0.7rem 0.9rem;
+  border-radius: 50px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-main);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+#eleven-api-key.field:focus {
+  border-color: var(--success);
+}
+
+.field-error {
+  border-color: var(--danger);
+  background-color: var(--danger);
+}
+
+#eleven-api-key.field.field-error {
+  border-color: var(--danger-hover);
+  background-color: var(--danger);
+}
+
+.field::placeholder {
+  color: var(--text-muted);
+}
+
+/* Nav button */
+.nav-button {
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background-color: transparent;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background-color: var(--bg-hover);
+  color: var(--text);
+  border-color: rgba(252, 252, 252, 0.2);
+}
+
+/* Skeletons */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-main),
+    transparent
+  );
+  animation: skeleton-shimmer 1.2s infinite;
+}
+
+.skeleton-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.skeleton-line {
+  border-radius: 999px;
+  height: var(--skeleton-line-height, 8px);
+}
+
+.skeleton-line-main {
+  width: 120px;
+  margin-bottom: 4px;
+}
+
+.skeleton-line-small {
+  width: 80px;
+}
+
+/* Token info (texte secondaire) */
+.token-info {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.token-info small {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.9;
+}

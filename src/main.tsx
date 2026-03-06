@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { App } from "./ui/App";
 import { AuthCallbackPage } from "./ui/pages/AuthCallbackPage/AuthCallbackPage";
-import "./styles.css";
+import "./styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
