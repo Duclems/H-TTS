@@ -35,17 +35,11 @@ export async function fetchElevenUser(): Promise<ElevenUser | null> {
       }
     });
 
-    if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Erreur HTTP sur /v1/user", res.status, res.statusText);
-      return null;
-    }
+    if (!res.ok) return null;
 
     const json = (await res.json()) as ElevenUser;
     return json;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Erreur réseau sur /v1/user", e);
+  } catch {
     return null;
   }
 }
@@ -62,17 +56,11 @@ export async function fetchElevenVoices(): Promise<ElevenVoice[]> {
       }
     });
 
-    if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Erreur HTTP sur /v2/voices", res.status, res.statusText);
-      return [];
-    }
+    if (!res.ok) return [];
 
     const json = (await res.json()) as { voices?: ElevenVoice[] };
     return json.voices ?? [];
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Erreur réseau sur /v2/voices", e);
+  } catch {
     return [];
   }
 }
@@ -106,16 +94,10 @@ export async function checkElevenTtsPermission(voiceId?: string): Promise<boolea
         voice_settings: { stability: 0.5, similarity_boost: 0.75 }
       })
     });
-    if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Erreur HTTP TTS (permission)", res.status, res.statusText);
-      return false;
-    }
+    if (!res.ok) return false;
     const blob = await res.blob();
     return blob.size > 0;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Erreur réseau TTS (permission)", e);
+  } catch {
     return false;
   }
 }
@@ -127,9 +109,8 @@ export type ElevenPermissionChecks = {
 };
 
 /**
- * Teste les trois autorisations ElevenLabs (Utilisateur, Voix, Text to Speech).
- * On ne marque TTS comme invalide que si on a pu le tester (au moins une voix) et qu'il a échoué.
- * Sans voix on ne peut pas tester le TTS, donc on ne le considère pas comme cassé.
+ * Vérifie les autorisations ElevenLabs (Utilisateur, Voix).
+ * On ne fait pas d'appel TTS de test pour éviter les 402 (Payment Required) en console.
  */
 export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> {
   const apiKey = getApiKey();
@@ -139,13 +120,12 @@ export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> 
 
   const user = await fetchElevenUser();
   const voices = await fetchElevenVoices();
-  const tts =
-    voices.length > 0 ? await checkElevenTtsPermission(voices[0].voice_id) : true;
+  const hasVoices = voices.length > 0;
 
   return {
     user: !!user,
-    voices: voices.length > 0,
-    tts
+    voices: hasVoices,
+    tts: hasVoices
   };
 }
 

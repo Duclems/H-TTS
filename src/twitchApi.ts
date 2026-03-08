@@ -84,16 +84,11 @@ export async function fetchUserByLogin(
   accessToken: string,
   login: string
 ): Promise<TwitchUser | null> {
-  const params = new URLSearchParams({
-    login
-  });
-
+  const params = new URLSearchParams({ login });
   const res = await fetch(`https://api.twitch.tv/helix/users?${params.toString()}`, {
     headers: buildAuthHeaders(accessToken)
   });
-
   if (!res.ok) return null;
-
   const body = (await res.json()) as HelixResponse<TwitchUser>;
   return body.data[0] ?? null;
 }
@@ -198,3 +193,4 @@ export async function createCustomReward(
   const body = (await res.json()) as HelixResponse<TwitchCustomReward>;
   return body.data[0] ?? null;
 }
+

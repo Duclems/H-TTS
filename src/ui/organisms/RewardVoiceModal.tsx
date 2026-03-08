@@ -9,6 +9,7 @@ import {
 import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../elevenLabsApi";
 import { Button } from "../atoms/Button";
 import { ModalHeader } from "../molecules/ModalHeader";
+import { useToast } from "../context/ToastContext";
 
 type Props = {
   rewardId: string;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
+  const { addToast } = useToast();
   const [voiceId, setVoiceId] = useState("");
   const [voices, setVoices] = useState<{ voice_id: string; name: string }[]>([]);
   const [modelId, setModelId] = useState("eleven_turbo_v2_5");
@@ -25,7 +27,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const [style, setStyle] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [testText, setTestText] = useState("");
-  const [saved, setSaved] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
 
@@ -66,8 +67,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
   const handleSave = () => {
     saveRewardVoiceConfig(rewardId, getConfig());
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 1000);
+    addToast("Enregistré.");
   };
 
   const handleTest = () => {
@@ -313,11 +313,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
           <Button variant="primary" onClick={handleSave}>
             Enregistrer
           </Button>
-          {saved && (
-            <span className="card-text text-success">
-              Enregistré.
-            </span>
-          )}
         </div>
       </div>
     </div>

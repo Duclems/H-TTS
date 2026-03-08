@@ -229,3 +229,21 @@
   color: var(--text-muted);
   opacity: 0.9;
 }
+
+/* Toast (atome) – cadre de notification */
+.toast {
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast--success {
+  border-color: var(--success);
+  background-color: var(--saved);
+  color: var(--text);
+}

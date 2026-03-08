@@ -4,11 +4,12 @@ import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken } from "../twitchAuth";
 import { loadElevenLabsConfig } from "../elevenLabsConfig";
 import { fetchElevenUser, checkElevenPermissions } from "../elevenLabsApi";
+import { ToastProvider } from "./context/ToastContext";
 import { SettingsModal } from "./organisms/SettingsModal";
 import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
 import { AboutModal } from "./organisms/AboutModal";
 
-const ELEVEN_CHECK_INTERVAL_MS = 10_000; // vérification des droits ElevenLabs toutes les 60 s
+const ELEVEN_CHECK_INTERVAL_MS = 10_000;
 
 export const App = () => {
   const token = getStoredToken();
@@ -43,7 +44,7 @@ export const App = () => {
       const hasCreditsInfo =
         !!sub && typeof sub.character_limit === "number" && typeof sub.character_count === "number";
 
-      setIsElevenValid(hasCreditsInfo);
+      setIsElevenValid(!!user && hasCreditsInfo);
       if (hasCreditsInfo && sub) {
         const remaining = Math.max(0, sub.character_limit - sub.character_count);
         setElevenCredits({ remaining, limit: sub.character_limit });
@@ -86,7 +87,9 @@ export const App = () => {
   const isTwitchConnected = !!token;
   const isFullyLinked =
     isTwitchConnected && !!isElevenValid && elevenPermissionsOk !== false;
-   const hasElevenKey = !!apiKey.trim();
+  const hasElevenKey = !!apiKey.trim();
+  const showElevenError =
+    !hasElevenKey || isElevenValid === false || elevenPermissionsOk === false;
 
   const handleTabChange = (tab: "history" | "rewards") => {
     setRewardsTab(tab);
@@ -97,6 +100,7 @@ export const App = () => {
   };
 
   return (
+    <ToastProvider>
     <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
       <div className="app-shell-header">
         {isTwitchConnected && rewardsTab === "history" && (
@@ -192,7 +196,7 @@ export const App = () => {
               className={
                 !hasElevenKey
                   ? "header-settings-btn header-settings-btn-eleven-missing"
-                  : isElevenValid === false || elevenPermissionsOk === false
+                  : showElevenError
                     ? "header-settings-btn header-settings-btn-eleven-error"
                     : "header-settings-btn"
               }
@@ -202,7 +206,7 @@ export const App = () => {
                   ? "Paramètres connectés (Twitch et ElevenLabs configurés)"
                   : !hasElevenKey
                     ? "Clé ElevenLabs manquante"
-                    : isElevenValid === false || elevenPermissionsOk === false
+                    : showElevenError
                       ? "Clé ElevenLabs invalide ou autorisations incomplètes"
                       : "Paramètres ElevenLabs à compléter"
               }
@@ -230,6 +234,7 @@ export const App = () => {
       {twitchOpen && <TwitchSessionModal onClose={() => setTwitchOpen(false)} />}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
     </div>
+    </ToastProvider>
   );
 };
 
