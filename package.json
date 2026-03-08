@@ -25,11 +25,14 @@
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "concurrently": "^8.2.0",
-    "electron": "^31.0.0",
-    "electron-builder": "^24.13.3",
+    "electron": "^35.7.5",
+    "electron-builder": "^26.8.1",
     "typescript": "^5.6.0",
-    "vite": "^5.0.0",
+    "vite": "^5.4.0",
     "wait-on": "^7.2.0"
+  },
+  "overrides": {
+    "esbuild": ">=0.24.3"
   },
   "build": {
     "appId": "com.h-tts.app",
