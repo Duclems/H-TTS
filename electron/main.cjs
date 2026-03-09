@@ -37,13 +37,6 @@ function createWindow() {
     win.hide();
   });
 
-  win.on("close", (event) => {
-    if (!app.isQuiting) {
-      event.preventDefault();
-      win.hide();
-    }
-  });
-
   // Ouvre tous les liens externes (target=_blank / window.open) dans le navigateur par défaut
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
