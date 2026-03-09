@@ -14,12 +14,7 @@ export const AboutModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader
-          titleId="about-modal-title"
-          title="À propos"
-          onClose={onClose}
-          closeVariant="default"
-        />
+        <ModalHeader titleId="about-modal-title" title="À propos" onClose={onClose} />
 
         <div className="settings-modal-body">
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>

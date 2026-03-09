@@ -18,12 +18,7 @@ export const TwitchSessionModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader
-          titleId="twitch-session-modal-title"
-          title="Connexion Twitch"
-          onClose={onClose}
-          closeVariant="twitch"
-        />
+        <ModalHeader titleId="twitch-session-modal-title" title="Connexion Twitch" onClose={onClose} />
 
         <div className="settings-modal-body">
           {token && <AuthenticatedTokenCard token={token} />}

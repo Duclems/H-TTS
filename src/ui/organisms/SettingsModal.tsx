@@ -15,12 +15,7 @@ export const SettingsModal = ({ onClose }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader
-          titleId="settings-modal-title"
-          title="Paramètres ElevenLabs"
-          onClose={onClose}
-          closeVariant="twitch"
-        />
+        <ModalHeader titleId="settings-modal-title" title="Paramètres ElevenLabs" onClose={onClose} />
 
         <div className="settings-modal-body">
           <ElevenLabsCard />

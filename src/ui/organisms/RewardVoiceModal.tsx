@@ -151,7 +151,6 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
           titleId="reward-voice-modal-title"
           title={`Voix TTS • ${rewardTitle}`}
           onClose={onClose}
-          closeVariant="twitch"
         />
 
         <div className="reward-voice-modal-body">
