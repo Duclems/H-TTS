@@ -196,14 +196,16 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
         if (!cleanedText) continue;
 
-        // eslint-disable-next-line no-console
-        console.log("[H-TTS] Nouvelle redemption Ã  lire via ElevenLabs", {
-          id: redemption.id,
-          rewardId: redemption.reward.id,
-          user: redemption.user_display_name || redemption.user_login,
-          rawText: redemption.user_input,
-          cleanedText
-        });
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log("[HI-TTS] Nouvelle redemption à lire via ElevenLabs", {
+            id: redemption.id,
+            rewardId: redemption.reward.id,
+            user: redemption.user_display_name || redemption.user_login,
+            rawText: redemption.user_input,
+            cleanedText
+          });
+        }
 
         void speakWithElevenLabsFromText(cleanedText, voiceConfig);
       }

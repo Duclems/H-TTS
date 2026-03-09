@@ -125,7 +125,7 @@ export const App = () => {
         {isTwitchConnected && rewardsTab === "rewards" && (
           <div className="app-header-main">
             <div className="app-header-main-top">
-              <div className="app-title">Création de rewards</div>
+              <div className="app-title">Gestion des rewards</div>
               {elevenCredits && (
                 <div className="app-header-credits">
                   Crédits restants :{" "}
@@ -135,7 +135,9 @@ export const App = () => {
                 </div>
               )}
             </div>
-            <p className="app-subtitle">Permet de créer un reward pour faire fonctionner le TTS.</p>
+            <p className="app-subtitle">
+              Crée et paramètrer ici vos rewards HI-TTS utilisés pour déclencher le TTS sur ton stream.
+            </p>
           </div>
         )}
       </div>

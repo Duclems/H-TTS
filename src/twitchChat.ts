@@ -1,5 +1,7 @@
 import tmi from "tmi.js";
 
+const IS_DEV = import.meta.env.DEV;
+
 // On tape en any pour rester compatible avec le runtime tmi.js côté navigateur/Electron
 // sans dépendre des typings externes.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,8 +113,10 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
       timestamp: Date.now()
     };
 
-    // eslint-disable-next-line no-console
-    console.log("[HI-TTS][IRC]", payload);
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[HI-TTS][IRC]", payload);
+    }
 
     for (const listener of listeners) {
       listener(payload);
@@ -122,12 +126,16 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
   client
     .connect()
     .then(() => {
-      // eslint-disable-next-line no-console
-      console.log(`[HI-TTS][IRC] Connecté au chat Twitch pour #${username}`);
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.log(`[HI-TTS][IRC] Connecté au chat Twitch pour #${username}`);
+      }
     })
     .catch((err: unknown) => {
-      // eslint-disable-next-line no-console
-      console.warn("[HI-TTS][IRC] Échec de connexion au chat Twitch", err);
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.warn("[HI-TTS][IRC] Échec de connexion au chat Twitch", err);
+      }
     });
 }
 

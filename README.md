@@ -128,12 +128,3 @@ Dans ce cas :
 - Le token est stocké dans `localStorage` pour simplicité de démo ; pour une vraie app en prod, réfléchis aux risques (XSS, etc.) et éventuellement déplace la logique sensible côté backend.
 
 
-
-Idées de systèmes d’auto‑update possibles (pour plus tard)
-Sans rentrer dans le code, voici les options classiques si tu veux un jour ajouter une mise à jour automatique :
-
-electron-updater + GitHub Releases
-
-Le plus courant : tu publies chaque nouvelle version en .exe / .zip sur GitHub Releases.
-L’app vérifie périodiquement (autoUpdater.checkForUpdates) et télécharge la nouvelle version si disponible, puis propose de redémarrer.
-Avantage : peu d’infra, tout passe par GitHub.

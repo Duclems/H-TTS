@@ -140,6 +140,8 @@ export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> 
  * Lance la synthèse TTS ElevenLabs avec la config voix fournie (par ex. celle du reward).
  * La clé API est toujours lue depuis la config globale (page ElevenLabs).
  */
+const IS_DEV = import.meta.env.DEV;
+
 export type ElevenTtsResult = {
   ok: boolean;
   status?: number;
@@ -154,26 +156,32 @@ export async function speakWithElevenLabsFromText(
 
   const apiKey = getApiKey();
   if (!apiKey) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Clé API manquante, aucun appel effectué.");
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Clé API manquante, aucun appel effectué.");
+    }
     return { ok: false };
   }
 
   if (!voiceConfig?.voiceId) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Aucune voix configurée pour ce reward, TTS ignoré.");
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Aucune voix configurée pour ce reward, TTS ignoré.");
+    }
     return { ok: false };
   }
 
   const { voiceId, modelId, stability, similarityBoost, style, speed } = voiceConfig;
 
   try {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Envoi du texte à ElevenLabs…", {
-      voiceId,
-      modelId,
-      text: trimmed
-    });
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Envoi du texte à ElevenLabs…", {
+        voiceId,
+        modelId,
+        text: trimmed
+      });
+    }
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: "POST",
       headers: {
@@ -196,29 +204,39 @@ export async function speakWithElevenLabsFromText(
     });
 
     if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Erreur HTTP", res.status, res.statusText);
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[ElevenLabs] Erreur HTTP", res.status, res.statusText);
+      }
       return { ok: false, status: res.status };
     }
 
     const blob = await res.blob();
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Audio reçu, taille:", blob.size);
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Audio reçu, taille:", blob.size);
+    }
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
     audio.onended = () => {
       URL.revokeObjectURL(url);
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Lecture audio terminée.");
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[ElevenLabs] Lecture audio terminée.");
+      }
     };
     await audio.play().catch((err) => {
-      // eslint-disable-next-line no-console
-      console.log("[ElevenLabs] Impossible de lancer la lecture audio", err);
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[ElevenLabs] Impossible de lancer la lecture audio", err);
+      }
     });
     return { ok: true, status: res.status };
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log("[ElevenLabs] Erreur réseau ou inattendue", e);
+    if (IS_DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[ElevenLabs] Erreur réseau ou inattendue", e);
+    }
     return { ok: false };
   }
 }

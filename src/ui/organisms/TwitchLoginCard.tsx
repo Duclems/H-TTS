@@ -19,7 +19,13 @@ export const TwitchLoginCard = () => {
         Se connecter avec Twitch
       </Button>
       <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.6rem", opacity: 0.8 }}>
-        Le token Twitch est stocké l'application. Ne le partage jamais.
+        HI-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans
+        l&apos;application pour ton usage personnel uniquement et n&apos;est envoyé qu&apos;à Twitch. Ne le
+        partage jamais.
+      </p>
+      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.2rem", opacity: 0.8 }}>
+        Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans &laquo; À propos
+        &raquo; &gt; Politique de confidentialité.
       </p>
     </section>
   );
