@@ -1,0 +1,39 @@
+<svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0 0 400 400">
+  <style>
+    :root {
+      --color: #F3F0E7;
+    }
+  </style>
+
+  <g id="svgg">
+    <path id="path0" d="M107.724 41.220 C 47.285 52.695,20.384 120.645,56.424 170.800 C 69.226 188.615,69.338 211.090,56.717 229.456 C 32.200 265.133,35.845 308.675,65.739 337.235 C 94.651 364.857,140.184 367.436,171.564 343.228 C 185.871 332.191,212.497 331.624,226.991 342.048 C 245.001 354.999,262.608 360.649,282.000 359.698 C 348.675 356.428,383.091 280.190,341.845 227.132 C 330.349 212.345,331.212 187.882,343.848 170.305 C 374.202 128.084,359.503 70.390,312.695 48.030 C 286.295 35.419,253.906 38.359,230.653 55.477 C 213.257 68.283,188.077 68.477,170.112 55.942 C 151.594 43.022,127.804 37.408,107.724 41.220 M218.573 103.235 C 299.399 119.707,326.501 220.372,264.643 274.358 C 213.827 318.708,132.449 298.938,108.401 236.400 C 80.415 163.622,143.101 87.855,218.573 103.235"
+      stroke="none"
+      fill="var(--color)"
+      fill-rule="evenodd" />
+  </g>
+
+  <rect width="20" height="110" x="155" y="145" rx="15" ry="10" fill="var(--color)">
+    <animate attributeName="height" values="110;60;110" dur="1.2s" begin="0s" repeatCount="indefinite" />
+    <animate attributeName="y" values="145;170;145" dur="1.2s" begin="0s" repeatCount="indefinite" />
+  </rect>
+
+  <rect width="20" height="70" x="120" y="165" rx="15" ry="10" fill="var(--color)">
+    <animate attributeName="height" values="70;35;70" dur="1.2s" begin="0.12s" repeatCount="indefinite" />
+    <animate attributeName="y" values="165;182.5;165" dur="1.2s" begin="0.12s" repeatCount="indefinite" />
+  </rect>
+
+  <rect width="20" height="150" x="190" y="125" rx="15" ry="10" fill="var(--color)">
+    <animate attributeName="height" values="150;80;150" dur="1.2s" begin="0.24s" repeatCount="indefinite" />
+    <animate attributeName="y" values="125;160;125" dur="1.2s" begin="0.24s" repeatCount="indefinite" />
+  </rect>
+
+  <rect width="20" height="110" x="225" y="145" rx="15" ry="10" fill="var(--color)">
+    <animate attributeName="height" values="110;60;110" dur="1.2s" begin="0.36s" repeatCount="indefinite" />
+    <animate attributeName="y" values="145;170;145" dur="1.2s" begin="0.36s" repeatCount="indefinite" />
+  </rect>
+
+  <rect width="20" height="70" x="260" y="165" rx="15" ry="10" fill="var(--color)">
+    <animate attributeName="height" values="70;35;70" dur="1.2s" begin="0.48s" repeatCount="indefinite" />
+    <animate attributeName="y" values="165;182.5;165" dur="1.2s" begin="0.48s" repeatCount="indefinite" />
+  </rect>
+</svg>

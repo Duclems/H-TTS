@@ -10,6 +10,10 @@ let tray = null;
 let mainWindow = null;
 
 function createWindow() {
+  const iconPath = isDev
+    ? path.join(__dirname, "..", "public", "logos", "hi-tts-ico.ico")
+    : path.join(__dirname, "..", "dist", "logos", "hi-tts-ico.ico");
+
   const win = new BrowserWindow({
     width: 450,
     height: 450,
@@ -17,7 +21,8 @@ function createWindow() {
     minHeight: 450,
     maxWidth: 450,
     maxHeight: 450,
-    title: "HI-TTS - Twitch Desktop",
+    title: "HI-TTS",
+    icon: iconPath,
     backgroundColor: "#1e130b",
     webPreferences: {
       nodeIntegration: false,
@@ -77,10 +82,12 @@ app.whenReady().then(() => {
   createWindow();
 
   // Icône de zone de notification (tray)
-  const trayIcon = nativeImage.createEmpty();
-  trayIcon.resize({ width: 16, height: 16 });
+  const trayIconPath = isDev
+    ? path.join(__dirname, "..", "public", "logos", "hi-tts-ico.ico")
+    : path.join(__dirname, "..", "dist", "logos", "hi-tts-ico.ico");
+  const trayIcon = nativeImage.createFromPath(trayIconPath);
   tray = new Tray(trayIcon);
-  tray.setToolTip("HI-TTS - Twitch Desktop");
+  tray.setToolTip("HI-TTS");
 
   const contextMenu = Menu.buildFromTemplate([
     {

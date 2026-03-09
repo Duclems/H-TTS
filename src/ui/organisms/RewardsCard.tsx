@@ -451,7 +451,24 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
   return (
     <section className="card">
-      {loading && <p className="card-text">Chargement des rewards</p>}
+      {loading && !error && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2.2rem 1rem 1.6rem",
+            gap: "0.6rem"
+          }}
+        >
+          <img
+            src="/logos/hi-tts-animated.svg"
+            alt="Chargement HI-TTS"
+            style={{ width: "112px", height: "112px", opacity: 0.95 }}
+          />
+        </div>
+      )}
       {error && <p className="error-text">{error}</p>}
 
       {!loading && (
@@ -467,6 +484,37 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
               >
                 {creating ? "Création du reward" : "Créer un reward HI-TTS"}
               </button>
+
+              {!creating && rewards.length === 0 && (
+                <div
+                  style={{
+                    marginTop: "1.2rem",
+                    borderRadius: "0.9rem",
+                    padding: "1.2rem 0.9rem",
+                    border: "1px dashed var(--border)",
+                    backgroundColor: "rgba(10, 5, 4, 0.9)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.6rem"
+                  }}
+                >
+                  <img
+                    src="/logos/hi-tts-animated.svg"
+                    alt="Animation HI-TTS"
+                    style={{ width: "104px", height: "104px"}}
+                  />
+                  <p
+                    className="card-text"
+                    style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}
+                  >
+                    Aucun reward HI-TTS pour le moment. Crée ton premier reward pour commencer à
+                    déclencher le TTS sur ton stream.
+                  </p>
+                </div>
+              )}
+
               {rewards.map((reward) => {
                 const img =
                   reward.image?.url_2x ??
@@ -541,25 +589,33 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           {activeTab === "history" && (
             <>
               <div className="rewards-history-container">
-                {loading && visibleRedemptions.length === 0 && (
-                  <>
-                    {[1, 2, 3].map((id) => (
-                      <div key={id} className="panel rewards-history-item">
-                        <div className="rewards-history-item-main">
-                          <div className="rewards-history-avatar">
-                            <div className="skeleton skeleton-avatar" />
-                          </div>
-                          <div className="rewards-history-text">
-                            <div className="skeleton skeleton-line skeleton-line-main" />
-                            <div className="skeleton skeleton-line skeleton-line-small" />
-                          </div>
-                        </div>
-                        <p className="rewards-history-message">
-                          <span className="skeleton skeleton-line skeleton-line-main" />
-                        </p>
-                      </div>
-                    ))}
-                  </>
+                {!loading && visibleRedemptions.length === 0 && (
+                  <div
+                    style={{
+                      borderRadius: "0.9rem",
+                      padding: "1.4rem 1rem",
+                      border: "1px dashed var(--border)",
+                      backgroundColor: "rgba(10, 5, 4, 0.9)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.6rem"
+                    }}
+                  >
+                    <img
+                      src="/logos/hi-tts-animated.svg"
+                      alt="Animation HI-TTS"
+                      style={{ width: "104px", height: "104px", opacity: 0.9 }}
+                    />
+                    <p
+                      className="card-text"
+                      style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}
+                    >
+                      Dès qu’un viewer utilise un reward
+                      HI-TTS,<br/> il apparaîtra ici
+                    </p>
+                  </div>
                 )}
 
                 {!loading &&

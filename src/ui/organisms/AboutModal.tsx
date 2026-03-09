@@ -20,8 +20,8 @@ export const AboutModal = ({ onClose }: Props) => {
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
             <div
               style={{
-                width: 40,
-                height: 40,
+                width: 56,
+                height: 56,
                 borderRadius: "50%",
                 backgroundColor: "var(--bg-hover)",
                 display: "flex",
@@ -31,9 +31,9 @@ export const AboutModal = ({ onClose }: Props) => {
               }}
             >
               <img
-                src="/settings.svg"
-                alt="settings"
-                style={{ width: 28, height: 28, display: "block", filter: "brightness(1)" }}
+                src="/logos/hi-tts-animated.svg"
+                alt="HI-TTS"
+                style={{ width: 42, height: 42, display: "block" }}
               />
             </div>
             <div>
