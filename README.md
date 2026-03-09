@@ -69,24 +69,29 @@ Organisation simplifiée (**Atomik/Atomic Design**) :
 src/
   config.ts                -> Lecture des variables d'env (client_id, scopes, redirect_uri)
   twitchAuth.ts            -> Logique OAuth Twitch (build URL, parse hash, stockage token)
-  styles.css               -> Styles globaux (UI moderne, focus desktop)
+  styles/                  -> Entrée CSS unique `styles/index.css`
+    base.css               -> Reset, variables, police Figtree, keyframes globaux
+    atoms.css              -> Styles des composants de base (boutons, champs, pills, chips, toasts…)
+    molecules.css          -> Compositions simples (headers de modals, dropdowns, sliders…)
+    organisms.css          -> Blocs complets (cartes, listes de rewards, blocs ElevenLabs…)
+    templates.css          -> Layout app-shell (header, main, footer, onglets)
 
   ui/
-    App.tsx                -> Composition de l'écran principal
+    App.tsx                -> Shell principal (header historique/rewards, corps, footer, modals)
 
-    atoms/                 -> Petits composants réutilisables (boutons, labels, icônes, etc.)
-    molecules/             -> Combinaisons simples d'atoms
-    organisms/             -> Blocs fonctionnels complets
-    templates/             -> Layouts / structures de page
+    atoms/                 -> Petits composants réutilisables (Button, Input, Label, Chip, Avatar, Skeleton, Toast…)
+    molecules/             -> Combinaisons d'atoms (FormField, TokenChipRow, ModalHeader, ToastItem…)
+    organisms/             -> Blocs fonctionnels complets :
+                               - TwitchLoginCard, AuthenticatedTokenCard
+                               - RewardsCard (unique pour rewards + historique)
+                               - SettingsModal, TwitchSessionModal, AboutModal
+                               - ElevenLabsCard, RewardVoiceModal
     pages/
-      HomePage/
-        TwitchLoginCard.tsx        -> Carte de connexion Twitch
-        AuthenticatedTokenCard.tsx -> Affichage du token stocké
       AuthCallbackPage/
         AuthCallbackPage.tsx       -> Traitement du retour OAuth Twitch
 ```
 
-Actuellement seuls certains éléments sont implémentés (pages et cartes), mais la structure `atoms / molecules / organisms / templates / pages` est prévue pour être étendue.
+L'application tourne dans une fenêtre **Electron** (`electron/main.cjs`) qui charge le build Vite et expose une icône de tray pour tourner en arrière-plan.
 
 ### 5. Accès aux Channel Points (rewards / redemptions)
 
@@ -122,3 +127,13 @@ Dans ce cas :
 - Ne mets **jamais** de **client secret** dans `.env` côté front.
 - Le token est stocké dans `localStorage` pour simplicité de démo ; pour une vraie app en prod, réfléchis aux risques (XSS, etc.) et éventuellement déplace la logique sensible côté backend.
 
+
+
+Idées de systèmes d’auto‑update possibles (pour plus tard)
+Sans rentrer dans le code, voici les options classiques si tu veux un jour ajouter une mise à jour automatique :
+
+electron-updater + GitHub Releases
+
+Le plus courant : tu publies chaque nouvelle version en .exe / .zip sur GitHub Releases.
+L’app vérifie périodiquement (autoUpdater.checkForUpdates) et télécharge la nouvelle version si disponible, puis propose de redémarrer.
+Avantage : peu d’infra, tout passe par GitHub.

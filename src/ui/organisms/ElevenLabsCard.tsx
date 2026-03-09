@@ -222,11 +222,14 @@ export const ElevenLabsCard = () => {
         </a>
         .
       </p>
-      <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
+      <p className="card-text" style={{ marginTop: "0.6rem" }}>
         Sélectionne les champs suivants pour configurer le TTS :
       </p>
       <TokenChipRow chips={permissionChips} style={{ marginTop: "0.4rem" }} />
-
+      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.35rem", opacity: 0.8 }}>
+        Ta clé est stockée localement dans l’application. Ne la
+        partage jamais.
+      </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
         <FormField
           id="eleven-api-key"
@@ -238,6 +241,7 @@ export const ElevenLabsCard = () => {
           error={hasError}
         />
       </div>
+      
 
       <Button
         variant={saveButtonDanger ? "danger" : "primary"}

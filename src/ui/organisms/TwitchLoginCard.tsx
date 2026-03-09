@@ -18,6 +18,9 @@ export const TwitchLoginCard = () => {
       <Button variant="primary" onClick={handleLogin}>
         Se connecter avec Twitch
       </Button>
+      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.6rem", opacity: 0.8 }}>
+        Le token Twitch est stocké l'application. Ne le partage jamais.
+      </p>
     </section>
   );
 };
