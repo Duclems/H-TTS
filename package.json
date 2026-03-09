@@ -50,14 +50,16 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/logos/hi-tts-scd.ico"
+      "icon": "public/logos/hi-tts.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "runAfterFinish": true
+      "runAfterFinish": true,
+      "installerIcon": "public/logos/hi-tts.ico",
+      "uninstallerIcon": "public/logos/hi-tts.ico"
     }
   }
 }
