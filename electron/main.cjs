@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, Tray, nativeImage, nativeTheme } = require("electron");
+const { app, BrowserWindow, Menu, shell, Tray, nativeImage } = require("electron");
 const path = require("path");
 const express = require("express");
 
@@ -9,15 +9,14 @@ let serverStarted = false;
 let tray = null;
 let mainWindow = null;
 
-function resolveIconPath() {
-  const iconFile = nativeTheme.shouldUseDarkColors ? "hi-tts-ico.ico" : "hi-tts-scd.ico";
+function getIconPath() {
   return isDev
-    ? path.join(__dirname, "..", "public", "logos", iconFile)
-    : path.join(__dirname, "..", "dist", "logos", iconFile);
+    ? path.join(__dirname, "..", "public", "logos", "hi-tts.ico")
+    : path.join(__dirname, "..", "dist", "logos", "hi-tts.ico");
 }
 
 function createWindow() {
-  const iconPath = resolveIconPath();
+  const iconPath = getIconPath();
 
   const win = new BrowserWindow({
     width: 450,
@@ -87,7 +86,7 @@ app.whenReady().then(() => {
   createWindow();
 
   // Icône de zone de notification (tray)
-  const trayIcon = nativeImage.createFromPath(resolveIconPath());
+  const trayIcon = nativeImage.createFromPath(getIconPath());
   tray = new Tray(trayIcon);
   tray.setToolTip("HI-TTS");
 
