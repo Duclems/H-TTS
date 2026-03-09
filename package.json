@@ -1,5 +1,5 @@
 {
-  "name": "h-tts",
+  "name": "hi-tts",
   "version": "0.1.0",
   "private": true,
   "main": "electron/main.cjs",
@@ -35,8 +35,8 @@
     "esbuild": ">=0.24.3"
   },
   "build": {
-    "appId": "com.h-tts.app",
-    "productName": "H-TTS",
+    "appId": "com.hi-tts.app",
+    "productName": "HI-TTS",
     "files": [
       "dist/**",
       "electron/**",

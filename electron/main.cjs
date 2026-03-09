@@ -17,7 +17,7 @@ function createWindow() {
     minHeight: 450,
     maxWidth: 450,
     maxHeight: 450,
-    title: "H-TTS - Twitch Desktop",
+    title: "HI-TTS - Twitch Desktop",
     backgroundColor: "#1e130b",
     webPreferences: {
       nodeIntegration: false,
@@ -60,7 +60,7 @@ function createWindow() {
 
       staticApp.listen(PORT, () => {
         // eslint-disable-next-line no-console
-        console.log(`[H-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
+        console.log(`[HI-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
       });
 
       serverStarted = true;
@@ -80,11 +80,11 @@ app.whenReady().then(() => {
   const trayIcon = nativeImage.createEmpty();
   trayIcon.resize({ width: 16, height: 16 });
   tray = new Tray(trayIcon);
-  tray.setToolTip("H-TTS - Twitch Desktop");
+  tray.setToolTip("HI-TTS - Twitch Desktop");
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: "Afficher H-TTS",
+      label: "Afficher HI-TTS",
       click: () => {
         if (mainWindow) {
           mainWindow.show();

@@ -1,4 +1,4 @@
-## H-TTS · Client desktop React (Vite) avec OAuth2 Twitch
+## HI-TTS · Client desktop React (Vite) avec OAuth2 Twitch
 
 Cette app est un client React (Vite) structuré en **Atomik React** qui permet de :
 

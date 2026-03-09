@@ -42,7 +42,7 @@ export const AboutModal = ({ onClose }: Props) => {
               />
             </div>
             <div>
-              <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>H-TTS · Twitch Desktop</div>
+              <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>HI-TTS · Twitch Desktop</div>
               <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Tooling TTS pour Twitch</div>
             </div>
           </div>

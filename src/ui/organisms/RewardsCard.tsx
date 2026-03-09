@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
 import {
   fetchCurrentUser,
@@ -412,12 +412,12 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       setCreating(true);
       setError(null);
 
-      const title = buildUniqueRewardTitle("H-TTS Reward");
+      const title = buildUniqueRewardTitle("HI-TTS Reward");
 
       const reward = await createCustomReward(token.access_token, broadcasterId, {
         title,
         cost: 100,
-        prompt: "Reward générée par l'app H-TTS.",
+        prompt: "Reward générée par l'app HI-TTS.",
         is_enabled: true,
         is_user_input_required: true,
         background_color: "#9146FF",
@@ -463,7 +463,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                 onClick={handleCreateReward}
                 disabled={creating || !broadcasterId}
               >
-                {creating ? "Création du reward" : "Créer un reward H-TTS"}
+                {creating ? "Création du reward" : "Créer un reward HI-TTS"}
               </button>
               {rewards.map((reward) => {
                 const img =

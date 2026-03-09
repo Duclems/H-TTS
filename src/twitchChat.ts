@@ -112,7 +112,7 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     };
 
     // eslint-disable-next-line no-console
-    console.log("[H-TTS][IRC]", payload);
+    console.log("[HI-TTS][IRC]", payload);
 
     for (const listener of listeners) {
       listener(payload);
@@ -123,11 +123,11 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     .connect()
     .then(() => {
       // eslint-disable-next-line no-console
-      console.log(`[H-TTS][IRC] Connecté au chat Twitch pour #${username}`);
+      console.log(`[HI-TTS][IRC] Connecté au chat Twitch pour #${username}`);
     })
     .catch((err: unknown) => {
       // eslint-disable-next-line no-console
-      console.warn("[H-TTS][IRC] Échec de connexion au chat Twitch", err);
+      console.warn("[HI-TTS][IRC] Échec de connexion au chat Twitch", err);
     });
 }
 
