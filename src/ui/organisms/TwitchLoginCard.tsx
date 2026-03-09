@@ -24,7 +24,7 @@ export const TwitchLoginCard = () => {
         partage jamais.
       </p>
       <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.2rem", opacity: 0.8 }}>
-        Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans &laquo; À propos
+        Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans &laquo; Paramètres
         &raquo; &gt; Politique de confidentialité.
       </p>
     </section>

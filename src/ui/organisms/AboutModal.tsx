@@ -10,46 +10,16 @@ export const AboutModal = ({ onClose }: Props) => {
       className="modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="about-modal-title"
+      aria-labelledby="settings-about-modal-title"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader titleId="about-modal-title" title="À propos" onClose={onClose} />
+      <div className="panel modal-content settings-modal-content settings-modal-has-footer" onClick={(e) => e.stopPropagation()}>
+        <header>
+          <ModalHeader titleId="settings-about-modal-title" title="Paramètres" onClose={onClose} />
+        </header>
 
-        <div className="settings-modal-body">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: "50%",
-                backgroundColor: "var(--bg-hover)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}
-            >
-              <img
-                src="/logos/hi-tts-animated.svg"
-                alt="HI-TTS"
-                style={{ width: 42, height: 42, display: "block" }}
-              />
-            </div>
-            <div>
-              <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>HI-TTS</div>
-              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                Tooling TTS gratuit pour Twitch · © 2026 Hiarte
-              </div>
-            </div>
-          </div>
-
-          <p className="card-text">
-            Application de bureau pour suivre les rewards Twitch, configurer le TTS ElevenLabs et lier les
-            deux de façon simple depuis ton stream. Construite avec Electron et une intégration ElevenLabs
-            en lecture seule (voix + quotas).
-          </p>
-          <h3 style={{ fontSize: "0.8rem", marginTop: "0.9rem", marginBottom: "0.25rem" }}>
+        <main className="settings-modal-main">
+          <h3 style={{ fontSize: "0.8rem", marginTop: "0", marginBottom: "0.25rem" }}>
             Politique de confidentialité (résumé)
           </h3>
           <p className="card-text" style={{ fontSize: "0.75rem" }}>
@@ -69,7 +39,23 @@ export const AboutModal = ({ onClose }: Props) => {
             ElevenLabs. Pour une utilisation en production ou pour des streamers tiers, pense à rédiger une
             politique de confidentialité détaillée adaptée à ton contexte.
           </p>
-        </div>
+        </main>
+
+        <footer className="settings-modal-footer">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <img
+              src="/logos/hi-tts-animated.svg"
+              alt="HI-TTS"
+              style={{ width: 48, height: 48, display: "block", flexShrink: 0 }}
+            />
+            <div>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>HI-TTS</div>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                Outil TTS gratuit pour Twitch • © 2026 Hiarte
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
