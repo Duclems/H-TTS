@@ -50,7 +50,14 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/logos/hi-tts-ico.ico"
+      "icon": "public/logos/hi-tts-scd.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
     }
   }
 }
