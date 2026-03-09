@@ -119,7 +119,7 @@ export const ElevenLabsCard = () => {
   const handleSave = async () => {
     const trimmed = apiKey.trim();
     saveElevenLabsConfig({ apiKey: trimmed });
-    addToast("Clé sauvegardée localement.");
+    addToast("Clé sauvegarder");
 
     if (!trimmed) {
       setUserInfo(null);

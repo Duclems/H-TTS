@@ -4,12 +4,13 @@ import type { ToastVariant } from "../atoms/Toast";
 
 type ToastEntry = {
   id: string;
-  message: string;
+  message: React.ReactNode;
   variant: ToastVariant;
+  durationMs?: number;
 };
 
 type ToastContextValue = {
-  addToast: (message: string, variant?: ToastVariant) => void;
+  addToast: (message: React.ReactNode, variant?: ToastVariant, durationMs?: number) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -22,10 +23,13 @@ function nextId() {
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastEntry[]>([]);
 
-  const addToast = useCallback((message: string, variant: ToastVariant = "success") => {
-    const id = nextId();
-    setToasts((prev) => [...prev, { id, message, variant }]);
-  }, []);
+  const addToast = useCallback(
+    (message: React.ReactNode, variant: ToastVariant = "success", durationMs?: number) => {
+      const id = nextId();
+      setToasts((prev) => [...prev, { id, message, variant, durationMs }]);
+    },
+    []
+  );
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -44,6 +48,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             message={t.message}
             variant={t.variant}
             onDismiss={removeToast}
+            durationMs={t.durationMs}
           />
         ))}
       </div>

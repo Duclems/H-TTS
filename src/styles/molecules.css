@@ -274,6 +274,10 @@
   pointer-events: auto;
 }
 
+.toast-item.toast-item--leaving {
+  animation: toast-fade-out 0.25s ease-in forwards;
+}
+
 @keyframes toast-slide-in {
   from {
     opacity: 0;
@@ -282,5 +286,16 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes toast-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 }

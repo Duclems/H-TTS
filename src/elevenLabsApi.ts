@@ -49,12 +49,19 @@ export async function fetchElevenVoices(): Promise<ElevenVoice[]> {
   if (!apiKey) return [];
 
   try {
-    const res = await fetch("https://api.elevenlabs.io/v2/voices?page_size=100", {
+    const res = await fetch(
+      // On récupère les voix de la bibliothèque de l’utilisateur ("Mes Voix").
+      // voice_type=saved = toutes les voix non-default + les voix par défaut
+      // ajoutées à une collection (ce qui correspond à ce que l’utilisateur
+      // a explicitement ajouté dans sa bibliothèque).
+      "https://api.elevenlabs.io/v2/voices?page_size=100&voice_type=saved",
+      {
       method: "GET",
       headers: {
         "xi-api-key": apiKey
+        }
       }
-    });
+    );
 
     if (!res.ok) return [];
 
@@ -133,10 +140,15 @@ export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> 
  * Lance la synthèse TTS ElevenLabs avec la config voix fournie (par ex. celle du reward).
  * La clé API est toujours lue depuis la config globale (page ElevenLabs).
  */
+export type ElevenTtsResult = {
+  ok: boolean;
+  status?: number;
+};
+
 export async function speakWithElevenLabsFromText(
   text: string,
   voiceConfig: RewardVoiceConfig | null
-): Promise<void> {
+): Promise<ElevenTtsResult> {
   const trimmed = text.trim();
   if (!trimmed) return;
 
@@ -144,13 +156,13 @@ export async function speakWithElevenLabsFromText(
   if (!apiKey) {
     // eslint-disable-next-line no-console
     console.log("[ElevenLabs] Clé API manquante, aucun appel effectué.");
-    return;
+    return { ok: false };
   }
 
   if (!voiceConfig?.voiceId) {
     // eslint-disable-next-line no-console
     console.log("[ElevenLabs] Aucune voix configurée pour ce reward, TTS ignoré.");
-    return;
+    return { ok: false };
   }
 
   const { voiceId, modelId, stability, similarityBoost, style, speed } = voiceConfig;
@@ -186,7 +198,7 @@ export async function speakWithElevenLabsFromText(
     if (!res.ok) {
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Erreur HTTP", res.status, res.statusText);
-      return;
+      return { ok: false, status: res.status };
     }
 
     const blob = await res.blob();
@@ -203,8 +215,10 @@ export async function speakWithElevenLabsFromText(
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Impossible de lancer la lecture audio", err);
     });
+    return { ok: true, status: res.status };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log("[ElevenLabs] Erreur réseau ou inattendue", e);
+    return { ok: false };
   }
 }

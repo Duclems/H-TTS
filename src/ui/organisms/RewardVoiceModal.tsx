@@ -65,15 +65,65 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     speed
   });
 
-  const handleSave = () => {
-    saveRewardVoiceConfig(rewardId, getConfig());
-    addToast("Enregistré.");
+  const handleSave = async () => {
+    const cfg = getConfig();
+
+    if (!cfg.voiceId) {
+      saveRewardVoiceConfig(rewardId, cfg);
+      addToast("Enregistré");
+      onClose();
+      return;
+    }
+
+    const result = await speakWithElevenLabsFromText("Enregistré !", cfg);
+    if (!result.ok && result.status === 402) {
+      addToast(
+        <>
+          Erreur ElevenLabs. Vérifie que cette voix est bien disponible dans{" "}
+          <a
+            href="https://elevenlabs.io/app/voice-lab"
+            target="_blank"
+            rel="noreferrer"
+          >
+            « Mes Voix » sur ElevenLabs
+          </a>
+          .
+        </>,
+        "danger",
+        8000
+      );
+      return;
+    }
+
+    saveRewardVoiceConfig(rewardId, cfg);
+    addToast("Enregistré");
+    onClose();
   };
 
-  const handleTest = () => {
+  const handleTest = async () => {
     const cfg = getConfig();
     if (!cfg.voiceId) return;
-    void speakWithElevenLabsFromText(testText.trim() || "Test de la voix.", cfg);
+    const result = await speakWithElevenLabsFromText(
+      testText.trim() || "Test de la voix.",
+      cfg
+    );
+    if (!result.ok && result.status === 402) {
+      addToast(
+        <>
+          Erreur ElevenLabs. Vérifie que cette voix est bien disponible dans{" "}
+          <a
+            href="https://elevenlabs.io/app/voice-lab"
+            target="_blank"
+            rel="noreferrer"
+          >
+            « Mes Voix » sur ElevenLabs
+          </a>
+          .
+        </>,
+        "danger",
+        8000
+      );
+    }
   };
 
   const getRangeStyle = (value: number, min: number, max: number): CSSProperties =>

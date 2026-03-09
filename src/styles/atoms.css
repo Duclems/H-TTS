@@ -240,10 +240,24 @@
   background-color: var(--bg-raised);
   border: 1px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: left;
+}
+
+.toast a {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .toast--success {
   border-color: var(--success);
   background-color: var(--saved);
   color: var(--text);
+  width: fit-content !important;
+}
+
+.toast--danger {
+  border-color: var(--danger-hover);
+  background-color: var(--danger);
+  color: var(--text);
+  width: 335px;
 }
