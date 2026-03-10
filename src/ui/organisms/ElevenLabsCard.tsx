@@ -9,6 +9,7 @@ import { Skeleton } from "../atoms/Skeleton";
 import { TokenChipRow } from "../molecules/TokenChipRow";
 import type { ChipItem } from "../molecules/TokenChipRow";
 import { useToast } from "../context/ToastContext";
+import { useI18n } from "../context/I18nContext";
 
 const LAST_USER_KEY = "h_tts_eleven_last_user";
 
@@ -56,6 +57,7 @@ function getInitialUserInfo(): ElevenUserInfo | null {
 
 export const ElevenLabsCard = () => {
   const { addToast } = useToast();
+  const { t } = useI18n();
   const [apiKey, setApiKey] = useState(getInitialApiKey);
   const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(getInitialUserInfo);
   const [loadingUser, setLoadingUser] = useState(false);
@@ -103,7 +105,7 @@ export const ElevenLabsCard = () => {
           : null;
 
       const info: ElevenUserInfo = {
-        name: (user as any).first_name || "Compte ElevenLabs",
+        name: (user as any).first_name || t("eleven.defaultAccount"),
         avatarUrl,
         remainingCharacters: remaining,
         characterLimit: subscription?.character_limit ?? null
@@ -119,7 +121,7 @@ export const ElevenLabsCard = () => {
   const handleSave = async () => {
     const trimmed = apiKey.trim();
     saveElevenLabsConfig({ apiKey: trimmed });
-    addToast("Clé sauvegarder");
+    addToast(t("eleven.cardKeySaved"));
 
     if (!trimmed) {
       setUserInfo(null);
@@ -159,7 +161,7 @@ export const ElevenLabsCard = () => {
         : null;
 
     const info: ElevenUserInfo = {
-      name: (user as any).first_name || "Compte ElevenLabs",
+      name: (user as any).first_name || t("eleven.defaultAccount"),
       avatarUrl,
       remainingCharacters: remaining,
       characterLimit: subscription?.character_limit ?? null
@@ -172,9 +174,9 @@ export const ElevenLabsCard = () => {
   };
 
   const permissionChips: ChipItem[] = [
-    { label: "Text to Speech" },
-    { label: "Voix" },
-    { label: "Utilisateur" }
+    { label: t("eleven.permissionTts") },
+    { label: t("eleven.permissionVoices") },
+    { label: t("eleven.permissionUser") }
   ];
 
   const saveButtonDanger = !apiKey.trim() || hasError;
@@ -199,9 +201,9 @@ export const ElevenLabsCard = () => {
             <div className="eleven-user-name">{userInfo.name}</div>
             {userInfo.remainingCharacters != null && userInfo.characterLimit != null && (
               <div className="eleven-user-credits">
-                Crédits restants :{" "}
+                {t("eleven.creditsRemaining")}{" "}
                 {userInfo.remainingCharacters.toLocaleString("fr-FR")} /{" "}
-                {userInfo.characterLimit.toLocaleString("fr-FR")} caractères
+                {userInfo.characterLimit.toLocaleString("fr-FR")} {t("eleven.characters")}
               </div>
             )}
           </div>
@@ -209,31 +211,30 @@ export const ElevenLabsCard = () => {
       )}
 
       <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
-        Récupère ta clé API ElevenLabs. Elle est utilisée pour tous les TTS.
+        {t("eleven.intro")}
         <br />
-        Tu peux la récupérer depuis{" "}
+        {t("eleven.getFromLink")}{" "}
         <a
           href="https://elevenlabs.io/app/developers/api-keys"
           target="_blank"
           rel="noreferrer"
           style={{ color: "inherit", textDecoration: "underline dotted" }}
         >
-          la page des clés API ElevenLabs
+          {t("eleven.apiKeysLink")}
         </a>
         .
       </p>
       <p className="card-text" style={{ marginTop: "0.6rem" }}>
-        Sélectionne les champs suivants pour configurer le TTS :
+        {t("eleven.selectPermissions")}
       </p>
       <TokenChipRow chips={permissionChips} style={{ marginTop: "0.4rem" }} />
       <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.35rem", opacity: 0.8 }}>
-        Ta clé est stockée localement dans l’application. Ne la
-        partage jamais.
+        {t("eleven.keyStoredNote")}
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
         <FormField
           id="eleven-api-key"
-          label="Clé API ElevenLabs"
+          label={t("eleven.apiKeyLabel")}
           type="password"
           value={apiKey}
           onChange={setApiKey}
@@ -248,7 +249,7 @@ export const ElevenLabsCard = () => {
         style={{ marginTop: "0.9rem" }}
         onClick={handleSave}
       >
-        Sauvegarder
+        {t("eleven.save")}
       </Button>
     </section>
   );

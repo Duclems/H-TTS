@@ -8,10 +8,12 @@ import { ToastProvider } from "./context/ToastContext";
 import { SettingsModal } from "./organisms/SettingsModal";
 import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
 import { AboutModal } from "./organisms/AboutModal";
+import { useI18n } from "./context/I18nContext";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000;
 
 export const App = () => {
+  const { t } = useI18n();
   const token = getStoredToken();
   const { apiKey } = loadElevenLabsConfig();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -106,29 +108,26 @@ export const App = () => {
         {isTwitchConnected && rewardsTab === "history" && (
           <div className="app-header-main">
             <div className="app-header-main-top">
-              <div className="app-title">Historique</div>
+              <div className="app-title">{t("app.history")}</div>
               {elevenCredits && (
                 <div className="app-header-credits">
-                  Crédits restants :{" "}
+                  {t("app.creditsRemaining")}{" "}
                   <strong>
                     {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
                   </strong>
                 </div>
               )}
             </div>
-            <p className="app-subtitle">
-              Les redeems sont rafraîchis toutes les <strong>seconde</strong> et chaque redeem peut
-              déclencher un TTS pendant <strong>10 secondes</strong> après son apparition.
-            </p>
+            <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
           </div>
         )}
         {isTwitchConnected && rewardsTab === "rewards" && (
           <div className="app-header-main">
             <div className="app-header-main-top">
-              <div className="app-title">Gestion des rewards</div>
+              <div className="app-title">{t("app.rewardsManagement")}</div>
               {elevenCredits && (
                 <div className="app-header-credits">
-                  Crédits restants :{" "}
+                  {t("app.creditsRemaining")}{" "}
                   <strong>
                     {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
                   </strong>
@@ -136,7 +135,7 @@ export const App = () => {
               )}
             </div>
             <p className="app-subtitle">
-              Crée et paramètrer ici vos rewards HI-TTS utilisés pour déclencher le TTS sur ton stream.
+              {t("app.rewardsSubtitle")}
             </p>
           </div>
         )}
@@ -168,7 +167,7 @@ export const App = () => {
               <span className="app-header-tab-icon">
                 <img src="/house.svg" alt="" aria-hidden="true" />
               </span>
-              <span>Accueil</span>
+              <span>{t("app.home")}</span>
             </button>
             <button
               type="button"
@@ -180,15 +179,15 @@ export const App = () => {
               <span className="app-header-tab-icon">
                 <img src="/reward.svg" alt="" aria-hidden="true" />
               </span>
-              <span>Rewards</span>
+              <span>{t("app.rewards")}</span>
             </button>
           </div>
           <div className="app-header-icons">
             <button
               type="button"
               className="header-settings-btn"
-              title="Session Twitch"
-              aria-label="Afficher la session Twitch"
+              title={t("app.twitchSession")}
+              aria-label={t("app.twitchSessionAria")}
               onClick={() => setTwitchOpen(true)}
             >
               <img src="/twitch.svg" alt="Twitch" />
@@ -202,31 +201,31 @@ export const App = () => {
                     ? "header-settings-btn header-settings-btn-eleven-error"
                     : "header-settings-btn"
               }
-              title="Paramètres ElevenLabs"
+              title={t("app.elevenSettings")}
               aria-label={
                 isFullyLinked
-                  ? "Paramètres connectés (Twitch et ElevenLabs configurés)"
+                  ? t("app.elevenConnected")
                   : !hasElevenKey
-                    ? "Clé ElevenLabs manquante"
+                    ? t("app.elevenKeyMissing")
                     : showElevenError
-                      ? "Clé ElevenLabs invalide ou autorisations incomplètes"
-                      : "Paramètres ElevenLabs à compléter"
+                      ? t("app.elevenKeyInvalid")
+                      : t("app.elevenToComplete")
               }
               onClick={() => setSettingsOpen(true)}
             >
               <img
                 src={isFullyLinked ? "/link.svg" : "/unlink.svg"}
-                alt={isFullyLinked ? "Lié" : "Non lié"}
+                alt={isFullyLinked ? t("app.linked") : t("app.unlinked")}
               />
             </button>
             <button
               type="button"
               className="header-settings-btn"
-              title="Paramètres"
-              aria-label="Afficher les paramètres"
+              title={t("settings.titleAbout")}
+              aria-label={t("settings.titleAbout")}
               onClick={() => setAboutOpen(true)}
             >
-              <img src="/settings.svg" alt="Paramètres" />
+              <img src="/settings.svg" alt={t("settings.titleAbout")} />
             </button>
           </div>
         </footer>

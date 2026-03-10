@@ -7,6 +7,7 @@ import { Avatar } from "../atoms/Avatar";
 import { Button } from "../atoms/Button";
 import { Skeleton } from "../atoms/Skeleton";
 import { TokenChipRow } from "../molecules/TokenChipRow";
+import { useI18n } from "../context/I18nContext";
 
 const TWITCH_LAST_PROFILE_KEY = "h_tts_twitch_last_profile";
 
@@ -41,6 +42,7 @@ type Props = {
 };
 
 export const AuthenticatedTokenCard = ({ token }: Props) => {
+  const { t } = useI18n();
   const [user, setUser] = useState<TwitchUser | null>(
     () => getInitialTwitchProfile()?.user ?? null
   );
@@ -62,7 +64,7 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
         if (cancelled) return;
 
         if (!currentUser) {
-          setError("Impossible de récupérer ton profil Twitch (vérifie les scopes).");
+          setError(t("tokenCard.errorProfile"));
           setUser(null);
           setFollowersCount(null);
           window.localStorage.removeItem(TWITCH_LAST_PROFILE_KEY);
@@ -78,7 +80,7 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
         }
       } catch {
         if (!cancelled) {
-          setError("Erreur lors de la récupération du profil Twitch.");
+          setError(t("tokenCard.errorFetch"));
           setUser(null);
           setFollowersCount(null);
           window.localStorage.removeItem(TWITCH_LAST_PROFILE_KEY);
@@ -134,7 +136,7 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
               <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "8px" } as CSSProperties} />
             ) : user && typeof followersCount === "number" ? (
               <div className="eleven-user-followers">
-                • {followersCount.toLocaleString()} followers
+                • {followersCount.toLocaleString()} {t("tokenCard.followers")}
               </div>
             ) : null}
           </div>
@@ -149,7 +151,7 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
       <TokenChipRow chips={scopeChips} />
 
       <Button variant="danger" style={{ marginTop: "0.9rem" }} onClick={handleLogout}>
-        Déconnexion
+        {t("tokenCard.logout")}
       </Button>
     </section>
   );

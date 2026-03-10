@@ -1,10 +1,13 @@
 import { ModalHeader } from "../molecules/ModalHeader";
+import { LanguageSelector } from "../molecules/LanguageSelector";
+import { useI18n } from "../context/I18nContext";
 
 type Props = {
   onClose: () => void;
 };
 
 export const AboutModal = ({ onClose }: Props) => {
+  const { t } = useI18n();
   return (
     <div
       className="modal-overlay"
@@ -15,43 +18,38 @@ export const AboutModal = ({ onClose }: Props) => {
     >
       <div className="panel modal-content settings-modal-content settings-modal-has-footer" onClick={(e) => e.stopPropagation()}>
         <header>
-          <ModalHeader titleId="settings-about-modal-title" title="Paramètres" onClose={onClose} />
+          <ModalHeader
+            titleId="settings-about-modal-title"
+            title={t("settings.title")}
+            onClose={onClose}
+            closeAriaLabel={t("modal.close")}
+            rightContent={<LanguageSelector />}
+          />
         </header>
 
         <main className="settings-modal-main">
-          <h3 style={{ fontSize: "0.8rem", marginTop: "0", marginBottom: "0.25rem" }}>
-            Politique de confidentialité (résumé)
+          <h3 style={{ fontSize: "0.8rem", marginTop: "0", marginBottom: "0.5rem" }}>
+            {t("about.title")}
           </h3>
-          <p className="card-text" style={{ fontSize: "0.75rem" }}>
-            - <strong>Twitch</strong> : le token OAuth est stocké localement dans ton navigateur (localStorage) pour
-            que l&apos;application puisse accéder aux rewards et à ton profil sans te redemander de connexion à
-            chaque lancement. Ce modèle est adapté à un usage perso, mais toute application ou script exécutant
-            du code non maîtrisé pourrait, en théorie, lire ce token.
-          </p>
-          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem" }}>
-            - <strong>ElevenLabs</strong> : ta clé API est enregistrée localement dans la configuration de
-            l&apos;application et utilisée uniquement pour appeler l&apos;API ElevenLabs depuis ta machine. Ne la
-            partage jamais et considère que toute personne ayant accès à cette machine peut potentiellement
-            l&apos;utiliser.
-          </p>
-          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem", opacity: 0.85 }}>
-            Aucune donnée n&apos;est envoyée vers un serveur tiers autre que les API officielles de Twitch et
-            ElevenLabs. Pour une utilisation en production ou pour des streamers tiers, pense à rédiger une
-            politique de confidentialité détaillée adaptée à ton contexte.
-          </p>
+          <h4 style={{ fontSize: "0.75rem", marginTop: "0", marginBottom: "0.25rem", fontWeight: 600 }}>
+            {t("about.privacyTitle")}
+          </h4>
+          <p className="card-text" style={{ fontSize: "0.75rem" }} dangerouslySetInnerHTML={{ __html: t("about.twitchPrivacy") }} />
+          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem" }} dangerouslySetInnerHTML={{ __html: t("about.elevenPrivacy") }} />
+          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem", opacity: 0.85 }} dangerouslySetInnerHTML={{ __html: t("about.noDataSent") }} />
         </main>
 
         <footer className="settings-modal-footer">
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <img
               src="/logos/hi-tts-animated.svg"
-              alt="HI-TTS"
+              alt={t("about.footerApp")}
               style={{ width: 48, height: 48, display: "block", flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>HI-TTS</div>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
               <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                Outil TTS gratuit pour Twitch • © 2026 Hiarte
+                {t("about.footerTagline")}
               </div>
             </div>
           </div>

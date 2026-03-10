@@ -1,0 +1,117 @@
+{
+  "app": {
+    "history": "Historique",
+    "creditsRemaining": "Crédits restants",
+    "redeemsRefresh": "Les redeems sont rafraîchis toutes les <strong>seconde</strong> et chaque redeem peut déclencher un TTS pendant <strong>10 secondes</strong> après son apparition.",
+    "rewardsManagement": "Gestion des rewards",
+    "rewardsSubtitle": "Crée et paramètrer ici vos rewards HI-TTS utilisés pour déclencher le TTS sur ton stream.",
+    "home": "Accueil",
+    "rewards": "Rewards",
+    "twitchSession": "Session Twitch",
+    "twitchSessionAria": "Afficher la session Twitch",
+    "elevenSettings": "Paramètres ElevenLabs",
+    "elevenConnected": "Paramètres connectés (Twitch et ElevenLabs configurés)",
+    "elevenKeyMissing": "Clé ElevenLabs manquante",
+    "elevenKeyInvalid": "Clé ElevenLabs invalide ou autorisations incomplètes",
+    "elevenToComplete": "Paramètres ElevenLabs à compléter",
+    "linked": "Lié",
+    "unlinked": "Non lié",
+    "settings": "Paramètres",
+    "settingsAria": "Afficher les paramètres"
+  },
+  "modal": {
+    "close": "Fermer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "titleAbout": "Paramètres / à propos",
+    "elevenTitle": "Paramètres ElevenLabs"
+  },
+  "about": {
+    "title": "À propos",
+    "privacyTitle": "Politique de confidentialité (résumé)",
+    "twitchPrivacy": "- <strong>Twitch</strong> : le token OAuth est stocké localement dans ton navigateur (localStorage) pour que l'application puisse accéder aux rewards et à ton profil sans te redemander de connexion à chaque lancement. Ce modèle est adapté à un usage perso, mais toute application ou script exécutant du code non maîtrisé pourrait, en théorie, lire ce token.",
+    "elevenPrivacy": "- <strong>ElevenLabs</strong> : ta clé API est enregistrée localement dans la configuration de l'application et utilisée uniquement pour appeler l'API ElevenLabs depuis ta machine. Ne la partage jamais et considère que toute personne ayant accès à cette machine peut potentiellement l'utiliser.",
+    "noDataSent": "Aucune donnée n'est envoyée vers un serveur tiers autre que les API officielles de Twitch et ElevenLabs. Pour une utilisation en production ou pour des streamers tiers, pense à rédiger une politique de confidentialité détaillée adaptée à ton contexte.",
+    "footerApp": "HI-TTS",
+    "footerTagline": "Outil TTS gratuit pour Twitch · © 2026 Hiarte"
+  },
+  "twitchLogin": {
+    "title": "Connexion à Twitch",
+    "intro": "L'application a besoin d'une connexion à Twitch pour accéder à la suite.",
+    "cta": "Se connecter avec Twitch",
+    "tokenNote": "HI-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans l'application pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
+    "detailsLink": "Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans « Paramètres » > Politique de confidentialité."
+  },
+  "eleven": {
+    "cardKeySaved": "Clé sauvegardée",
+    "defaultAccount": "Compte ElevenLabs",
+    "creditsRemaining": "Crédits restants :",
+    "characters": "caractères",
+    "intro": "Récupère ta clé API ElevenLabs. Elle est utilisée pour tous les TTS.",
+    "getFromLink": "Tu peux la récupérer depuis",
+    "apiKeysLink": "la page des clés API ElevenLabs",
+    "selectPermissions": "Sélectionne les champs suivants pour configurer le TTS :",
+    "permissionTts": "Text to Speech",
+    "permissionVoices": "Voix",
+    "permissionUser": "Utilisateur",
+    "keyStoredNote": "Ta clé est stockée localement dans l'application. Ne la partage jamais.",
+    "apiKeyLabel": "Clé API ElevenLabs",
+    "save": "Sauvegarder"
+  },
+  "rewards": {
+    "errorProfile": "Impossible de récupérer ton profil Twitch (vérifie les scopes).",
+    "errorFetch": "Erreur lors de la récupération des rewards/redemptions.",
+    "errorCreate": "Impossible de créer le reward. Vérifie les scopes, que tu es bien le propriétaire de la chaîne et que les points de chaîne / custom rewards sont activés (et que ta chaîne est éligible).",
+    "errorCreateShort": "Erreur lors de la création du reward.",
+    "loadingAlt": "Chargement HI-TTS",
+    "creating": "Création du reward",
+    "createCta": "Créer un reward HI-TTS",
+    "empty": "Aucun reward HI-TTS pour le moment. Crée ton premier reward pour commencer à déclencher le TTS sur ton stream.",
+    "points": "points de chaîne",
+    "settings": "Paramètres",
+    "historyEmpty": "Dès qu'un viewer utilise un reward HI-TTS, il apparaîtra ici",
+    "rewardPrompt": "Reward générée par l'app HI-TTS.",
+    "animationAlt": "Animation HI-TTS"
+  },
+  "rewardVoice": {
+    "title": "Voix TTS",
+    "voiceLabel": "Voix ElevenLabs",
+    "chooseVoice": "Choisir une voix…",
+    "modelLabel": "Modèle",
+    "chooseModel": "Choisir un modèle",
+    "speed": "Vitesse",
+    "stability": "Stabilité",
+    "similarity": "Similarité",
+    "style": "Style",
+    "testLabel": "Texte de test",
+    "testPlaceholder": "Saisis un texte pour tester…",
+    "testButton": "Tester la voix",
+    "save": "Enregistrer",
+    "errorEleven": "Erreur ElevenLabs. Vérifie que cette voix est bien disponible dans",
+    "myVoicesLink": "« Mes Voix » sur ElevenLabs",
+    "testPhrase": "Test de la voix.",
+    "saved": "Enregistré"
+  },
+  "twitchSession": {
+    "title": "Connexion Twitch"
+  },
+  "authCallback": {
+    "errorOAuth": "Impossible de lire la réponse OAuth de Twitch.",
+    "errorState": "Le paramètre de sécurité 'state' ne correspond pas. Abandon.",
+    "title": "Traitement du callback Twitch…",
+    "subtitle": "Nous analysons la réponse OAuth puis te redirigeons.",
+    "backHome": "Revenir à l'accueil"
+  },
+  "tokenCard": {
+    "errorProfile": "Impossible de récupérer ton profil Twitch (vérifie les scopes).",
+    "errorFetch": "Erreur lors de la récupération du profil Twitch.",
+    "followers": "followers",
+    "logout": "Déconnexion"
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  }
+}

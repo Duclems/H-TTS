@@ -18,6 +18,7 @@ import {
 import { speakWithElevenLabsFromText } from "../../elevenLabsApi";
 import { loadRewardVoiceConfig } from "../../rewardVoiceConfig";
 import { RewardVoiceModal } from "./RewardVoiceModal";
+import { useI18n } from "../context/I18nContext";
 
 type Props = {
   token: TwitchTokenResponse;
@@ -26,6 +27,7 @@ type Props = {
 };
 
 export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Props) => {
+  const { t } = useI18n();
   const EMOTES_CACHE_KEY = "h_tts_emotes_by_redemption";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
         const user = await fetchCurrentUser(token.access_token);
         if (!user) {
-          setError("Impossible de récupérer ton profil Twitch (vérifie les scopes).");
+          setError(t("rewards.errorProfile"));
           return;
         }
 
@@ -85,7 +87,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         }
         setRedemptions(allRedemptions);
       } catch (e) {
-        setError("Erreur lors de la récupération des rewards/redemptions.");
+        setError(t("rewards.errorFetch"));
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -419,7 +421,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       const reward = await createCustomReward(token.access_token, broadcasterId, {
         title,
         cost: 100,
-        prompt: "Reward générée par l'app HI-TTS.",
+        prompt: t("rewards.rewardPrompt"),
         is_enabled: true,
         is_user_input_required: true,
         background_color: "#9146FF",
@@ -433,9 +435,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       });
 
       if (!reward) {
-        setError(
-          "Impossible de créer le reward. Vérifie les scopes, que tu es bien le propriétaire de la chaîne et que les points de chaîne / custom rewards sont activés (et que ta chaîne est éligible)."
-        );
+        setError(t("rewards.errorCreate"));
         return;
       }
 
@@ -443,7 +443,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       const r = await fetchRewardRedemptions(token.access_token, broadcasterId, reward.id);
       setRedemptions((prev) => [...prev, ...r]);
     } catch {
-      setError("Erreur lors de la création du reward.");
+      setError(t("rewards.errorCreateShort"));
     } finally {
       setCreating(false);
     }
@@ -464,7 +464,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         >
           <img
             src="/logos/hi-tts-animated.svg"
-            alt="Chargement HI-TTS"
+            alt={t("rewards.loadingAlt")}
             style={{ width: "112px", height: "112px", opacity: 0.95 }}
           />
         </div>
@@ -482,7 +482,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                 onClick={handleCreateReward}
                 disabled={creating || !broadcasterId}
               >
-                {creating ? "Création du reward" : "Créer un reward HI-TTS"}
+                {creating ? t("rewards.creating") : t("rewards.createCta")}
               </button>
 
               {!creating && rewards.length === 0 && (
@@ -502,15 +502,14 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                 >
                   <img
                     src="/logos/hi-tts-animated.svg"
-                    alt="Animation HI-TTS"
+                    alt={t("rewards.animationAlt")}
                     style={{ width: "104px", height: "104px"}}
                   />
                   <p
                     className="card-text"
                     style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}
                   >
-                    Aucun reward HI-TTS pour le moment. Crée ton premier reward pour commencer à
-                    déclencher le TTS sur ton stream.
+                    {t("rewards.empty")}
                   </p>
                 </div>
               )}
@@ -553,7 +552,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>{reward.title}</div>
                         <div style={{ fontSize: "0.8rem", opacity: 0.85 }}>
-                          {reward.cost} points de chaîne
+                          {reward.cost} {t("rewards.points")}
                         </div>
                       </div>
                       <button
@@ -571,7 +570,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                         }}
                         onClick={() => setSettingsRewardId(reward.id)}
                       >
-                        Paramètres
+                        {t("rewards.settings")}
                       </button>
                     </div>
 
@@ -605,15 +604,14 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                   >
                     <img
                       src="/logos/hi-tts-animated.svg"
-                      alt="Animation HI-TTS"
+                      alt={t("rewards.animationAlt")}
                       style={{ width: "104px", height: "104px", opacity: 0.9 }}
                     />
                     <p
                       className="card-text"
                       style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}
                     >
-                      Dès qu’un viewer utilise un reward
-                      HI-TTS,<br/> il apparaîtra ici
+                      {t("rewards.historyEmpty")}
                     </p>
                   </div>
                 )}

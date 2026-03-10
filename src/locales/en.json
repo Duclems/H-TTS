@@ -1,0 +1,117 @@
+{
+  "app": {
+    "history": "History",
+    "creditsRemaining": "Credits remaining",
+    "redeemsRefresh": "Redeems are refreshed every <strong>second</strong> and each redeem can trigger TTS for <strong>10 seconds</strong> after it appears.",
+    "rewardsManagement": "Rewards management",
+    "rewardsSubtitle": "Create and configure your HI-TTS rewards here to trigger TTS on your stream.",
+    "home": "Home",
+    "rewards": "Rewards",
+    "twitchSession": "Twitch session",
+    "twitchSessionAria": "Show Twitch session",
+    "elevenSettings": "ElevenLabs settings",
+    "elevenConnected": "Connected (Twitch and ElevenLabs configured)",
+    "elevenKeyMissing": "ElevenLabs API key missing",
+    "elevenKeyInvalid": "ElevenLabs key invalid or permissions incomplete",
+    "elevenToComplete": "ElevenLabs settings to complete",
+    "linked": "Linked",
+    "unlinked": "Not linked",
+    "settings": "Settings",
+    "settingsAria": "Show settings"
+  },
+  "modal": {
+    "close": "Close"
+  },
+  "settings": {
+    "title": "Settings",
+    "titleAbout": "Settings / about",
+    "elevenTitle": "ElevenLabs settings"
+  },
+  "about": {
+    "title": "About",
+    "privacyTitle": "Privacy policy (summary)",
+    "twitchPrivacy": "- <strong>Twitch</strong>: the OAuth token is stored locally in your browser (localStorage) so the app can access rewards and your profile without asking you to log in again on each launch. This is suitable for personal use; any app or script running unvetted code could in theory read this token.",
+    "elevenPrivacy": "- <strong>ElevenLabs</strong>: your API key is stored locally in the app config and used only to call the ElevenLabs API from your machine. Never share it; anyone with access to this machine could use it.",
+    "noDataSent": "No data is sent to any third-party server other than Twitch and ElevenLabs official APIs. For production or third-party streamers, consider writing a detailed privacy policy for your context.",
+    "footerApp": "HI-TTS",
+    "footerTagline": "Free TTS tool for Twitch · © 2026 Hiarte"
+  },
+  "twitchLogin": {
+    "title": "Connect to Twitch",
+    "intro": "The app needs a Twitch connection to continue.",
+    "cta": "Connect with Twitch",
+    "tokenNote": "HI-TTS is a free app by Hiarte. Your Twitch token is stored locally for your personal use only and is only sent to Twitch. Never share it.",
+    "detailsLink": "Details about token and ElevenLabs key storage are in « Settings » > Privacy policy."
+  },
+  "eleven": {
+    "cardKeySaved": "Key saved",
+    "defaultAccount": "ElevenLabs account",
+    "creditsRemaining": "Credits remaining:",
+    "characters": "characters",
+    "intro": "Get your ElevenLabs API key. It is used for all TTS.",
+    "getFromLink": "You can get it from",
+    "apiKeysLink": "ElevenLabs API keys page",
+    "selectPermissions": "Select the following permissions to configure TTS:",
+    "permissionTts": "Text to Speech",
+    "permissionVoices": "Voices",
+    "permissionUser": "User",
+    "keyStoredNote": "Your key is stored locally. Never share it.",
+    "apiKeyLabel": "ElevenLabs API key",
+    "save": "Save"
+  },
+  "rewards": {
+    "errorProfile": "Unable to fetch your Twitch profile (check scopes).",
+    "errorFetch": "Error fetching rewards/redemptions.",
+    "errorCreate": "Unable to create reward. Check scopes, that you own the channel, and that channel points / custom rewards are enabled (and that your channel is eligible).",
+    "errorCreateShort": "Error creating reward.",
+    "loadingAlt": "Loading HI-TTS",
+    "creating": "Creating reward",
+    "createCta": "Create HI-TTS reward",
+    "empty": "No HI-TTS rewards yet. Create your first reward to start triggering TTS on your stream.",
+    "points": "channel points",
+    "settings": "Settings",
+    "historyEmpty": "When a viewer uses a HI-TTS reward, it will appear here",
+    "rewardPrompt": "Reward created by HI-TTS app.",
+    "animationAlt": "HI-TTS animation"
+  },
+  "rewardVoice": {
+    "title": "TTS voice",
+    "voiceLabel": "ElevenLabs voice",
+    "chooseVoice": "Choose a voice…",
+    "modelLabel": "Model",
+    "chooseModel": "Choose a model",
+    "speed": "Speed",
+    "stability": "Stability",
+    "similarity": "Similarity",
+    "style": "Style",
+    "testLabel": "Test text",
+    "testPlaceholder": "Enter text to test…",
+    "testButton": "Test voice",
+    "save": "Save",
+    "errorEleven": "ElevenLabs error. Make sure this voice is available in",
+    "myVoicesLink": "« My Voices » on ElevenLabs",
+    "testPhrase": "Voice test.",
+    "saved": "Saved"
+  },
+  "twitchSession": {
+    "title": "Twitch connection"
+  },
+  "authCallback": {
+    "errorOAuth": "Unable to read Twitch OAuth response.",
+    "errorState": "Security parameter 'state' does not match. Aborting.",
+    "title": "Processing Twitch callback…",
+    "subtitle": "We are processing the OAuth response and will redirect you.",
+    "backHome": "Back to home"
+  },
+  "tokenCard": {
+    "errorProfile": "Unable to fetch your Twitch profile (check scopes).",
+    "errorFetch": "Error fetching Twitch profile.",
+    "followers": "followers",
+    "logout": "Log out"
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  }
+}

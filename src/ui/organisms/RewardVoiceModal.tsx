@@ -10,6 +10,7 @@ import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../elevenLabs
 import { Button } from "../atoms/Button";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useToast } from "../context/ToastContext";
+import { useI18n } from "../context/I18nContext";
 
 type Props = {
   rewardId: string;
@@ -19,6 +20,7 @@ type Props = {
 
 export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const { addToast } = useToast();
+  const { t } = useI18n();
   const [voiceId, setVoiceId] = useState("");
   const [voices, setVoices] = useState<{ voice_id: string; name: string }[]>([]);
   const [modelId, setModelId] = useState("eleven_turbo_v2_5");
@@ -70,22 +72,22 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
     if (!cfg.voiceId) {
       saveRewardVoiceConfig(rewardId, cfg);
-      addToast("Enregistré");
+      addToast(t("rewardVoice.saved"));
       onClose();
       return;
     }
 
-    const result = await speakWithElevenLabsFromText("Enregistré !", cfg);
+    const result = await speakWithElevenLabsFromText(t("rewardVoice.saved"), cfg);
     if (!result.ok && result.status === 402) {
       addToast(
         <>
-          Erreur ElevenLabs. Vérifie que cette voix est bien disponible dans{" "}
+          {t("rewardVoice.errorEleven")}{" "}
           <a
             href="https://elevenlabs.io/app/voice-lab"
             target="_blank"
             rel="noreferrer"
           >
-            « Mes Voix » sur ElevenLabs
+            {t("rewardVoice.myVoicesLink")}
           </a>
           .
         </>,
@@ -96,7 +98,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     }
 
     saveRewardVoiceConfig(rewardId, cfg);
-    addToast("Enregistré");
+    addToast(t("rewardVoice.saved"));
     onClose();
   };
 
@@ -104,19 +106,19 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     const cfg = getConfig();
     if (!cfg.voiceId) return;
     const result = await speakWithElevenLabsFromText(
-      testText.trim() || "Test de la voix.",
+      testText.trim() || t("rewardVoice.testPhrase"),
       cfg
     );
     if (!result.ok && result.status === 402) {
       addToast(
         <>
-          Erreur ElevenLabs. Vérifie que cette voix est bien disponible dans{" "}
+          {t("rewardVoice.errorEleven")}{" "}
           <a
             href="https://elevenlabs.io/app/voice-lab"
             target="_blank"
             rel="noreferrer"
           >
-            « Mes Voix » sur ElevenLabs
+            {t("rewardVoice.myVoicesLink")}
           </a>
           .
         </>,
@@ -149,15 +151,16 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       >
         <ModalHeader
           titleId="reward-voice-modal-title"
-          title={`Voix TTS • ${rewardTitle}`}
+          title={`${t("rewardVoice.title")} • ${rewardTitle}`}
           onClose={onClose}
+          closeAriaLabel={t("modal.close")}
         />
 
         <div className="reward-voice-modal-body">
           <div className="reward-voice-modal-fields">
             <div className="reward-voice-dropdown-wrap reward-voice-field-first">
               <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Voix ElevenLabs
+                {t("rewardVoice.voiceLabel")}
               </label>
               {voices.length > 0 ? (
                 <>
@@ -172,9 +175,9 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                     }}
                     aria-expanded={voiceOpen}
                     aria-haspopup="listbox"
-                    aria-label="Choisir une voix"
+                    aria-label={t("rewardVoice.chooseVoice")}
                   >
-                    {voices.find((v) => v.voice_id === voiceId)?.name ?? "Choisir une voix…"}
+                    {voices.find((v) => v.voice_id === voiceId)?.name ?? t("rewardVoice.chooseVoice")}
                   </button>
                   {voiceOpen && (
                     <ul
@@ -192,7 +195,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                           setVoiceOpen(false);
                         }}
                       >
-                        Choisir une voix…
+                        {t("rewardVoice.chooseVoice")}
                       </li>
                       {voices.map((v) => (
                         <li
@@ -217,7 +220,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                   type="text"
                   value={voiceId}
                   onChange={(e) => setVoiceId(e.target.value)}
-                  placeholder="Choisir une voix…"
+                  placeholder={t("rewardVoice.chooseVoice")}
                   className="field"
                 />
               )}
@@ -225,7 +228,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
             <div className="reward-voice-dropdown-wrap">
               <label htmlFor="rv-model" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Modèle
+                {t("rewardVoice.modelLabel")}
               </label>
               <button
                 id="rv-model"
@@ -238,7 +241,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                 }}
                 aria-expanded={modelOpen}
                 aria-haspopup="listbox"
-                aria-label="Choisir un modèle"
+                aria-label={t("rewardVoice.chooseModel")}
               >
                 {MODEL_OPTIONS.find((m) => m.id === modelId)?.label ?? modelId}
               </button>
@@ -270,7 +273,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
             <div className="reward-voice-range-grid">
               <div className="reward-voice-range-item">
                 <label htmlFor="rv-speed" className="reward-voice-range-label">
-                  Vitesse ({speed.toFixed(2)})
+                  {t("rewardVoice.speed")} ({speed.toFixed(2)})
                 </label>
                 <input
                   id="rv-speed"
@@ -286,7 +289,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               </div>
               <div className="reward-voice-range-item">
                 <label htmlFor="rv-stability" className="reward-voice-range-label">
-                  Stabilité ({(stability * 100).toFixed(0)}%)
+                  {t("rewardVoice.stability")} ({(stability * 100).toFixed(0)}%)
                 </label>
                 <input
                   id="rv-stability"
@@ -302,7 +305,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               </div>
               <div className="reward-voice-range-item">
                 <label htmlFor="rv-similarity" className="reward-voice-range-label">
-                  Similarité ({(similarityBoost * 100).toFixed(0)}%)
+                  {t("rewardVoice.similarity")} ({(similarityBoost * 100).toFixed(0)}%)
                 </label>
                 <input
                   id="rv-similarity"
@@ -318,7 +321,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               </div>
               <div className="reward-voice-range-item">
                 <label htmlFor="rv-style" className="reward-voice-range-label">
-                  Style ({(style * 100).toFixed(0)}%)
+                  {t("rewardVoice.style")} ({(style * 100).toFixed(0)}%)
                 </label>
                 <input
                   id="rv-style"
@@ -336,14 +339,14 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
             <div>
               <label htmlFor="rv-test" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
-                Texte de test
+                {t("rewardVoice.testLabel")}
               </label>
               <input
                 id="rv-test"
                 type="text"
                 value={testText}
                 onChange={(e) => setTestText(e.target.value)}
-                placeholder="Saisis un texte pour tester…"
+                placeholder={t("rewardVoice.testPlaceholder")}
                 className="field reward-voice-input"
               />
               <Button
@@ -352,7 +355,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                 onClick={handleTest}
                 disabled={!voiceId.trim()}
               >
-                Tester la voix
+                {t("rewardVoice.testButton")}
               </Button>
             </div>
           </div>
@@ -360,7 +363,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
 
         <div className="reward-voice-modal-footer">
           <Button variant="primary" onClick={handleSave}>
-            Enregistrer
+            {t("rewardVoice.save")}
           </Button>
         </div>
       </div>
