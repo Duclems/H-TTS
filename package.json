@@ -40,6 +40,7 @@
   "build": {
     "appId": "com.hi-tts.app",
     "productName": "HI-TTS",
+    "artifactName": "HI-TTS-Setup-${version}.${ext}",
     "files": [
       "dist/**",
       "electron/**",
@@ -59,7 +60,10 @@
       "createStartMenuShortcut": true,
       "runAfterFinish": true,
       "installerIcon": "public/logos/hi-tts.ico",
-      "uninstallerIcon": "public/logos/hi-tts.ico"
+      "uninstallerIcon": "public/logos/hi-tts.ico",
+      "installerLanguages": ["fr_FR", "en_US"],
+      "displayLanguageSelector": true,
+      "multiLanguageInstaller": true
     }
   }
 }
