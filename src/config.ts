@@ -1,6 +1,6 @@
 export const TWITCH_CLIENT_ID = import.meta.env.VITE_TWITCH_CLIENT_ID as string;
 export const TWITCH_REDIRECT_URI =
-  (import.meta.env.VITE_TWITCH_REDIRECT_URI as string) ?? "http://localhost:5173/auth/callback";
+  (import.meta.env.VITE_TWITCH_REDIRECT_URI as string) ?? "http://localhost:55510/auth/callback";
 export const TWITCH_SCOPES =
   (import.meta.env.VITE_TWITCH_SCOPES as string) ?? "user:read:email";
 

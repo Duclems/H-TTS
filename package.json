@@ -7,13 +7,13 @@
   "private": true,
   "main": "electron/main.cjs",
   "scripts": {
-    "dev:ui": "vite",
-    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "dev:ui": "vite --port 55510",
+    "dev:electron": "wait-on http://localhost:55510 && electron .",
     "dev": "concurrently \"npm:dev:ui\" \"npm:dev:electron\"",
     "build:ui": "vite build",
     "build:electron": "npm run build:ui && electron-builder",
     "build": "npm run build:electron",
-    "preview": "vite preview"
+    "preview": "vite preview --port 55510"
   },
   "dependencies": {
     "electron-updater": "^6.8.3",
@@ -75,5 +75,8 @@
         "releaseType": "draft"
       }
     ]
+  },
+  "config": {
+    "port": "55510"
   }
 }

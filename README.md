@@ -21,7 +21,7 @@ npm run dev
 
 Cela va :
 
-- démarrer le serveur Vite sur `http://localhost:5173`,
+- démarrer le serveur Vite sur `http://localhost:55510`,
 - ouvrir une fenêtre **Electron** qui charge cette URL.
 
 ### 2. Configuration des variables d’environnement
@@ -35,7 +35,7 @@ cp .env.example .env
 Puis remplis :
 
 - **`VITE_TWITCH_CLIENT_ID`** : ton client id Twitch (obtenu depuis le portail développeur).
-- **`VITE_TWITCH_REDIRECT_URI`** : doit correspondre exactement à l’URL de callback enregistrée chez Twitch (par ex. `http://localhost:5173/auth/callback`).
+- **`VITE_TWITCH_REDIRECT_URI`** : doit correspondre exactement à l’URL de callback enregistrée chez Twitch (par ex. `http://localhost:55510/auth/callback`).
 - **`VITE_TWITCH_SCOPES`** : scopes Twitch requis, par ex. :
   - `user:read:email`
   - `channel:read:redemptions`

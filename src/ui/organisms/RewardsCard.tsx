@@ -26,6 +26,8 @@ type Props = {
   onMissingRewardVoiceChange?: (hasMissing: boolean) => void;
 };
 
+const REDEEM_REFRESH_INTERVAL_MS = 2_000;
+
 export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Props) => {
   const { t } = useI18n();
   const EMOTES_CACHE_KEY = "h_tts_emotes_by_redemption";
@@ -137,7 +139,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       } catch {
         // on garde les anciennes valeurs en cas d'erreur temporaire
       }
-    }, 1000);
+    }, REDEEM_REFRESH_INTERVAL_MS);
 
     return () => {
       cancelled = true;

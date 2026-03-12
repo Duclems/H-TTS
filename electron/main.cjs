@@ -4,7 +4,7 @@ const express = require("express");
 const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
-const PORT = 5173;
+const PORT = 55510;
 
 let serverStarted = false;
 let tray = null;
