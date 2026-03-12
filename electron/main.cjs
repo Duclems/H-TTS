@@ -1,6 +1,7 @@
-const { app, BrowserWindow, Menu, shell, Tray, nativeImage } = require("electron");
+const { app, BrowserWindow, Menu, shell, Tray, nativeImage, dialog } = require("electron");
 const path = require("path");
 const express = require("express");
+const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
 const PORT = 5173;
@@ -79,6 +80,64 @@ function createWindow() {
   }
 }
 
+function setupAutoUpdater() {
+  if (isDev) {
+    // Pas de mise à jour auto en mode développement
+    return;
+  }
+
+  // On ne télécharge pas automatiquement : on demande d'abord l'accord
+  autoUpdater.autoDownload = false;
+
+  autoUpdater.on("error", (error) => {
+    // eslint-disable-next-line no-console
+    console.error("[HI-TTS] Erreur auto-update", error);
+  });
+
+  autoUpdater.on("update-available", (info) => {
+    // eslint-disable-next-line no-console
+    console.log("[HI-TTS] Mise à jour disponible", info.version);
+
+    const result = dialog.showMessageBoxSync({
+      type: "info",
+      buttons: ["Télécharger maintenant", "Plus tard"],
+      defaultId: 0,
+      cancelId: 1,
+      title: "Mise à jour HI-TTS",
+      message: `Une nouvelle version de HI-TTS est disponible (${info.version}).`,
+    });
+
+    if (result === 0) {
+      autoUpdater.downloadUpdate().catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error("[HI-TTS] Erreur lors du téléchargement de la mise à jour", error);
+      });
+    }
+  });
+
+  autoUpdater.on("update-downloaded", (_event, _releaseNotes) => {
+    const result = dialog.showMessageBoxSync({
+      type: "info",
+      buttons: ["Redémarrer maintenant", "Plus tard"],
+      defaultId: 0,
+      cancelId: 1,
+      title: "Mise à jour HI-TTS",
+      message: `Une nouvelle version de HI-TTS a été téléchargée (${info.version}).`,
+      detail: "Redémarrer l'application pour appliquer la mise à jour."
+    });
+
+    if (result === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+
+  // Vérifie au démarrage, déclenche les événements ci-dessus
+  autoUpdater.checkForUpdates().catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error("[HI-TTS] Impossible de vérifier les mises à jour", error);
+  });
+}
+
 app.whenReady().then(() => {
   // Supprime complètement la barre de menus (File / Edit / View / Window / Help)
   Menu.setApplicationMenu(null);
@@ -128,6 +187,8 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+
+  setupAutoUpdater();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -1,6 +1,7 @@
 import { ModalHeader } from "../molecules/ModalHeader";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
+import pkg from "../../../package.json";
 
 type Props = {
   onClose: () => void;
@@ -8,6 +9,7 @@ type Props = {
 
 export const AboutModal = ({ onClose }: Props) => {
   const { t } = useI18n();
+  const version = pkg.version ?? "0.0.0";
   return (
     <div
       className="modal-overlay"
@@ -50,6 +52,9 @@ export const AboutModal = ({ onClose }: Props) => {
               <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
               <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
                 {t("about.footerTagline")}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.1rem" }}>
+                {`v${version}`}
               </div>
             </div>
           </div>

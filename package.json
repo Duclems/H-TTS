@@ -1,6 +1,6 @@
 {
   "name": "hi-tts",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "HI-TTS – TTS ElevenLabs pour rewards Twitch en desktop.",
   "author": "Hiarte <contact@hiarte.fr>",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "electron-updater": "^6.8.3",
     "express": "^4.19.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -61,9 +62,18 @@
       "runAfterFinish": true,
       "installerIcon": "public/logos/hi-tts.ico",
       "uninstallerIcon": "public/logos/hi-tts.ico",
-      "installerLanguages": ["fr_FR", "en_US"],
+      "installerLanguages": [
+        "fr_FR",
+        "en_US"
+      ],
       "displayLanguageSelector": true,
       "multiLanguageInstaller": true
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "draft"
+      }
+    ]
   }
 }
