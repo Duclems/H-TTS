@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { subscribeDebug, type DebugLogEntry, type DebugLogType } from "../../debugLog";
 import { ModalHeader } from "../molecules/ModalHeader";
 
@@ -14,6 +14,11 @@ export const DebugModal = ({ onClose }: Props) => {
     const unsubscribe = subscribeDebug(setLogs);
     return () => unsubscribe();
   }, []);
+
+  const availableTypes = useMemo(() => {
+    const base: DebugLogType[] = ["reward", "redeem", "tmi", "eleven", "system", "auth", "other"];
+    return base.filter((type) => logs.some((log) => log.type === type));
+  }, [logs]);
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="HI-TTS debug overlay" onClick={(e) => {
@@ -50,13 +55,13 @@ export const DebugModal = ({ onClose }: Props) => {
                 }}
               >
                 <option value="all">Choisissez une catégorie</option>
-                <option value="reward">Rewards</option>
-                <option value="redeem">Redeems</option>
-                <option value="tmi">Chat / TMI</option>
-                <option value="eleven">ElevenLabs</option>
-                <option value="system">Système</option>
-                <option value="auth">Auth / Twitch</option>
-                <option value="other">Autres</option>
+                {availableTypes.includes("reward") && <option value="reward">Rewards</option>}
+                {availableTypes.includes("redeem") && <option value="redeem">Redeems</option>}
+                {availableTypes.includes("tmi") && <option value="tmi">Chat / TMI</option>}
+                {availableTypes.includes("eleven") && <option value="eleven">ElevenLabs</option>}
+                {availableTypes.includes("system") && <option value="system">Système</option>}
+                {availableTypes.includes("auth") && <option value="auth">Auth / Twitch</option>}
+                {availableTypes.includes("other") && <option value="other">Autres</option>}
               </select>
             }
             onClose={onClose}

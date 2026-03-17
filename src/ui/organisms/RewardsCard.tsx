@@ -158,7 +158,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
     };
   }, [token.access_token, broadcasterId]);
 
-  // Lecture audio via ElevenLabs des nouvelles redemptions (fenÃªtre de 10 secondes)
+  // Lecture audio via ElevenLabs des nouvelles redemptions (fenêtre de 30 secondes)
   useEffect(() => {
     if (redemptions.length === 0) return;
 
@@ -176,8 +176,8 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       const redeemedAt = new Date(redemption.redeemed_at).getTime();
       if (Number.isNaN(redeemedAt)) continue;
 
-      // On ne déclenche que pour les redemptions apparues dans les 10 dernières secondes
-      if (now - redeemedAt <= 10_000) {
+      // On ne déclenche que pour les redemptions apparues dans les 30 dernières secondes
+      if (now - redeemedAt <= 30_000) {
         const voiceConfig = loadRewardVoiceConfig(redemption.reward.id);
 
         // On nettoie le texte pour ElevenLabs : suppression des emotes
