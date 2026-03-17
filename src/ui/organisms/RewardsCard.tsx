@@ -26,7 +26,7 @@ type Props = {
   onMissingRewardVoiceChange?: (hasMissing: boolean) => void;
 };
 
-const REDEEM_REFRESH_INTERVAL_MS = 2_000;
+const REDEEM_REFRESH_INTERVAL_MS = 5_000;
 
 export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Props) => {
   const { t } = useI18n();
