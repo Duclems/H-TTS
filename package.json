@@ -60,8 +60,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "runAfterFinish": true,
-      "installerIcon": "public/logos/hi-tts.ico",
-      "uninstallerIcon": "public/logos/hi-tts.ico",
+      "installerIcon": "public/logos/hi-tts-task.ico",
+      "uninstallerIcon": "public/logos/hi-tts-task.ico",
       "installerLanguages": [
         "fr_FR",
         "en_US"

@@ -43,6 +43,16 @@ function createWindow() {
     }
   });
 
+  // Ajoute un header spécial sur toutes les requêtes HTTP émises par la fenêtre
+  // pour qu'Express puisse distinguer l'app Electron d'un navigateur externe.
+  win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    const headers = {
+      ...details.requestHeaders,
+      "X-HI-TTS-APP": "1"
+    };
+    callback({ requestHeaders: headers });
+  });
+
   mainWindow = win;
 
   // Ouvre tous les liens externes (target=_blank / window.open) dans le navigateur par défaut
@@ -60,6 +70,16 @@ function createWindow() {
     if (!serverStarted) {
       const staticApp = express();
       const distPath = path.join(__dirname, "..", "dist");
+
+      // Middleware de sécurité : bloque tout accès qui ne vient pas de l'app
+      staticApp.use((req, res, next) => {
+        const headerValue = req.header("X-HI-TTS-APP");
+        if (headerValue === "1") {
+          return next();
+        }
+        res.status(403).send("Forbidden");
+      });
+
       staticApp.use(express.static(distPath));
 
       staticApp.get("*", (_req, res) => {
