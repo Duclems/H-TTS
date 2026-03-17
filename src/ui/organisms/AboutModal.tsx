@@ -10,6 +10,22 @@ type Props = {
 export const AboutModal = ({ onClose }: Props) => {
   const { t } = useI18n();
   const version = pkg.version ?? "0.0.0";
+  const renderPrivacyBlock = (key: string) => {
+    const raw = t(key);
+    const [title, ...rest] = raw.split("\n");
+    const body = rest.join("\n").trim();
+
+    return (
+      <div className="about-privacy-block">
+        <div className="about-privacy-heading">{title}</div>
+        {body && (
+          <p className="card-text about-privacy-body">
+            {body}
+          </p>
+        )}
+      </div>
+    );
+  };
   return (
     <div
       className="modal-overlay"
@@ -30,31 +46,64 @@ export const AboutModal = ({ onClose }: Props) => {
         </header>
 
         <main className="settings-modal-main">
-          <h3 style={{ fontSize: "0.8rem", marginTop: "0", marginBottom: "0.5rem" }}>
-            {t("about.title")}
-          </h3>
-          <h4 style={{ fontSize: "0.75rem", marginTop: "0", marginBottom: "0.25rem", fontWeight: 600 }}>
+          <h3 className="about-main-title">{t("about.title")}</h3>
+
+          <section>
+            <p className="card-text about-hiarte-text">
+              {t("about.hiTtsIntro")}
+            </p>
+          </section>
+
+          <section className="about-hiarte">
+            <img
+              src="/logos/hiarte.svg"
+              alt="Hiarte"
+              className="about-hiarte-logo"
+            />
+            <p className="card-text about-hiarte-text-main">
+              {t("about.hiarteBodyMain")}
+            </p>
+          </section>
+          <p className="card-text about-hiarte-text">
+            {t("about.hiarteBodyMore")}
+            {" "}
+            <a
+              href="https://www.hiarte.fr/about"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "inherit", textDecoration: "underline dotted" }}
+            >
+              {t("about.hiarteLink")}
+            </a>
+            .
+          </p>
+
+          <h4 className="about-privacy-title">
             {t("about.privacyTitle")}
           </h4>
-          <p className="card-text" style={{ fontSize: "0.75rem" }} dangerouslySetInnerHTML={{ __html: t("about.twitchPrivacy") }} />
-          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem" }} dangerouslySetInnerHTML={{ __html: t("about.elevenPrivacy") }} />
-          <p className="card-text" style={{ fontSize: "0.75rem", marginTop: "0.35rem", opacity: 0.85 }} dangerouslySetInnerHTML={{ __html: t("about.noDataSent") }} />
+          <p className="card-text about-privacy-intro">
+            {t("about.privacyIntro")}
+          </p>
+          {renderPrivacyBlock("about.privacyTwitch")}
+          {renderPrivacyBlock("about.privacyEleven")}
+          {renderPrivacyBlock("about.privacyTransmission")}
+          {renderPrivacyBlock("about.privacyStorage")}
         </main>
 
         <footer className="settings-modal-footer">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <div className="about-footer-row">
             <img
               src="/logos/hi-tts-animated.svg"
               alt={t("about.footerApp")}
-              style={{ width: 48, height: 48, display: "block", flexShrink: 0 }}
+              className="about-footer-logo"
             />
-            <div>
-              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                {t("about.footerTagline")}
+            <div className="about-footer-meta">
+              <div className="about-footer-title-row">
+                <div className="about-footer-title">{t("about.footerApp")}</div>
+                <div className="about-footer-version">• {`v${version}`}</div>
               </div>
-              <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.1rem" }}>
-                {`v${version}`}
+              <div className="about-footer-tagline">
+                {t("about.footerTagline")}
               </div>
             </div>
           </div>

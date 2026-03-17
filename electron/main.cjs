@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, Tray, nativeImage, dialog } = require("electron");
+const { app, BrowserWindow, Menu, shell, dialog } = require("electron");
 const path = require("path");
 const express = require("express");
 const { autoUpdater } = require("electron-updater");
@@ -7,7 +7,6 @@ const isDev = !app.isPackaged;
 const PORT = 55510;
 
 let serverStarted = false;
-let tray = null;
 let mainWindow = null;
 
 function getIconPath() {
@@ -40,12 +39,6 @@ function createWindow() {
   });
 
   mainWindow = win;
-
-  // Minimise vers la zone de notification au lieu de fermer complètement
-  win.on("minimize", (event) => {
-    event.preventDefault();
-    win.hide();
-  });
 
   // Ouvre tous les liens externes (target=_blank / window.open) dans le navigateur par défaut
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -143,50 +136,6 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createWindow();
-
-  // Icône de zone de notification (tray)
-  const trayIcon = nativeImage.createFromPath(getIconPath());
-  tray = new Tray(trayIcon);
-  tray.setToolTip("HI-TTS");
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Afficher HI-TTS",
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.focus();
-        } else {
-          createWindow();
-        }
-      }
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Quitter",
-      click: () => {
-        app.isQuiting = true;
-        app.quit();
-      }
-    }
-  ]);
-
-  tray.setContextMenu(contextMenu);
-
-  tray.on("click", () => {
-    if (mainWindow) {
-      if (mainWindow.isVisible()) {
-        mainWindow.focus();
-      } else {
-        mainWindow.show();
-        mainWindow.focus();
-      }
-    } else {
-      createWindow();
-    }
-  });
 
   setupAutoUpdater();
 
