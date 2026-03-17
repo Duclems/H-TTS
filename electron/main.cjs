@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, dialog } = require("electron");
+const { app, BrowserWindow, Menu, shell, dialog, nativeTheme } = require("electron");
 const path = require("path");
 const express = require("express");
 const { autoUpdater } = require("electron-updater");
@@ -10,9 +10,13 @@ let serverStarted = false;
 let mainWindow = null;
 
 function getIconPath() {
+  const prefersDark = nativeTheme.shouldUseDarkColors;
+  // Inverse : thème sombre -> icône claire, thème clair -> icône sombre
+  const fileName = prefersDark ? "hi-tts-light.ico" : "hi-tts-dark.ico";
+
   return isDev
-    ? path.join(__dirname, "..", "public", "logos", "hi-tts.ico")
-    : path.join(__dirname, "..", "dist", "logos", "hi-tts.ico");
+    ? path.join(__dirname, "..", "public", "logos", fileName)
+    : path.join(__dirname, "..", "dist", "logos", fileName);
 }
 
 function createWindow() {
