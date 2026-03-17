@@ -10,8 +10,10 @@ let serverStarted = false;
 let mainWindow = null;
 
 function getIconPath() {
-  // Icône utilisée par la barre des tâches Windows : toujours la même
-  const fileName = "hi-tts-task.ico";
+  // Icône de la fenêtre (et donc de la barre des tâches) : adaptée au thème
+  const prefersDark = nativeTheme.shouldUseDarkColors;
+  // Thème sombre -> icône claire, thème clair -> icône sombre
+  const fileName = prefersDark ? "hi-tts-light.ico" : "hi-tts-dark.ico";
 
   return isDev
     ? path.join(__dirname, "..", "public", "logos", fileName)
