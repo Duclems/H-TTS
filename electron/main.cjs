@@ -10,9 +10,8 @@ let serverStarted = false;
 let mainWindow = null;
 
 function getIconPath() {
-  const prefersDark = nativeTheme.shouldUseDarkColors;
-  // Inverse : thème sombre -> icône claire, thème clair -> icône sombre
-  const fileName = prefersDark ? "hi-tts-light.ico" : "hi-tts-dark.ico";
+  // Icône utilisée par la barre des tâches Windows : toujours la même
+  const fileName = "hi-tts-task.ico";
 
   return isDev
     ? path.join(__dirname, "..", "public", "logos", fileName)

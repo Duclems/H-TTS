@@ -52,7 +52,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/logos/hi-tts.ico"
+      "icon": "public/logos/hi-tts-task.ico"
     },
     "nsis": {
       "oneClick": false,
