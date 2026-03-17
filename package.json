@@ -1,7 +1,7 @@
 {
   "name": "hi-tts",
-  "version": "0.1.4",
-  "description": "HI-TTS – TTS ElevenLabs pour rewards Twitch en desktop.",
+  "version": "0.1.5",
+  "description": "HI-TTS • TTS ElevenLabs pour rewards Twitch en desktop.",
   "author": "Hiarte <contact@hiarte.fr>",
   "license": "MIT",
   "private": true,

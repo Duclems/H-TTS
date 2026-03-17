@@ -1,4 +1,4 @@
-/* Atoms – éléments de base réutilisables */
+/* Atoms • éléments de base réutilisables */
 
 /* Cartes (titres / textes) */
 .card {
@@ -230,7 +230,7 @@
   opacity: 0.9;
 }
 
-/* Toast (atome) – cadre de notification */
+/* Toast (atome) • cadre de notification */
 .toast {
   padding: 0.6rem 1rem;
   border-radius: 0.6rem;

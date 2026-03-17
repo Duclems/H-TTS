@@ -9,6 +9,7 @@ import { SettingsModal } from "./organisms/SettingsModal";
 import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
 import { AboutModal } from "./organisms/AboutModal";
 import { useI18n } from "./context/I18nContext";
+import { DebugModal } from "./organisms/DebugModal";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000;
 
@@ -26,6 +27,7 @@ export const App = () => {
   const [elevenCredits, setElevenCredits] = useState<{ remaining: number; limit: number } | null>(
     null
   );
+  const [debugOpen, setDebugOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,6 +77,19 @@ export const App = () => {
       clearInterval(intervalId);
     };
   }, [apiKey]);
+
+  // Raccourci clavier global pour la modal de debug : Ctrl+Shift+Alt+H
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key?.toLowerCase() === "h" && event.ctrlKey && event.shiftKey && event.altKey) {
+        event.preventDefault();
+        setDebugOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const formatCredits = (value: number): string => {
     if (value >= 1_000_000) {
@@ -234,6 +249,7 @@ export const App = () => {
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {twitchOpen && <TwitchSessionModal onClose={() => setTwitchOpen(false)} />}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
+      {debugOpen && <DebugModal onClose={() => setDebugOpen(false)} />}
     </div>
     </ToastProvider>
   );

@@ -19,6 +19,7 @@ import { speakWithElevenLabsFromText } from "../../elevenLabsApi";
 import { loadRewardVoiceConfig } from "../../rewardVoiceConfig";
 import { RewardVoiceModal } from "./RewardVoiceModal";
 import { useI18n } from "../context/I18nContext";
+import { logDebug } from "../../debugLog";
 
 type Props = {
   token: TwitchTokenResponse;
@@ -136,7 +137,16 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           allRedemptions.push(...r);
         }
         setRedemptions(allRedemptions);
-      } catch {
+      } catch (error) {
+        logDebug({
+          timestamp: Date.now(),
+          source: "rewards-poll",
+          message: "Erreur lors du rafraîchissement des rewards / redemptions Twitch.",
+          details:
+            error instanceof Error
+              ? { name: error.name, message: error.message }
+              : String(error),
+        });
         // on garde les anciennes valeurs en cas d'erreur temporaire
       }
     }, REDEEM_REFRESH_INTERVAL_MS);
