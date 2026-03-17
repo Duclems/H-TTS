@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { subscribeDebug, type DebugLogEntry } from "../../debugLog";
+import { subscribeDebug, type DebugLogEntry, type DebugLogType } from "../../debugLog";
 import { ModalHeader } from "../molecules/ModalHeader";
 
 type Props = {
@@ -8,6 +8,7 @@ type Props = {
 
 export const DebugModal = ({ onClose }: Props) => {
   const [logs, setLogs] = useState<DebugLogEntry[]>([]);
+  const [filter, setFilter] = useState<DebugLogType | "all">("all");
 
   useEffect(() => {
     const unsubscribe = subscribeDebug(setLogs);
@@ -33,6 +34,31 @@ export const DebugModal = ({ onClose }: Props) => {
           <ModalHeader
             titleId="hi-tts-debug-modal-title"
             title="HI-TTS • Debug"
+            rightContent={
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value as DebugLogType | "all")}
+                style={{
+                  fontSize: "0.8rem",
+                  height: "1.75rem",
+                  padding: "0 0.75rem",
+                  borderRadius: "999px",
+                  border: "1px solid var(--border-main)",
+                  backgroundColor: "var(--bg-raised)",
+                  color: "var(--text)",
+                  maxWidth: "260px",
+                }}
+              >
+                <option value="all">Choisissez une catégorie</option>
+                <option value="reward">Rewards</option>
+                <option value="redeem">Redeems</option>
+                <option value="tmi">Chat / TMI</option>
+                <option value="eleven">ElevenLabs</option>
+                <option value="system">Système</option>
+                <option value="auth">Auth / Twitch</option>
+                <option value="other">Autres</option>
+              </select>
+            }
             onClose={onClose}
           />
         </header>
@@ -50,6 +76,7 @@ export const DebugModal = ({ onClose }: Props) => {
             </p>
           )}
           {logs
+            .filter((log) => filter === "all" || log.type === filter)
             .slice()
             .reverse()
             .map((log, index) => (

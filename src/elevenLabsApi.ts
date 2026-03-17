@@ -1,4 +1,5 @@
 import { loadElevenLabsConfig } from "./elevenLabsConfig";
+import { logDebug } from "./debugLog";
 import type { RewardVoiceConfig } from "./rewardVoiceConfig";
 
 type ElevenSubscription = {
@@ -156,6 +157,12 @@ export async function speakWithElevenLabsFromText(
 
   const apiKey = getApiKey();
   if (!apiKey) {
+    logDebug({
+      timestamp: Date.now(),
+      type: "eleven",
+      source: "eleven-tts",
+      message: "Appel TTS ignoré : clé API ElevenLabs manquante.",
+    });
     if (IS_DEV) {
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Clé API manquante, aucun appel effectué.");
@@ -164,6 +171,12 @@ export async function speakWithElevenLabsFromText(
   }
 
   if (!voiceConfig?.voiceId) {
+    logDebug({
+      timestamp: Date.now(),
+      type: "eleven",
+      source: "eleven-tts",
+      message: "Appel TTS ignoré : aucune voix configurée pour ce reward.",
+    });
     if (IS_DEV) {
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Aucune voix configurée pour ce reward, TTS ignoré.");
@@ -204,6 +217,13 @@ export async function speakWithElevenLabsFromText(
     });
 
     if (!res.ok) {
+      logDebug({
+        timestamp: Date.now(),
+        type: "eleven",
+        source: "eleven-tts",
+        message: "Erreur HTTP ElevenLabs lors du TTS.",
+        details: { status: res.status, statusText: res.statusText },
+      });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
         console.log("[ElevenLabs] Erreur HTTP", res.status, res.statusText);
@@ -226,6 +246,13 @@ export async function speakWithElevenLabsFromText(
       }
     };
     await audio.play().catch((err) => {
+      logDebug({
+        timestamp: Date.now(),
+        type: "eleven",
+        source: "eleven-tts",
+        message: "Impossible de lancer la lecture audio ElevenLabs.",
+        details: err instanceof Error ? { name: err.name, message: err.message } : String(err),
+      });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
         console.log("[ElevenLabs] Impossible de lancer la lecture audio", err);
@@ -233,6 +260,13 @@ export async function speakWithElevenLabsFromText(
     });
     return { ok: true, status: res.status };
   } catch (e) {
+    logDebug({
+      timestamp: Date.now(),
+      type: "eleven",
+      source: "eleven-tts",
+      message: "Erreur réseau ou inattendue lors de l'appel ElevenLabs.",
+      details: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+    });
     if (IS_DEV) {
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Erreur réseau ou inattendue", e);

@@ -1,5 +1,8 @@
+export type DebugLogType = "reward" | "redeem" | "tmi" | "eleven" | "system" | "auth" | "other";
+
 export type DebugLogEntry = {
   timestamp: number;
+  type: DebugLogType;
   source: string;
   message: string;
   details?: unknown;

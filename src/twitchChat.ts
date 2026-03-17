@@ -1,4 +1,5 @@
 import tmi from "tmi.js";
+import { logDebug } from "./debugLog";
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -118,6 +119,20 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
       console.log("[HI-TTS][IRC]", payload);
     }
 
+    logDebug({
+      timestamp: Date.now(),
+      type: payload.rewardId ? "redeem" : "tmi",
+      source: "tmi-message",
+      message: payload.rewardId
+        ? `Message associé à un reward (redeem) reçu sur #${username}.`
+        : `Message chat reçu sur #${username}.`,
+      details: {
+        channel,
+        user: payload.userDisplayName || payload.userLogin,
+        hasRewardId: !!payload.rewardId,
+      },
+    });
+
     for (const listener of listeners) {
       listener(payload);
     }
@@ -126,12 +141,25 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
   client
     .connect()
     .then(() => {
+      logDebug({
+        timestamp: Date.now(),
+        type: "tmi",
+        source: "tmi-connect",
+        message: `Connecté au chat Twitch pour #${username}.`,
+      });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
         console.log(`[HI-TTS][IRC] Connecté au chat Twitch pour #${username}`);
       }
     })
     .catch((err: unknown) => {
+      logDebug({
+        timestamp: Date.now(),
+        type: "tmi",
+        source: "tmi-connect",
+        message: `Échec de connexion au chat Twitch pour #${username}.`,
+        details: err instanceof Error ? { name: err.name, message: err.message } : String(err),
+      });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
         console.warn("[HI-TTS][IRC] Échec de connexion au chat Twitch", err);

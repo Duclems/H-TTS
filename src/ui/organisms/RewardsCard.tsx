@@ -140,6 +140,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       } catch (error) {
         logDebug({
           timestamp: Date.now(),
+          type: "reward",
           source: "rewards-poll",
           message: "Erreur lors du rafraîchissement des rewards / redemptions Twitch.",
           details:
@@ -208,7 +209,19 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                 return result.replace(/\s+/g, " ").trim();
               })();
 
-        if (!cleanedText) continue;
+        if (!cleanedText) {
+          logDebug({
+            timestamp: Date.now(),
+            type: "redeem",
+            source: "redeem-skip",
+            message: "Redemption ignorée car aucun texte utilisable après nettoyage.",
+            details: {
+              redemptionId: redemption.id,
+              rewardId: redemption.reward.id,
+            },
+          });
+          continue;
+        }
 
         if (import.meta.env.DEV) {
           // eslint-disable-next-line no-console
@@ -220,6 +233,19 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
             cleanedText
           });
         }
+
+        logDebug({
+          timestamp: Date.now(),
+          type: "redeem",
+          source: "redeem-tts",
+          message: "Lancement du TTS ElevenLabs pour une nouvelle redemption.",
+          details: {
+            redemptionId: redemption.id,
+            rewardId: redemption.reward.id,
+            user: redemption.user_display_name || redemption.user_login,
+            text: cleanedText,
+          },
+        });
 
         void speakWithElevenLabsFromText(cleanedText, voiceConfig);
       }
