@@ -2,12 +2,70 @@ const { app, BrowserWindow, Menu, shell, dialog, nativeTheme } = require("electr
 const path = require("path");
 const express = require("express");
 const { autoUpdater } = require("electron-updater");
+const net = require("net");
+const { exec } = require("child_process");
 
 const isDev = !app.isPackaged;
 const PORT = 55510;
 
 let serverStarted = false;
 let mainWindow = null;
+
+function isPortOpen(port) {
+  return new Promise((resolve) => {
+    const socket = net
+      .connect({ port, host: "127.0.0.1" })
+      .once("connect", () => {
+        socket.end();
+        resolve(true);
+      })
+      .once("error", () => {
+        resolve(false);
+      });
+  });
+}
+
+function getPidsOnPort(port) {
+  return new Promise((resolve) => {
+    // netstat output: ... TCP 127.0.0.1:55510 ... LISTENING PID
+    exec(`netstat -ano -p tcp | findstr :${port}`, (err, stdout) => {
+      if (err || !stdout) return resolve([]);
+
+      const pids = new Set();
+      const lines = stdout.split(/\r?\n/).filter(Boolean);
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const pid = parts[parts.length - 1];
+        if (pid && /^\d+$/.test(pid)) pids.add(pid);
+      }
+      resolve(Array.from(pids));
+    });
+  });
+}
+
+function tryKillPid(pid) {
+  return new Promise((resolve) => {
+    // /F = force, /T = kill child processes
+    exec(`taskkill /PID ${pid} /F /T`, () => resolve());
+  });
+}
+
+async function freePortIfNeeded(port) {
+  const open = await isPortOpen(port);
+  if (!open) return true;
+
+  const pids = await getPidsOnPort(port);
+  if (pids.length === 0) return false;
+
+  // Attempt to free the port by killing the process(es) holding it.
+  for (const pid of pids) {
+    await tryKillPid(pid);
+  }
+
+  // Wait a moment and re-check.
+  await new Promise((r) => setTimeout(r, 500));
+  return !(await isPortOpen(port));
+}
 
 function getIconPath() {
   // Icône de la fenêtre (et donc de la barre des tâches) : adaptée au thème
@@ -86,15 +144,54 @@ function createWindow() {
         res.sendFile(path.join(distPath, "index.html"));
       });
 
-      staticApp.listen(PORT, () => {
-        // eslint-disable-next-line no-console
-        console.log(`[Hi-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
-      });
+      // Start server ONLY after we successfully free the port (prevents EADDRINUSE popup).
+      void (async () => {
+        const ok = await freePortIfNeeded(PORT);
+        if (!ok) {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            dialog
+              .showMessageBox({
+                type: "error",
+                title: "HI-TTS",
+                message:
+                  `Port ${PORT} is already in use and could not be freed automatically.\n\n` +
+                  "Please close other HI-TTS instances (and any dev server) and restart the app."
+              })
+              .catch(() => {});
+          }
+          app.quit();
+          return;
+        }
 
-      serverStarted = true;
+        const server = staticApp.listen(PORT, () => {
+          // eslint-disable-next-line no-console
+          console.log(`[Hi-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
+        });
+
+        server.on("error", (err) => {
+          // eslint-disable-next-line no-console
+          console.error("[Hi-TTS] Express listen error", err);
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            dialog
+              .showMessageBox({
+                type: "error",
+                title: "HI-TTS",
+                message:
+                  "Unable to start the internal server (port already in use). " +
+                  "Please close other instances and restart."
+              })
+              .catch(() => {});
+          }
+          app.quit();
+        });
+
+        serverStarted = true;
+        win.loadURL(`http://localhost:${PORT}`);
+      })();
     }
-
-    win.loadURL(`http://localhost:${PORT}`);
+    else {
+      win.loadURL(`http://localhost:${PORT}`);
+    }
   }
 }
 

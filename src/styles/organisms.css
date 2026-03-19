@@ -35,7 +35,7 @@
 }
 
 .settings-modal-content.settings-modal-has-footer .settings-modal-header .card-title {
-  color: var(--danger);
+  color: var(--text);
 }
 
 .settings-modal-main {
