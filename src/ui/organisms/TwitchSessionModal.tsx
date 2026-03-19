@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { AuthenticatedTokenCard } from "./AuthenticatedTokenCard";
 import { getStoredToken } from "../../twitchAuth";
 import { ModalHeader } from "../molecules/ModalHeader";
@@ -10,6 +11,18 @@ type Props = {
 export const TwitchSessionModal = ({ onClose }: Props) => {
   const { t } = useI18n();
   const token = getStoredToken();
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
   return (
     <div

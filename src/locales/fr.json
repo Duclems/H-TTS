@@ -4,7 +4,7 @@
     "creditsRemaining": "Crédits restants",
     "redeemsRefresh": "Les redeems sont rafraîchis toutes les <strong>5&nbsp;secondes</strong> et il peut se déclencher jusqu’à <strong>30&nbsp;secondes</strong> après son apparition.",
     "rewardsManagement": "Gestion des rewards",
-    "rewardsSubtitle": "Crée et paramètrer ici vos rewards HI-TTS utilisés pour déclencher le TTS sur ton stream.",
+    "rewardsSubtitle": "Crée et paramètrer ici vos rewards Hi-TTS utilisés pour déclencher le TTS sur ton stream.",
     "home": "Accueil",
     "rewards": "Rewards",
     "twitchSession": "Session Twitch",
@@ -30,8 +30,8 @@
   "about": {
     "title": "À propos",
     "hiarteTitle": "À propos de Hiarte",
-    "hiTtsIntro": "HI-TTS a pour objectif de rendre le Text-to-Speech simple, fiable et agréable à utiliser en liant tes rewards Twitch à des voix ElevenLabs, tout en restant transparent sur l'utilisation de tes données.",
-    "hiarteBodyMain": "HI-TTS est conçu et maintenu par Hiarte, un studio indépendant qui crée des outils et expériences pour les créateurs de contenu et les streamers.",
+    "hiTtsIntro": "Hi-TTS a pour objectif de rendre le Text-to-Speech simple, fiable et agréable à utiliser en liant tes rewards Twitch à des voix ElevenLabs, tout en restant transparent sur l'utilisation de tes données.",
+    "hiarteBodyMain": "Hi-TTS est conçu et maintenu par Hiarte, un studio indépendant qui crée des outils et expériences pour les créateurs de contenu et les streamers.",
     "hiarteBodyMore": "Si tu souhaites découvrir les autres applications disponibles, voir les projets en cours ou en savoir plus sur l'entreprise, tu peux retrouver toutes les infos sur le site de Hiarte.",
     "hiarteLink": "En savoir plus sur Hiarte",
     "privacyTitle": "Politique de confidentialité",
@@ -40,14 +40,14 @@
     "privacyEleven": "2. Données liées à ElevenLabs\nLa clé API ElevenLabs est enregistrée localement dans la configuration de l’application. Elle est utilisée uniquement afin d’effectuer les requêtes nécessaires vers l’API officielle d’ElevenLabs.\n\nCette clé est sensible. Elle ne doit jamais être partagée. Toute personne disposant d’un accès à ton ordinateur, à tes fichiers de configuration ou à l’environnement d’exécution de l’application peut potentiellement l’utiliser.\n\n Faites attention à ce que vous installez sur votre machine.",
     "privacyTransmission": "3. Transmission des données\nL’application n’envoie pas de données vers un serveur tiers non prévu. Les seules communications externes effectuées sont celles nécessaires au fonctionnement avec les API officielles de Twitch et d’ElevenLabs.",
     "privacyStorage": "4. Stockage local\nLes informations de connexion et de configuration mentionnées ci-dessus sont conservées localement sur ta machine. Elles ne sont pas centralisées sur un serveur géré par l’application elle-même.",
-    "footerApp": "HI-TTS",
+    "footerApp": "Hi-TTS",
     "footerTagline": "Outil TTS gratuit pour Twitch • © 2026 Hiarte"
   },
   "twitchLogin": {
     "title": "Connexion à Twitch",
     "intro": "L'application a besoin d'une connexion à Twitch pour accéder à la suite.",
     "cta": "Se connecter avec Twitch",
-    "tokenNote": "HI-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans l'application pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
+    "tokenNote": "Hi-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans l'application pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
     "detailsLink": "Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans « Paramètres » > Politique de confidentialité."
   },
   "eleven": {
@@ -71,18 +71,19 @@
     "errorFetch": "Erreur lors de la récupération des rewards/redemptions.",
     "errorCreate": "Impossible de créer le reward. Vérifie les scopes, que tu es bien le propriétaire de la chaîne et que les points de chaîne / custom rewards sont activés (et que ta chaîne est éligible).",
     "errorCreateShort": "Erreur lors de la création du reward.",
-    "loadingAlt": "Chargement HI-TTS",
+    "loadingAlt": "Chargement Hi-TTS",
     "creating": "Création du reward",
-    "createCta": "Créer un reward HI-TTS",
-    "empty": "Aucun reward HI-TTS pour le moment. Crée ton premier reward pour commencer à déclencher le TTS sur ton stream.",
+    "createCta": "Créer un reward Hi-TTS",
+    "empty": "Aucun reward Hi-TTS pour le moment. Crée ton premier reward pour commencer à déclencher le TTS sur ton stream.",
     "points": "points de chaîne",
     "settings": "Paramètres",
-    "historyEmpty": "Dès qu'un viewer utilise un reward HI-TTS, il apparaîtra ici",
-    "rewardPrompt": "Reward générée par l'app HI-TTS.",
-    "animationAlt": "Animation HI-TTS"
+    "historyEmpty": "Dès qu'un viewer utilise un reward Hi-TTS, il apparaîtra ici",
+    "rewardPrompt": "Reward générée par l'app Hi-TTS.",
+    "animationAlt": "Animation Hi-TTS"
   },
   "rewardVoice": {
     "title": "Voix TTS",
+    "modalTitle": "Paramétrage de la voix",
     "voiceLabel": "Voix ElevenLabs",
     "chooseVoice": "Choisir une voix…",
     "modelLabel": "Modèle",
@@ -99,6 +100,18 @@
     "myVoicesLink": "« Mes Voix » sur ElevenLabs",
     "testPhrase": "Test de la voix.",
     "saved": "Enregistré"
+  },
+  "debug": {
+    "title": "Hi-TTS • Debug",
+    "selectPlaceholder": "Choisir une catégorie",
+    "categoryReward": "Rewards",
+    "categoryRedeem": "Redeems",
+    "categoryTmi": "Chat / TMI",
+    "categoryEleven": "ElevenLabs",
+    "categorySystem": "Système",
+    "categoryAuth": "Auth / Twitch",
+    "categoryOther": "Autres",
+    "empty": "Aucun log pour l’instant. Les erreurs ou événements techniques apparaîtront ici."
   },
   "twitchSession": {
     "title": "Connexion Twitch"

@@ -161,7 +161,7 @@ export async function speakWithElevenLabsFromText(
       timestamp: Date.now(),
       type: "eleven",
       source: "eleven-tts",
-      message: "Appel TTS ignoré : clé API ElevenLabs manquante.",
+      message: "TTS request skipped: missing ElevenLabs API key.",
     });
     if (IS_DEV) {
       // eslint-disable-next-line no-console
@@ -175,7 +175,7 @@ export async function speakWithElevenLabsFromText(
       timestamp: Date.now(),
       type: "eleven",
       source: "eleven-tts",
-      message: "Appel TTS ignoré : aucune voix configurée pour ce reward.",
+      message: "TTS request skipped: no voice configured for this reward.",
     });
     if (IS_DEV) {
       // eslint-disable-next-line no-console
@@ -221,7 +221,7 @@ export async function speakWithElevenLabsFromText(
         timestamp: Date.now(),
         type: "eleven",
         source: "eleven-tts",
-        message: "Erreur HTTP ElevenLabs lors du TTS.",
+        message: "ElevenLabs HTTP error during TTS request.",
         details: { status: res.status, statusText: res.statusText },
       });
       if (IS_DEV) {
@@ -250,7 +250,7 @@ export async function speakWithElevenLabsFromText(
         timestamp: Date.now(),
         type: "eleven",
         source: "eleven-tts",
-        message: "Impossible de lancer la lecture audio ElevenLabs.",
+        message: "Failed to start ElevenLabs audio playback.",
         details: err instanceof Error ? { name: err.name, message: err.message } : String(err),
       });
       if (IS_DEV) {
@@ -264,7 +264,7 @@ export async function speakWithElevenLabsFromText(
       timestamp: Date.now(),
       type: "eleven",
       source: "eleven-tts",
-      message: "Erreur réseau ou inattendue lors de l'appel ElevenLabs.",
+      message: "Network or unexpected error during ElevenLabs request.",
       details: e instanceof Error ? { name: e.name, message: e.message } : String(e),
     });
     if (IS_DEV) {

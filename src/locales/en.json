@@ -4,7 +4,7 @@
     "creditsRemaining": "Credits remaining",
     "redeemsRefresh": "Redeems are refreshed every <strong>5 seconds</strong> and each redeem can trigger for up to <strong>30 seconds</strong> after it appears.",
     "rewardsManagement": "Rewards management",
-    "rewardsSubtitle": "Create and configure your HI-TTS rewards here to trigger TTS on your stream.",
+    "rewardsSubtitle": "Create and configure your Hi-TTS rewards here to trigger TTS on your stream.",
     "home": "Home",
     "rewards": "Rewards",
     "twitchSession": "Twitch session",
@@ -30,8 +30,8 @@
   "about": {
     "title": "About",
     "hiarteTitle": "About Hiarte",
-    "hiTtsIntro": "HI-TTS aims to make Text-to-Speech simple, reliable and pleasant to use by linking your Twitch rewards to ElevenLabs voices, while staying transparent about how your data is handled.",
-    "hiarteBodyMain": "HI-TTS is built and maintained by Hiarte, an independent studio creating tools and experiences for content creators and streamers.",
+    "hiTtsIntro": "Hi-TTS aims to make Text-to-Speech simple, reliable and pleasant to use by linking your Twitch rewards to ElevenLabs voices, while staying transparent about how your data is handled.",
+    "hiarteBodyMain": "Hi-TTS is built and maintained by Hiarte, an independent studio creating tools and experiences for content creators and streamers.",
     "hiarteBodyMore": "If you want to discover other available apps, see ongoing projects or learn more about the company, you can find all the information on Hiarte's website.",
     "hiarteLink": "Learn more about Hiarte",
     "privacyTitle": "Privacy policy",
@@ -40,14 +40,14 @@
     "privacyEleven": "2. Data related to ElevenLabs\nYour ElevenLabs API key is stored locally in the application's configuration. It is only used to make the necessary requests to the official ElevenLabs API.\n\nThis key is sensitive and must never be shared. Anyone with access to your computer, your configuration files or the application's runtime environment could potentially use it.\n\nBe careful with what you install on your machine.",
     "privacyTransmission": "3. Data transmission\nThe application does not send data to any unexpected third-party server. The only external communications performed are those required to work with the official APIs of Twitch and ElevenLabs.",
     "privacyStorage": "4. Local storage\nThe connection and configuration information mentioned above is kept locally on your machine. It is not centralised on a server managed by the application itself.",
-    "footerApp": "HI-TTS",
+    "footerApp": "Hi-TTS",
     "footerTagline": "Free TTS tool for Twitch • © 2026 Hiarte"
   },
   "twitchLogin": {
     "title": "Connect to Twitch",
     "intro": "The app needs a Twitch connection to continue.",
     "cta": "Connect with Twitch",
-    "tokenNote": "HI-TTS is a free app by Hiarte. Your Twitch token is stored locally for your personal use only and is only sent to Twitch. Never share it.",
+    "tokenNote": "Hi-TTS is a free app by Hiarte. Your Twitch token is stored locally for your personal use only and is only sent to Twitch. Never share it.",
     "detailsLink": "Details about token and ElevenLabs key storage are in « Settings » > Privacy policy."
   },
   "eleven": {
@@ -71,18 +71,19 @@
     "errorFetch": "Error fetching rewards/redemptions.",
     "errorCreate": "Unable to create reward. Check scopes, that you own the channel, and that channel points / custom rewards are enabled (and that your channel is eligible).",
     "errorCreateShort": "Error creating reward.",
-    "loadingAlt": "Loading HI-TTS",
+    "loadingAlt": "Loading Hi-TTS",
     "creating": "Creating reward",
-    "createCta": "Create HI-TTS reward",
-    "empty": "No HI-TTS rewards yet. Create your first reward to start triggering TTS on your stream.",
+    "createCta": "Create Hi-TTS reward",
+    "empty": "No Hi-TTS rewards yet. Create your first reward to start triggering TTS on your stream.",
     "points": "channel points",
     "settings": "Settings",
-    "historyEmpty": "When a viewer uses a HI-TTS reward, it will appear here",
-    "rewardPrompt": "Reward created by HI-TTS app.",
-    "animationAlt": "HI-TTS animation"
+    "historyEmpty": "When a viewer uses a Hi-TTS reward, it will appear here",
+    "rewardPrompt": "Reward created by Hi-TTS app.",
+    "animationAlt": "Hi-TTS animation"
   },
   "rewardVoice": {
     "title": "TTS voice",
+    "modalTitle": "Voice settings",
     "voiceLabel": "ElevenLabs voice",
     "chooseVoice": "Choose a voice…",
     "modelLabel": "Model",
@@ -99,6 +100,18 @@
     "myVoicesLink": "« My Voices » on ElevenLabs",
     "testPhrase": "Voice test.",
     "saved": "Saved"
+  },
+  "debug": {
+    "title": "Hi-TTS • Debug",
+    "selectPlaceholder": "Choose a category",
+    "categoryReward": "Rewards",
+    "categoryRedeem": "Redeems",
+    "categoryTmi": "Chat / TMI",
+    "categoryEleven": "ElevenLabs",
+    "categorySystem": "System",
+    "categoryAuth": "Auth / Twitch",
+    "categoryOther": "Other",
+    "empty": "No logs yet. Technical errors and events will appear here."
   },
   "twitchSession": {
     "title": "Twitch connection"

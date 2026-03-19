@@ -1,22 +1,22 @@
-﻿Accord de licence HI-TTS (FR)
+﻿Accord de licence Hi-TTS (FR)
 ================================
 
-Ce programme HI-TTS est fourni par Hiarte.
+Ce programme Hi-TTS est fourni par Hiarte.
 
 En cliquant sur « J’accepte » ou en installant le logiciel, vous acceptez les
 conditions suivantes :
 
 1. Licence
 ----------
-- Vous pouvez utiliser HI-TTS gratuitement pour vos streams, vidéos et projets
+- Vous pouvez utiliser Hi-TTS gratuitement pour vos streams, vidéos et projets
   personnels ou professionnels.
 - Vous pouvez installer le logiciel sur plusieurs machines que vous contrôlez.
-- Vous ne pouvez pas revendre HI-TTS en tant que produit autonome ni le
+- Vous ne pouvez pas revendre Hi-TTS en tant que produit autonome ni le
   distribuer sous votre propre marque.
 
 2. Données et services tiers
 ----------------------------
-- HI-TTS s’appuie sur les services de Twitch et d’ElevenLabs. Leur utilisation
+- Hi-TTS s’appuie sur les services de Twitch et d’ElevenLabs. Leur utilisation
   reste soumise à leurs propres Conditions d’utilisation et Politiques de
   confidentialité.
 - Vos identifiants (token Twitch, clé API ElevenLabs) sont stockés localement
@@ -24,7 +24,7 @@ conditions suivantes :
 
 3. Absence de garantie
 ----------------------
-HI-TTS est fourni « EN L’ÉTAT », sans aucune garantie d’aucune sorte, expresse
+Hi-TTS est fourni « EN L’ÉTAT », sans aucune garantie d’aucune sorte, expresse
 ou implicite. Hiarte ne garantit pas que le logiciel sera exempt d’erreurs,
 compatible avec tous les systèmes ou disponible en permanence.
 
@@ -32,12 +32,12 @@ compatible avec tous les systèmes ou disponible en permanence.
 -------------------------------
 Dans toute la mesure permise par la loi, Hiarte ne pourra être tenue
 responsable d’aucun dommage direct ou indirect résultant de l’utilisation ou
-de l’impossibilité d’utilisation de HI-TTS (perte de données, perte de revenus,
+de l’impossibilité d’utilisation de Hi-TTS (perte de données, perte de revenus,
 interruption de stream, etc.).
 
 5. Licence open source sous-jacente
 -----------------------------------
-Le code de HI-TTS est distribué sous licence MIT. Le texte intégral de la
+Le code de Hi-TTS est distribué sous licence MIT. Le texte intégral de la
 licence MIT est fourni dans le fichier « LICENSE » du projet. En cas de
 contradiction entre cet accord et la licence MIT, la licence MIT prévaut pour
 le code source.

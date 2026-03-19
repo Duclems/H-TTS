@@ -30,7 +30,7 @@ function createWindow() {
     minHeight: 450,
     maxWidth: 450,
     maxHeight: 450,
-    title: "HI-TTS",
+    title: "Hi-TTS",
     icon: iconPath,
     backgroundColor: "#1e130b",
     webPreferences: {
@@ -48,7 +48,7 @@ function createWindow() {
   win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
     const headers = {
       ...details.requestHeaders,
-      "X-HI-TTS-APP": "1"
+      "X-Hi-TTS-APP": "1"
     };
     callback({ requestHeaders: headers });
   });
@@ -73,7 +73,7 @@ function createWindow() {
 
       // Middleware de sécurité : bloque tout accès qui ne vient pas de l'app
       staticApp.use((req, res, next) => {
-        const headerValue = req.header("X-HI-TTS-APP");
+        const headerValue = req.header("X-Hi-TTS-APP");
         if (headerValue === "1") {
           return next();
         }
@@ -88,7 +88,7 @@ function createWindow() {
 
       staticApp.listen(PORT, () => {
         // eslint-disable-next-line no-console
-        console.log(`[HI-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
+        console.log(`[Hi-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
       });
 
       serverStarted = true;
@@ -109,26 +109,26 @@ function setupAutoUpdater() {
 
   autoUpdater.on("error", (error) => {
     // eslint-disable-next-line no-console
-    console.error("[HI-TTS] Erreur auto-update", error);
+    console.error("[Hi-TTS] Erreur auto-update", error);
   });
 
   autoUpdater.on("update-available", (info) => {
     // eslint-disable-next-line no-console
-    console.log("[HI-TTS] Mise à jour disponible", info.version);
+    console.log("[Hi-TTS] Mise à jour disponible", info.version);
 
     const result = dialog.showMessageBoxSync({
       type: "info",
       buttons: ["Télécharger maintenant", "Plus tard"],
       defaultId: 0,
       cancelId: 1,
-      title: "Mise à jour HI-TTS",
-      message: `Une nouvelle version de HI-TTS est disponible (${info.version}).`,
+      title: "Mise à jour Hi-TTS",
+      message: `Une nouvelle version de Hi-TTS est disponible (${info.version}).`,
     });
 
     if (result === 0) {
       autoUpdater.downloadUpdate().catch((error) => {
         // eslint-disable-next-line no-console
-        console.error("[HI-TTS] Erreur lors du téléchargement de la mise à jour", error);
+        console.error("[Hi-TTS] Erreur lors du téléchargement de la mise à jour", error);
       });
     }
   });
@@ -139,8 +139,8 @@ function setupAutoUpdater() {
       buttons: ["Redémarrer maintenant", "Plus tard"],
       defaultId: 0,
       cancelId: 1,
-      title: "Mise à jour HI-TTS",
-      message: `Une nouvelle version de HI-TTS a été téléchargée (${info.version}).`,
+      title: "Mise à jour Hi-TTS",
+      message: `Une nouvelle version de Hi-TTS a été téléchargée (${info.version}).`,
       detail: "Redémarrer l'application pour appliquer la mise à jour."
     });
 
@@ -152,7 +152,7 @@ function setupAutoUpdater() {
   // Vérifie au démarrage, déclenche les événements ci-dessus
   autoUpdater.checkForUpdates().catch((error) => {
     // eslint-disable-next-line no-console
-    console.error("[HI-TTS] Impossible de vérifier les mises à jour", error);
+    console.error("[Hi-TTS] Impossible de vérifier les mises à jour", error);
   });
 }
 

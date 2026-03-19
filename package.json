@@ -1,7 +1,7 @@
 {
   "name": "hi-tts",
   "version": "0.1.6",
-  "description": "HI-TTS • TTS ElevenLabs pour rewards Twitch en desktop.",
+  "description": "Hi-TTS • TTS ElevenLabs pour rewards Twitch en desktop.",
   "author": "Hiarte <contact@hiarte.fr>",
   "license": "MIT",
   "private": true,
@@ -40,8 +40,8 @@
   },
   "build": {
     "appId": "com.hi-tts.app",
-    "productName": "HI-TTS",
-    "artifactName": "HI-TTS-Setup-${version}.${ext}",
+    "productName": "Hi-TTS",
+    "artifactName": "Hi-TTS-Setup-${version}.${ext}",
     "files": [
       "dist/**",
       "electron/**",

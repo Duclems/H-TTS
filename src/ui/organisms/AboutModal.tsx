@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
@@ -10,6 +11,19 @@ type Props = {
 export const AboutModal = ({ onClose }: Props) => {
   const { t } = useI18n();
   const version = pkg.version ?? "0.0.0";
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
   const renderPrivacyBlock = (key: string) => {
     const raw = t(key);
     const [title, ...rest] = raw.split("\n");

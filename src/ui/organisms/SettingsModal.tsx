@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ElevenLabsCard } from "./ElevenLabsCard";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useI18n } from "../context/I18nContext";
@@ -8,6 +9,19 @@ type Props = {
 
 export const SettingsModal = ({ onClose }: Props) => {
   const { t } = useI18n();
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
   return (
     <div
       className="modal-overlay"

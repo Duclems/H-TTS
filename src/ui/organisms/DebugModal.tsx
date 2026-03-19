@@ -1,14 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { subscribeDebug, type DebugLogEntry, type DebugLogType } from "../../debugLog";
 import { ModalHeader } from "../molecules/ModalHeader";
+import { useI18n } from "../context/I18nContext";
 
 type Props = {
   onClose: () => void;
 };
 
 export const DebugModal = ({ onClose }: Props) => {
+  const { t } = useI18n();
   const [logs, setLogs] = useState<DebugLogEntry[]>([]);
   const [filter, setFilter] = useState<DebugLogType | "all">("all");
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
   useEffect(() => {
     const unsubscribe = subscribeDebug(setLogs);
@@ -21,7 +35,7 @@ export const DebugModal = ({ onClose }: Props) => {
   }, [logs]);
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="HI-TTS debug overlay" onClick={(e) => {
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Hi-TTS debug overlay" onClick={(e) => {
       if (e.target === e.currentTarget) onClose();
     }}>
       <div
@@ -38,7 +52,7 @@ export const DebugModal = ({ onClose }: Props) => {
         <header>
           <ModalHeader
             titleId="hi-tts-debug-modal-title"
-            title="HI-TTS • Debug"
+            title={t("debug.title")}
             rightContent={
               <select
                 value={filter}
@@ -54,14 +68,14 @@ export const DebugModal = ({ onClose }: Props) => {
                   maxWidth: "260px",
                 }}
               >
-                <option value="all">Choisissez une catégorie</option>
-                {availableTypes.includes("reward") && <option value="reward">Rewards</option>}
-                {availableTypes.includes("redeem") && <option value="redeem">Redeems</option>}
-                {availableTypes.includes("tmi") && <option value="tmi">Chat / TMI</option>}
-                {availableTypes.includes("eleven") && <option value="eleven">ElevenLabs</option>}
-                {availableTypes.includes("system") && <option value="system">Système</option>}
-                {availableTypes.includes("auth") && <option value="auth">Auth / Twitch</option>}
-                {availableTypes.includes("other") && <option value="other">Autres</option>}
+                <option value="all">{t("debug.selectPlaceholder")}</option>
+                {availableTypes.includes("reward") && <option value="reward">{t("debug.categoryReward")}</option>}
+                {availableTypes.includes("redeem") && <option value="redeem">{t("debug.categoryRedeem")}</option>}
+                {availableTypes.includes("tmi") && <option value="tmi">{t("debug.categoryTmi")}</option>}
+                {availableTypes.includes("eleven") && <option value="eleven">{t("debug.categoryEleven")}</option>}
+                {availableTypes.includes("system") && <option value="system">{t("debug.categorySystem")}</option>}
+                {availableTypes.includes("auth") && <option value="auth">{t("debug.categoryAuth")}</option>}
+                {availableTypes.includes("other") && <option value="other">{t("debug.categoryOther")}</option>}
               </select>
             }
             onClose={onClose}
@@ -77,7 +91,7 @@ export const DebugModal = ({ onClose }: Props) => {
         >
           {logs.length === 0 && (
             <p style={{ margin: 0, color: "var(--text-muted)" }}>
-              Aucun log pour l’instant. Les erreurs ou événements techniques apparaîtront ici.
+              {t("debug.empty")}
             </p>
           )}
           {logs

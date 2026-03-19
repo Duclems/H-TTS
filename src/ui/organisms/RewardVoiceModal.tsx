@@ -6,7 +6,7 @@ import {
   MODEL_OPTIONS,
   type RewardVoiceConfig
 } from "../../rewardVoiceConfig";
-import { speakWithElevenLabsFromText, fetchElevenVoices } from "../../elevenLabsApi";
+import { speakWithElevenLabsFromText, fetchElevenVoices, fetchElevenUser } from "../../elevenLabsApi";
 import { Button } from "../atoms/Button";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useToast } from "../context/ToastContext";
@@ -17,6 +17,8 @@ type Props = {
   rewardTitle: string;
   onClose: () => void;
 };
+
+const VOICE_LABEL_CACHE_KEY = "h_tts_reward_voice_labels";
 
 export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const { addToast } = useToast();
@@ -31,10 +33,39 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const [testText, setTestText] = useState("");
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
+  const [isElevenKeyValid, setIsElevenKeyValid] = useState(true);
+  const [voicesLoading, setVoicesLoading] = useState(true);
+  const [lastVoiceLabel, setLastVoiceLabel] = useState("");
 
   useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  const saveLastVoiceLabel = (label: string) => {
+    setLastVoiceLabel(label);
+    try {
+      const raw = localStorage.getItem(VOICE_LABEL_CACHE_KEY);
+      const map = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+      map[rewardId] = label;
+      localStorage.setItem(VOICE_LABEL_CACHE_KEY, JSON.stringify(map));
+    } catch {
+      // ignore localStorage failures
+    }
+  };
+
+  useEffect(() => {
+    let initialVoiceId = "";
     const existing = loadRewardVoiceConfig(rewardId);
     if (existing) {
+      initialVoiceId = existing.voiceId;
       setVoiceId(existing.voiceId);
       setModelId(existing.modelId);
       setStability(existing.stability);
@@ -43,6 +74,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       setSpeed(existing.speed);
     } else {
       const def = getDefaultRewardVoiceConfig();
+      initialVoiceId = def.voiceId;
       setVoiceId(def.voiceId);
       setModelId(def.modelId);
       setStability(def.stability);
@@ -51,10 +83,31 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       setSpeed(def.speed);
     }
 
+    try {
+      const raw = localStorage.getItem(VOICE_LABEL_CACHE_KEY);
+      const map = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+      if (typeof map[rewardId] === "string") {
+        setLastVoiceLabel(map[rewardId]);
+      }
+    } catch {
+      // ignore localStorage failures
+    }
+
     void (async () => {
+      setVoicesLoading(true);
+      const user = await fetchElevenUser();
+      setIsElevenKeyValid(!!user);
+
       const list = await fetchElevenVoices();
       const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name, "fr-FR"));
       setVoices(sorted);
+      if (initialVoiceId) {
+        const matched = sorted.find((v) => v.voice_id === initialVoiceId);
+        if (matched?.name) {
+          saveLastVoiceLabel(matched.name);
+        }
+      }
+      setVoicesLoading(false);
     })();
   }, [rewardId]);
 
@@ -151,7 +204,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       >
         <ModalHeader
           titleId="reward-voice-modal-title"
-          title={`${t("rewardVoice.title")} • ${rewardTitle}`}
+          title={t("rewardVoice.modalTitle")}
           onClose={onClose}
           closeAriaLabel={t("modal.close")}
         />
@@ -162,13 +215,24 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
                 {t("rewardVoice.voiceLabel")}
               </label>
-              {voices.length > 0 ? (
+              {voicesLoading ? (
+                <input
+                  id="rv-voice-id"
+                  type="text"
+                  value={lastVoiceLabel}
+                  placeholder={t("rewardVoice.chooseVoice")}
+                  className="field"
+                  disabled
+                  readOnly
+                />
+              ) : voices.length > 0 ? (
                 <>
                   <button
                     id="rv-voice-id"
                     type="button"
                     className="field reward-voice-dropdown-trigger"
                     onClick={(e) => {
+                      if (!isElevenKeyValid) return;
                       e.stopPropagation();
                       setVoiceOpen((v) => !v);
                       setModelOpen(false);
@@ -176,10 +240,11 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                     aria-expanded={voiceOpen}
                     aria-haspopup="listbox"
                     aria-label={t("rewardVoice.chooseVoice")}
+                    disabled={!isElevenKeyValid}
                   >
                     {voices.find((v) => v.voice_id === voiceId)?.name ?? t("rewardVoice.chooseVoice")}
                   </button>
-                  {voiceOpen && (
+                  {voiceOpen && isElevenKeyValid && (
                     <ul
                       className="reward-voice-dropdown-list"
                       role="listbox"
@@ -205,6 +270,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                           className="reward-voice-dropdown-option"
                           onClick={() => {
                             setVoiceId(v.voice_id);
+                            saveLastVoiceLabel(v.name);
                             setVoiceOpen(false);
                           }}
                         >
@@ -218,10 +284,14 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
                 <input
                   id="rv-voice-id"
                   type="text"
-                  value={voiceId}
-                  onChange={(e) => setVoiceId(e.target.value)}
+                  value={isElevenKeyValid ? voiceId : lastVoiceLabel}
+                  onChange={(e) => {
+                    if (isElevenKeyValid) setVoiceId(e.target.value);
+                  }}
                   placeholder={t("rewardVoice.chooseVoice")}
                   className="field"
+                  disabled={!isElevenKeyValid}
+                  readOnly={!isElevenKeyValid}
                 />
               )}
             </div>

@@ -3,9 +3,11 @@ import { Button } from "../atoms/Button";
 import { CardTitle } from "../atoms/CardTitle";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
+import pkg from "../../../package.json";
 
 export const TwitchLoginCard = () => {
   const { t } = useI18n();
+  const version = pkg.version ?? "0.0.0";
   const handleLogin = () => {
     const url = buildTwitchAuthorizeUrl();
     window.location.assign(url);
@@ -41,7 +43,10 @@ export const TwitchLoginCard = () => {
             style={{ width: 48, height: 48, display: "block", flexShrink: 0 }}
           />
           <div>
-            <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
+              <div style={{ fontSize: "0.7rem", color: "var(--text)" }}>• {`v${version}`}</div>
+            </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
               {t("about.footerTagline")}
             </div>

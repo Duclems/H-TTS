@@ -142,7 +142,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           timestamp: Date.now(),
           type: "reward",
           source: "rewards-poll",
-          message: "Erreur lors du rafraîchissement des rewards / redemptions Twitch.",
+          message: "Error while refreshing Twitch rewards/redemptions.",
           details:
             error instanceof Error
               ? { name: error.name, message: error.message }
@@ -214,7 +214,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
             timestamp: Date.now(),
             type: "redeem",
             source: "redeem-skip",
-            message: "Redemption ignorée car aucun texte utilisable après nettoyage.",
+            message: "Redemption skipped: no usable text after cleanup.",
             details: {
               redemptionId: redemption.id,
               rewardId: redemption.reward.id,
@@ -225,7 +225,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
         if (import.meta.env.DEV) {
           // eslint-disable-next-line no-console
-          console.log("[HI-TTS] Nouvelle redemption à lire via ElevenLabs", {
+          console.log("[Hi-TTS] Nouvelle redemption à lire via ElevenLabs", {
             id: redemption.id,
             rewardId: redemption.reward.id,
             user: redemption.user_display_name || redemption.user_login,
@@ -238,7 +238,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           timestamp: Date.now(),
           type: "redeem",
           source: "redeem-tts",
-          message: "Lancement du TTS ElevenLabs pour une nouvelle redemption.",
+          message: "Starting ElevenLabs TTS for a new redemption.",
           details: {
             redemptionId: redemption.id,
             rewardId: redemption.reward.id,
@@ -454,7 +454,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
       setCreating(true);
       setError(null);
 
-      const title = buildUniqueRewardTitle("HI-TTS Reward");
+      const title = buildUniqueRewardTitle("Hi-TTS Reward");
 
       const reward = await createCustomReward(token.access_token, broadcasterId, {
         title,

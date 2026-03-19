@@ -1,29 +1,29 @@
-﻿HI-TTS License Agreement (EN)
+﻿Hi-TTS License Agreement (EN)
 =============================
 
-This HI-TTS program is provided by Hiarte.
+This Hi-TTS program is provided by Hiarte.
 
 By clicking “I accept” or installing the software, you agree to the
 following terms:
 
 1. License
 ---------
-- You may use HI-TTS free of charge for your streams, videos and personal or
+- You may use Hi-TTS free of charge for your streams, videos and personal or
   professional projects.
 - You may install the software on multiple machines that you control.
-- You may not resell HI-TTS as a standalone product nor distribute it under
+- You may not resell Hi-TTS as a standalone product nor distribute it under
   your own brand.
 
 2. Data and third‑party services
 -------------------------------
-- HI-TTS relies on Twitch and ElevenLabs services. Their use remains subject to
+- Hi-TTS relies on Twitch and ElevenLabs services. Their use remains subject to
   their own Terms of Service and Privacy Policies.
 - Your credentials (Twitch token, ElevenLabs API key) are stored locally on
   your machine and are not sent to Hiarte.
 
 3. No warranty
 -------------
-HI-TTS is provided "AS IS", without warranty of any kind, express or implied.
+Hi-TTS is provided "AS IS", without warranty of any kind, express or implied.
 Hiarte does not warrant that the software will be error‑free, compatible with
 all systems, or available at all times.
 
@@ -31,12 +31,12 @@ all systems, or available at all times.
 --------------------------
 To the maximum extent permitted by law, Hiarte shall not be liable for any
 indirect, direct, incidental or consequential damages arising out of the use or
-inability to use HI-TTS (including loss of data, revenue, stream downtime,
+inability to use Hi-TTS (including loss of data, revenue, stream downtime,
 reputation, etc.).
 
 5. Underlying open source license
 ---------------------------------
-The HI-TTS source code is distributed under the MIT License. The full MIT
+The Hi-TTS source code is distributed under the MIT License. The full MIT
 license text is provided in the "LICENSE" file of the project. In case of any
 conflict between this agreement and the MIT license, the MIT license shall
 prevail for the source code.

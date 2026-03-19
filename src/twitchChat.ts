@@ -116,7 +116,7 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
 
     if (IS_DEV) {
       // eslint-disable-next-line no-console
-      console.log("[HI-TTS][IRC]", payload);
+      console.log("[Hi-TTS][IRC]", payload);
     }
 
     logDebug({
@@ -124,8 +124,8 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
       type: payload.rewardId ? "redeem" : "tmi",
       source: "tmi-message",
       message: payload.rewardId
-        ? `Message associé à un reward (redeem) reçu sur #${username}.`
-        : `Message chat reçu sur #${username}.`,
+        ? `Chat message linked to a reward redemption received on #${username}.`
+        : `Chat message received on #${username}.`,
       details: {
         channel,
         user: payload.userDisplayName || payload.userLogin,
@@ -145,11 +145,11 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
         timestamp: Date.now(),
         type: "tmi",
         source: "tmi-connect",
-        message: `Connecté au chat Twitch pour #${username}.`,
+        message: `Connected to Twitch chat for #${username}.`,
       });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
-        console.log(`[HI-TTS][IRC] Connecté au chat Twitch pour #${username}`);
+        console.log(`[Hi-TTS][IRC] Connecté au chat Twitch pour #${username}`);
       }
     })
     .catch((err: unknown) => {
@@ -157,12 +157,12 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
         timestamp: Date.now(),
         type: "tmi",
         source: "tmi-connect",
-        message: `Échec de connexion au chat Twitch pour #${username}.`,
+        message: `Failed to connect to Twitch chat for #${username}.`,
         details: err instanceof Error ? { name: err.name, message: err.message } : String(err),
       });
       if (IS_DEV) {
         // eslint-disable-next-line no-console
-        console.warn("[HI-TTS][IRC] Échec de connexion au chat Twitch", err);
+        console.warn("[Hi-TTS][IRC] Échec de connexion au chat Twitch", err);
       }
     });
 }
