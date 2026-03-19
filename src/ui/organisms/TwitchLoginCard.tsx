@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { buildTwitchAuthorizeUrl } from "../../twitchAuth";
 import { Button } from "../atoms/Button";
 import { CardTitle } from "../atoms/CardTitle";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
+import { TwitchLoginAboutModal } from "./TwitchLoginAboutModal";
 import pkg from "../../../package.json";
 
 export const TwitchLoginCard = () => {
   const { t } = useI18n();
   const version = pkg.version ?? "0.0.0";
+  const [aboutOpen, setAboutOpen] = useState(false);
   const handleLogin = () => {
     const url = buildTwitchAuthorizeUrl();
     window.location.assign(url);
@@ -15,44 +18,52 @@ export const TwitchLoginCard = () => {
 
   return (
     <section className="card twitch-login-card">
-      <div className="twitch-login-card-lang" style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem", marginBottom: "0.75rem" }}>
-        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{t("language.label")}</span>
+      <div className="twitch-login-card-lang">
+        <span className="twitch-login-card-lang-label">{t("language.label")}</span>
         <LanguageSelector />
       </div>
 
-      <CardTitle>{t("twitchLogin.title")}</CardTitle>
-      <p className="card-text">
-        {t("twitchLogin.intro")}
-      </p>
+      <div className="twitch-login-main-cta">
+        <CardTitle>{t("twitchLogin.title")}</CardTitle>
+        <p className="card-text twitch-login-intro">
+          {t("twitchLogin.intro")}
+        </p>
 
-      <Button variant="primary" onClick={handleLogin}>
-        {t("twitchLogin.cta")}
-      </Button>
-      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.6rem", opacity: 0.8 }}>
-        {t("twitchLogin.tokenNote")}
-      </p>
-      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.2rem", opacity: 0.8 }}>
-        {t("twitchLogin.detailsLink")}
-      </p>
+        <Button variant="primary" onClick={handleLogin}>
+          {t("twitchLogin.cta")}
+        </Button>
+        <p className="card-text twitch-login-note">
+          {t("twitchLogin.tokenNote")}
+        </p>
+        <button
+          type="button"
+          className="twitch-login-about-button"
+          onClick={() => setAboutOpen(true)}
+        >
+          {t("twitchLogin.aboutPrivacyButton")}
+        </button>
+      </div>
 
       <footer className="twitch-login-footer">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+        <div className="twitch-login-footer-row">
           <img
             src="/logos/hi-tts-animated.svg"
             alt={t("about.footerApp")}
-            style={{ width: 48, height: 48, display: "block", flexShrink: 0 }}
+            className="about-footer-logo"
           />
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-              <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{t("about.footerApp")}</div>
-              <div style={{ fontSize: "0.7rem", color: "var(--text)" }}>• {`v${version}`}</div>
+          <div className="about-footer-meta">
+            <div className="about-footer-title-row">
+              <div className="about-footer-title">{t("about.footerApp")}</div>
+              <div className="about-footer-version">• {`v${version}`}</div>
             </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            <div className="about-footer-tagline">
               {t("about.footerTagline")}
             </div>
           </div>
         </div>
       </footer>
+
+      {aboutOpen && <TwitchLoginAboutModal onClose={() => setAboutOpen(false)} />}
     </section>
   );
 };

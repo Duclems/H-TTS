@@ -198,21 +198,104 @@
 }
 
 /* Page connexion Twitch : footer identique à la modal À propos */
+.twitch-login-card {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.twitch-login-card-lang {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.twitch-login-card-lang-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.twitch-login-main-cta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.twitch-login-intro {
+  margin-top: 0.2rem;
+  margin-bottom: 0.45rem;
+}
+
+.twitch-login-note {
+  font-size: 0.7rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0.2rem;
+  opacity: 0.8;
+}
+
+.twitch-login-details {
+  font-size: 0.7rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.2rem;
+  opacity: 0.8;
+}
+
+.twitch-login-about-button {
+  margin-top: 0.2rem;
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-decoration: underline dotted;
+  cursor: pointer;
+  padding: 0;
+}
+
+.twitch-login-about-button:hover {
+  color: var(--text);
+}
+
 .twitch-login-footer {
-  margin-top: 1.25rem;
-  padding-top: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
   border-top: 1px solid var(--border-main);
   background-color: var(--bg-subtle);
   margin-left: -0.75rem;
   margin-right: -0.75rem;
-  margin-bottom: -0.75rem;
-  padding: 0.75rem;
-  min-height: 50px;
+  margin-bottom: -0.55rem;
+  padding: 0.55rem 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.25rem;
+}
+
+.twitch-login-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.twitch-login-about-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.twitch-login-about-main {
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* Modal Voix reward */
