@@ -108,6 +108,9 @@ function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
 
   autoUpdater.on("error", (error) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(-1);
+    }
     // eslint-disable-next-line no-console
     console.error("[Hi-TTS] Erreur auto-update", error);
   });
@@ -133,20 +136,57 @@ function setupAutoUpdater() {
     }
   });
 
-  autoUpdater.on("update-downloaded", (_event, _releaseNotes) => {
+  autoUpdater.on("download-progress", (progressObj) => {
+    const percent = Math.max(0, Math.min(100, Number(progressObj?.percent ?? 0)));
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(percent / 100);
+    }
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Hi-TTS] Download progress: ${percent.toFixed(1)}% (${Math.round(
+        progressObj?.bytesPerSecond ?? 0
+      )} B/s)`
+    );
+  });
+
+  autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+    const downloadedVersion =
+      typeof releaseName === "string" && releaseName.trim()
+        ? releaseName.trim()
+        : "new version";
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(-1);
+    }
+
     const result = dialog.showMessageBoxSync({
       type: "info",
       buttons: ["Redémarrer maintenant", "Plus tard"],
       defaultId: 0,
       cancelId: 1,
       title: "Mise à jour Hi-TTS",
-      message: `Une nouvelle version de Hi-TTS a été téléchargée (${info.version}).`,
+      message: `Une nouvelle version de Hi-TTS a été téléchargée (${downloadedVersion}).`,
       detail: "Redémarrer l'application pour appliquer la mise à jour."
     });
 
     if (result === 0) {
       autoUpdater.quitAndInstall();
     }
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(-1);
+    }
+    // eslint-disable-next-line no-console
+    console.log("[Hi-TTS] Aucune mise à jour disponible.");
+    dialog.showMessageBox({
+      type: "info",
+      title: "Mise à jour Hi-TTS",
+      message: "Aucune mise à jour disponible pour le moment.",
+    }).catch(() => {
+      // ignore dialog errors
+    });
   });
 
   // Vérifie au démarrage, déclenche les événements ci-dessus
