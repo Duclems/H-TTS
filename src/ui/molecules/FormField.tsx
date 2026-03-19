@@ -12,6 +12,7 @@ type Props = {
   error?: boolean;
   inputClassName?: string;
   labelStyle?: CSSProperties;
+  disableLabelClick?: boolean;
 };
 
 export const FormField = ({
@@ -23,13 +24,20 @@ export const FormField = ({
   placeholder,
   error,
   inputClassName,
-  labelStyle
+  labelStyle,
+  disableLabelClick = false
 }: Props) => {
   return (
     <div>
-      <Label htmlFor={id} style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem", ...labelStyle }}>
-        {label}
-      </Label>
+      {disableLabelClick ? (
+        <div style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem", ...labelStyle }}>
+          {label}
+        </div>
+      ) : (
+        <Label htmlFor={id} style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem", ...labelStyle }}>
+          {label}
+        </Label>
+      )}
       <Input
         id={id}
         type={type}

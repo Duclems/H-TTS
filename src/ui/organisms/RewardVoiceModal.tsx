@@ -212,9 +212,9 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
         <div className="reward-voice-modal-body">
           <div className="reward-voice-modal-fields">
             <div className="reward-voice-dropdown-wrap reward-voice-field-first">
-              <label htmlFor="rv-voice-id" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+              <div className="reward-voice-field-label">
                 {t("rewardVoice.voiceLabel")}
-              </label>
+              </div>
               {voicesLoading ? (
                 <input
                   id="rv-voice-id"
@@ -297,9 +297,9 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
             </div>
 
             <div className="reward-voice-dropdown-wrap">
-              <label htmlFor="rv-model" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+              <div className="reward-voice-field-label">
                 {t("rewardVoice.modelLabel")}
-              </label>
+              </div>
               <button
                 id="rv-model"
                 type="button"
@@ -408,7 +408,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
             </div>
 
             <div>
-              <label htmlFor="rv-test" style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.2rem" }}>
+              <label htmlFor="rv-test" className="reward-voice-field-label">
                 {t("rewardVoice.testLabel")}
               </label>
               <input
@@ -421,7 +421,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
               />
               <Button
                 variant="primary"
-                style={{ marginTop: "0.75rem" }}
+                className="reward-voice-test-btn"
                 onClick={handleTest}
                 disabled={!voiceId.trim()}
               >

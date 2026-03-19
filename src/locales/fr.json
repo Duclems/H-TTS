@@ -48,7 +48,6 @@
     "intro": "L'application a besoin d'une connexion à Twitch pour accéder à la suite.",
     "cta": "Se connecter avec Twitch",
     "tokenNote": "Hi-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans l'application pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
-    "detailsLink": "Les détails sur le stockage du token et de la clé ElevenLabs sont expliqués dans « Paramètres » > Politique de confidentialité.",
     "aboutPrivacyButton": "À propos et politique de confidentialité"
   },
   "eleven": {
@@ -83,7 +82,6 @@
     "animationAlt": "Animation Hi-TTS"
   },
   "rewardVoice": {
-    "title": "Voix TTS",
     "modalTitle": "Paramétrage de la voix",
     "voiceLabel": "Voix ElevenLabs",
     "chooseVoice": "Choisir une voix…",

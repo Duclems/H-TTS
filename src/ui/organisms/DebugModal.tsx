@@ -39,14 +39,7 @@ export const DebugModal = ({ onClose }: Props) => {
       if (e.target === e.currentTarget) onClose();
     }}>
       <div
-        className="panel modal-content"
-        style={{
-          maxWidth: "640px",
-          maxHeight: "80vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
+        className="panel modal-content debug-modal"
         onClick={(e) => e.stopPropagation()}
       >
         <header>
@@ -57,16 +50,7 @@ export const DebugModal = ({ onClose }: Props) => {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as DebugLogType | "all")}
-                style={{
-                  fontSize: "0.8rem",
-                  height: "1.75rem",
-                  padding: "0 0.75rem",
-                  borderRadius: "999px",
-                  border: "1px solid var(--border-main)",
-                  backgroundColor: "var(--bg-raised)",
-                  color: "var(--text)",
-                  maxWidth: "260px",
-                }}
+                className="debug-modal-filter"
               >
                 <option value="all">{t("debug.selectPlaceholder")}</option>
                 {availableTypes.includes("reward") && <option value="reward">{t("debug.categoryReward")}</option>}
@@ -81,16 +65,9 @@ export const DebugModal = ({ onClose }: Props) => {
             onClose={onClose}
           />
         </header>
-        <main
-          style={{
-            padding: "0.5rem 0.9rem 0.75rem",
-            overflowY: "auto",
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
-            fontSize: "0.75rem",
-          }}
-        >
+        <main className="debug-modal-main">
           {logs.length === 0 && (
-            <p style={{ margin: 0, color: "var(--text-muted)" }}>
+            <p className="debug-modal-empty">
               {t("debug.empty")}
             </p>
           )}
@@ -101,24 +78,14 @@ export const DebugModal = ({ onClose }: Props) => {
             .map((log, index) => (
               <div
                 key={index}
-                style={{
-                  borderBottom: "1px solid var(--border-main)",
-                  padding: "0.4rem 0",
-                }}
+                className="debug-modal-entry"
               >
-                <div style={{ color: "var(--text-muted)" }}>
+                <div className="debug-modal-meta">
                   {new Date(log.timestamp).toLocaleTimeString()} • {log.source}
                 </div>
                 <div>{log.message}</div>
                 {Boolean(log.details) && (
-                  <pre
-                    style={{
-                      margin: "0.25rem 0 0",
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                      color: "var(--text-muted)",
-                    }}
-                  >
+                  <pre className="debug-modal-details">
                     {typeof log.details === "string"
                       ? log.details
                       : JSON.stringify(log.details, null, 2)}

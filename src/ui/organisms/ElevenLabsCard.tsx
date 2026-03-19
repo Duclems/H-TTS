@@ -240,6 +240,7 @@ export const ElevenLabsCard = () => {
           onChange={setApiKey}
           placeholder="sk_..."
           error={hasError}
+          disableLabelClick
         />
       </div>
       

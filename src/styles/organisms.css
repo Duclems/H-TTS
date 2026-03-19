@@ -154,6 +154,11 @@
   -ms-user-select: none;
 }
 
+.about-link {
+  color: inherit;
+  text-decoration: underline dotted;
+}
+
 .about-footer-row {
   display: flex;
   align-items: center;
@@ -298,6 +303,53 @@
   overflow-y: auto;
 }
 
+.debug-modal {
+  max-width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.debug-modal-filter {
+  font-size: 0.8rem;
+  height: 1.75rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-main);
+  background-color: var(--bg-raised);
+  color: var(--text);
+  max-width: 260px;
+}
+
+.debug-modal-main {
+  padding: 0.5rem 0.9rem 0.75rem;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  font-size: 0.75rem;
+}
+
+.debug-modal-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.debug-modal-entry {
+  border-bottom: 1px solid var(--border-main);
+  padding: 0.4rem 0;
+}
+
+.debug-modal-meta {
+  color: var(--text-muted);
+}
+
+.debug-modal-details {
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-muted);
+}
+
 /* Modal Voix reward */
 .reward-voice-modal {
   max-height: 80vh;
@@ -321,6 +373,16 @@
   gap: 0.5rem;
   align-items: center;
   flex-shrink: 0;
+}
+
+.reward-voice-field-label {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.reward-voice-test-btn {
+  margin-top: 0.75rem;
 }
 
 /* Bloc utilisateur ElevenLabs (avatar + meta) */

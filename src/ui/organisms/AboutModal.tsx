@@ -82,10 +82,10 @@ export const AboutModal = ({ onClose }: Props) => {
             {t("about.hiarteBodyMore")}
             {" "}
             <a
-              href="https://www.hiarte.frt"
+              href="https://www.hiarte.fr"
               target="_blank"
               rel="noreferrer"
-              style={{ color: "inherit", textDecoration: "underline dotted" }}
+              className="about-link"
             >
               {t("about.hiarteLink")}
             </a>
