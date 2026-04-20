@@ -37,6 +37,12 @@ function sleepMs(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+function readRootCssVar(name: string, fallback: string): string {
+  if (typeof document === "undefined") return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
 /** Délai avant prochaine tentative après erreur Helix / réseau. */
 function pollBackoffDelayMs(err: TwitchHelixErr, consecutiveFailures: number): number {
   if (err.retryAfterMs != null && err.retryAfterMs > 0) {
@@ -146,6 +152,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         });
 
         let rewardsData: TwitchCustomReward[] | null = null;
+        let lastRewardsErr: TwitchHelixErr | null = null;
         for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
           const rr = await fetchCustomRewardsResult(token.access_token, user.id);
           if (cancelled) return;
@@ -153,19 +160,33 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
             rewardsData = rr.data;
             break;
           }
+          lastRewardsErr = rr;
           if (attempt < 5) {
             await sleepMs(pollBackoffDelayMs(rr, attempt + 1));
           }
         }
-        if (!rewardsData) {
-          setError(t("rewards.errorFetch"));
-          return;
+        const rewardsList = rewardsData ?? [];
+        if (!rewardsData && lastRewardsErr) {
+          // Ancien comportement de `fetchCustomRewards` : réponse non-ok → liste vide, pas d’erreur UI.
+          // (403 / scope / client_id évite souvent d’afficher des rewards « manageable » sans être une panne.)
+          logDebug({
+            timestamp: Date.now(),
+            type: "reward",
+            source: "rewards-initial",
+            message:
+              "Custom rewards Helix failed after retries; using empty list (legacy-compatible).",
+            details: {
+              status: lastRewardsErr.status,
+              network: lastRewardsErr.network ?? false,
+              retryAfterMs: lastRewardsErr.retryAfterMs,
+            },
+          });
         }
 
-        setRewards(rewardsData);
+        setRewards(rewardsList);
 
         const allRedemptions: TwitchRewardRedemption[] = [];
-        for (const reward of rewardsActiveForPoll(rewardsData)) {
+        for (const reward of rewardsActiveForPoll(rewardsList)) {
           let chunk: TwitchRewardRedemption[] | null = null;
           for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
             const rr = await fetchRewardRedemptionsResult(
@@ -196,7 +217,15 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         }
         setRedemptions(allRedemptions);
       } catch (e) {
-        setError(t("rewards.errorFetch"));
+        logDebug({
+          timestamp: Date.now(),
+          type: "reward",
+          source: "rewards-initial",
+          message: "Unexpected error during initial rewards/redemptions load.",
+          details: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+        });
+        setRewards([]);
+        setRedemptions([]);
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -718,7 +747,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         prompt: t("rewards.rewardPrompt"),
         is_enabled: true,
         is_user_input_required: true,
-        background_color: "#9146FF",
+        background_color: readRootCssVar("--twitch-purple", "#9146ff"),
         is_global_cooldown_enabled: true,
         global_cooldown_seconds: 300,
         is_max_per_stream_enabled: true,
@@ -786,7 +815,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                     borderRadius: "0.9rem",
                     padding: "1.2rem 0.9rem",
                     border: "1px dashed var(--border)",
-                    backgroundColor: "rgba(10, 5, 4, 0.9)",
+                    backgroundColor: "var(--empty-state-bg)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -828,7 +857,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                           width: 40,
                           height: 40,
                           borderRadius: 12,
-                          backgroundColor: reward.background_color || "#2a1a0f",
+                          backgroundColor: reward.background_color || "var(--reward-swatch-fallback)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -888,7 +917,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                       borderRadius: "0.9rem",
                       padding: "1.4rem 1rem",
                       border: "1px dashed var(--border)",
-                      backgroundColor: "rgba(10, 5, 4, 0.9)",
+                      backgroundColor: "var(--empty-state-bg)",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",

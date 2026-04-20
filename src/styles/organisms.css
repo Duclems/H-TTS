@@ -16,7 +16,7 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  background-color: var(--bg-raised);
+  background-color: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: 0.9rem;
   color: var(--text);
@@ -470,24 +470,24 @@
 }
 
 .rewards-list-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--scrollbar-track-faint);
   border-radius: 999px;
 }
 
 .rewards-list-container::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.32);
+  background-color: var(--scrollbar-thumb-narrow);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 .rewards-list-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.48);
+  background-color: var(--scrollbar-thumb-narrow-hover);
 }
 
 .rewards-list-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
+  scrollbar-color: var(--scrollbar-thumb-muted) transparent;
 }
 
 .rewards-history-container {
@@ -501,24 +501,24 @@
 }
 
 .rewards-history-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--scrollbar-track-faint);
   border-radius: 999px;
 }
 
 .rewards-history-container::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.32);
+  background-color: var(--scrollbar-thumb-narrow);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 .rewards-history-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.48);
+  background-color: var(--scrollbar-thumb-narrow-hover);
 }
 
 .rewards-history-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
+  scrollbar-color: var(--scrollbar-thumb-muted) transparent;
 }
 
 .rewards-history-item {

@@ -76,7 +76,7 @@
   border-radius: 999px;
   background-color: var(--accent-soft);
   color: var(--accent);
-  border: 1px solid rgba(201, 162, 39, 0.4);
+  border: 1px solid var(--accent-gold-border);
 }
 
 .pill-dot {
@@ -105,7 +105,7 @@
 
 .error-text {
   font-size: 0.8rem;
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .text-success {
@@ -173,7 +173,7 @@
 .nav-button:hover {
   background-color: var(--bg-hover);
   color: var(--text);
-  border-color: rgba(252, 252, 252, 0.2);
+  border-color: var(--nav-border-hover);
 }
 
 /* Skeletons */
@@ -239,7 +239,7 @@
   color: var(--text);
   background-color: var(--bg-raised);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-sm);
   text-align: left;
 }
 

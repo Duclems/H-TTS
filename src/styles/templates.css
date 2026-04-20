@@ -155,7 +155,7 @@ img {
 
 .header-settings-btn-active {
   background-color: var(--accent-soft);
-  border-color: rgba(201, 162, 39, 0.4);
+  border-color: var(--accent-gold-border);
   color: var(--accent);
 }
 
@@ -166,8 +166,8 @@ img {
 }
 
 .header-settings-btn-eleven-error:hover {
-  background-color: #b84a4a;
-  border-color: #b84a4a;
+  background-color: var(--danger-pulse-mid);
+  border-color: var(--danger-pulse-mid);
 }
 
 .header-settings-btn-eleven-missing {
@@ -176,7 +176,7 @@ img {
 }
 
 .header-settings-btn-eleven-missing:hover {
-  border-color: #b86f4a;
+  border-color: var(--missing-pulse-mid);
 }
 
 /* Onglets header (Récompenses, etc.) */

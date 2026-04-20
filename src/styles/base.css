@@ -109,24 +109,46 @@
   --bg: #0b0705;
   --bg-raised: #140e0a;
   --bg-hover: #261812;
+  --bg-subtle: #100c09;
   --text: #ffffff;
   --text-muted: #ffffffbc;
   --border: #3a2418;
   --border-main: #2e1c14;
   --accent: #f8ebe5;
   --accent-soft: #241812;
+  --accent-gold-border: rgba(201, 162, 39, 0.4);
   --success: rgb(46, 108, 36);
   --saved: #1a3a14;
   --saved-hover: rgb(46, 108, 36);
   --danger: #381818;
   --danger-hover: rgb(112, 40, 40);
+  /* Texte d’erreur lisible sur fond sombre (--danger sert surtout de fond de bouton) */
+  --danger-text: #e08080;
+  --danger-pulse-mid: #b84a4a;
+  --danger-pulse-glow: rgba(184, 74, 74, 0.25);
+  --danger-pulse-glow-off: rgba(184, 74, 74, 0);
   --missing: #382518;
   --missing-hover: rgb(112, 64, 40);
+  --missing-pulse-mid: #b86f4a;
+  --missing-pulse-glow: rgba(184, 114, 74, 0.25);
+  --missing-pulse-glow-off: rgba(184, 118, 74, 0);
   --overlay: rgba(0, 0, 0, 0.52);
+  --shadow-sm: rgba(0, 0, 0, 0.15);
+  --shadow-md: rgba(0, 0, 0, 0.2);
   --range-progress: #703818;
   --range-dot: #a84e18;
   --range-progress-hover: #c85a18;
   --switch-main: #a84e18;
+  --scrollbar-thumb: rgba(252, 252, 252, 0.48);
+  --scrollbar-thumb-hover: rgba(252, 252, 252, 0.62);
+  --scrollbar-thumb-muted: rgba(252, 252, 252, 0.42);
+  --scrollbar-track-faint: rgba(255, 255, 255, 0.045);
+  --scrollbar-thumb-narrow: rgba(252, 252, 252, 0.32);
+  --scrollbar-thumb-narrow-hover: rgba(252, 252, 252, 0.48);
+  --nav-border-hover: rgba(252, 252, 252, 0.2);
+  --empty-state-bg: rgba(10, 5, 4, 0.9);
+  --reward-swatch-fallback: #2a1a0f;
+  --twitch-purple: #9146ff;
 }
 
 body {
@@ -153,30 +175,30 @@ body {
 @keyframes eleven-error-pulse {
   0% {
     background-color: var(--danger);
-    box-shadow: 0 0 0 0 rgba(184, 74, 74, 0.0);
+    box-shadow: 0 0 0 0 var(--danger-pulse-glow-off);
   }
   50% {
-    background-color: #b84a4a;
-    box-shadow: 0 0 0 6px rgba(184, 74, 74, 0.25);
+    background-color: var(--danger-pulse-mid);
+    box-shadow: 0 0 0 6px var(--danger-pulse-glow);
   }
   100% {
     background-color: var(--danger);
-    box-shadow: 0 0 0 0 rgba(184, 74, 74, 0.0);
+    box-shadow: 0 0 0 0 var(--danger-pulse-glow-off);
   }
 }
 
 @keyframes eleven-missing-pulse {
   0% {
     background-color: var(--missing);
-    box-shadow: 0 0 0 0 rgba(184, 120, 74, 0);
+    box-shadow: 0 0 0 0 var(--missing-pulse-glow-off);
   }
   50% {
-    background-color: #b86f4a;
-    box-shadow: 0 0 0 6px rgba(184, 114, 74, 0.25);
+    background-color: var(--missing-pulse-mid);
+    box-shadow: 0 0 0 6px var(--missing-pulse-glow);
   }
   100% {
     background-color: var(--missing);
-    box-shadow: 0 0 0 0 rgba(184, 118, 74, 0);
+    box-shadow: 0 0 0 0 var(--missing-pulse-glow-off);
   }
 }
 
@@ -187,7 +209,7 @@ body {
 /* Scrollbars globaux */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
+  scrollbar-color: var(--scrollbar-thumb-muted) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -200,12 +222,12 @@ html {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.48);
+  background-color: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.62);
+  background-color: var(--scrollbar-thumb-hover);
 }
