@@ -1,4 +1,4 @@
-import { loadElevenLabsConfig } from "./elevenLabsConfig";
+import { getCachedElevenLabsApiKey } from "./elevenLabsConfig";
 import { logDebug } from "./debugLog";
 import type { RewardVoiceConfig } from "./rewardVoiceConfig";
 
@@ -20,8 +20,8 @@ type ElevenVoice = {
 };
 
 function getApiKey(): string | null {
-  const { apiKey } = loadElevenLabsConfig();
-  return apiKey?.trim() || null;
+  const trimmed = getCachedElevenLabsApiKey().trim();
+  return trimmed || null;
 }
 
 export async function fetchElevenUser(): Promise<ElevenUser | null> {

@@ -1,5 +1,6 @@
-const { app, BrowserWindow, Menu, shell, dialog, nativeTheme } = require("electron");
+const { app, BrowserWindow, Menu, shell, dialog, nativeTheme, ipcMain, safeStorage } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const { autoUpdater } = require("electron-updater");
 const net = require("net");
@@ -10,6 +11,84 @@ const PORT = 55510;
 
 let serverStarted = false;
 let mainWindow = null;
+
+/** Aligné sur `electron/preload.cjs` (ALLOWED_KEYS). */
+const SECURE_STORAGE_KEYS = new Set(["hi_tts_secure_tw_token", "hi_tts_secure_eleven"]);
+
+function getSecretsFilePath() {
+  return path.join(app.getPath("userData"), "hi-tts-secrets.json");
+}
+
+function readSecretsStore() {
+  const p = getSecretsFilePath();
+  if (!fs.existsSync(p)) return {};
+  try {
+    const raw = fs.readFileSync(p, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+function writeSecretsStore(store) {
+  fs.mkdirSync(path.dirname(getSecretsFilePath()), { recursive: true });
+  fs.writeFileSync(getSecretsFilePath(), JSON.stringify(store), "utf8");
+}
+
+/**
+ * @param {string} plain
+ * @returns {{ e: boolean; d: string }}
+ */
+function packSecret(plain) {
+  if (safeStorage.isEncryptionAvailable()) {
+    return {
+      e: true,
+      d: safeStorage.encryptString(plain).toString("base64")
+    };
+  }
+  return { e: false, d: plain };
+}
+
+/**
+ * @param {{ e?: boolean; d?: string } | null | undefined} entry
+ * @returns {string | null}
+ */
+function unpackSecret(entry) {
+  if (!entry || typeof entry !== "object" || typeof entry.d !== "string") {
+    return null;
+  }
+  if (entry.e) {
+    return safeStorage.decryptString(Buffer.from(entry.d, "base64"));
+  }
+  return entry.d;
+}
+
+function registerSecureStorageIpc() {
+  ipcMain.handle("secure-storage:get", (_event, key) => {
+    if (!SECURE_STORAGE_KEYS.has(key)) return null;
+    const store = readSecretsStore();
+    const packed = store[key];
+    if (!packed) return null;
+    try {
+      return unpackSecret(packed);
+    } catch {
+      return null;
+    }
+  });
+
+  ipcMain.handle("secure-storage:set", (_event, key, plainText) => {
+    if (!SECURE_STORAGE_KEYS.has(key)) return;
+    const store = readSecretsStore();
+    if (plainText === null || plainText === "") {
+      delete store[key];
+    } else {
+      store[key] = packSecret(plainText);
+    }
+    writeSecretsStore(store);
+  });
+
+  ipcMain.handle("secure-storage:isEncryptionAvailable", () => safeStorage.isEncryptionAvailable());
+}
 
 function isPortOpen(port) {
   return new Promise((resolve) => {
@@ -94,6 +173,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, "preload.cjs"),
       // Empêche Chromium de ralentir les timers / audio quand la fenêtre
       // est minimisée ou en arrière-plan, pour que le TTS continue
       // de fonctionner en permanence.
@@ -163,7 +243,7 @@ function createWindow() {
           return;
         }
 
-        const server = staticApp.listen(PORT, () => {
+        const server = staticApp.listen(PORT, "127.0.0.1", () => {
           // eslint-disable-next-line no-console
           console.log(`[Hi-TTS] Serveur statique Electron démarré sur http://localhost:${PORT}`);
         });
@@ -294,6 +374,8 @@ function setupAutoUpdater() {
 }
 
 app.whenReady().then(() => {
+  registerSecureStorageIpc();
+
   // Supprime complètement la barre de menus (File / Edit / View / Window / Help)
   Menu.setApplicationMenu(null);
 

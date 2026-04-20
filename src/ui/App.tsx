@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
 import { RewardsCard } from "./organisms/RewardsCard";
-import { getStoredToken } from "../twitchAuth";
-import { loadElevenLabsConfig } from "../elevenLabsConfig";
+import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
+import { getCachedElevenLabsApiKey, hydrateElevenLabsFromSecureStorage } from "../elevenLabsConfig";
 import { fetchElevenUser, checkElevenPermissions } from "../elevenLabsApi";
 import { ToastProvider } from "./context/ToastContext";
 import { SettingsModal } from "./organisms/SettingsModal";
@@ -10,13 +10,30 @@ import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
 import { AboutModal } from "./organisms/AboutModal";
 import { useI18n } from "./context/I18nContext";
 import { DebugModal } from "./organisms/DebugModal";
+import { HIARTE_HI_TTS_PROJECT_URL } from "../config";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000;
 
+function HiarteCornerBrand() {
+  const { t } = useI18n();
+  return (
+    <a
+      href="https://www.hiarte.fr/"
+      target="_blank"
+      rel="noreferrer"
+      className="app-login-hiarte-brand"
+      aria-label={t("about.hiarteLink")}
+    >
+      <img src="/logos/hiarte.svg" alt="" />
+    </a>
+  );
+}
+
 export const App = () => {
   const { t } = useI18n();
-  const token = getStoredToken();
-  const { apiKey } = loadElevenLabsConfig();
+  const [bootLoading, setBootLoading] = useState(true);
+  const [token, setToken] = useState<TwitchTokenResponse | null>(null);
+  const [elevenApiKey, setElevenApiKey] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [twitchOpen, setTwitchOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -32,8 +49,33 @@ export const App = () => {
   useEffect(() => {
     let cancelled = false;
 
+    const run = async () => {
+      try {
+        const t = await getStoredToken();
+        await hydrateElevenLabsFromSecureStorage();
+        if (!cancelled) {
+          setToken(t);
+          setElevenApiKey(getCachedElevenLabsApiKey());
+        }
+      } finally {
+        if (!cancelled) {
+          setBootLoading(false);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
     const checkEleven = async () => {
-      const trimmed = apiKey.trim();
+      const trimmed = elevenApiKey.trim();
       if (!trimmed) {
         setIsElevenValid(false);
         setElevenPermissionsOk(null);
@@ -66,6 +108,8 @@ export const App = () => {
       }
     };
 
+    if (bootLoading) return;
+
     void checkEleven();
 
     const intervalId = setInterval(() => {
@@ -76,9 +120,8 @@ export const App = () => {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [apiKey]);
+  }, [elevenApiKey, bootLoading]);
 
-  // Raccourci clavier global pour la modal de debug : Ctrl+Shift+Alt+H
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key?.toLowerCase() === "h" && event.ctrlKey && event.shiftKey && event.altKey) {
@@ -104,7 +147,7 @@ export const App = () => {
   const isTwitchConnected = !!token;
   const isFullyLinked =
     isTwitchConnected && !!isElevenValid && elevenPermissionsOk !== false;
-  const hasElevenKey = !!apiKey.trim();
+  const hasElevenKey = !!elevenApiKey.trim();
   const showElevenError =
     !hasElevenKey || isElevenValid === false || elevenPermissionsOk === false;
 
@@ -116,142 +159,180 @@ export const App = () => {
     }
   };
 
+  const handleElevenLabsSaved = () => {
+    setElevenApiKey(getCachedElevenLabsApiKey());
+  };
+
+  if (bootLoading) {
+    return (
+      <ToastProvider>
+        <div
+          className="app-shell app-shell--login"
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <HiarteCornerBrand />
+          <a
+            href={HIARTE_HI_TTS_PROJECT_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="hi-tts-project-link"
+            aria-label={t("about.footerApp")}
+          >
+            <img
+              src="/logos/hi-tts-animated.svg"
+              alt=""
+              style={{ width: "112px", height: "112px", opacity: 0.95 }}
+            />
+          </a>
+        </div>
+      </ToastProvider>
+    );
+  }
+
   return (
     <ToastProvider>
-    <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
-      <div className="app-shell-header">
-        {isTwitchConnected && rewardsTab === "history" && (
-          <div className="app-header-main">
-            <div className="app-header-main-top">
-              <div className="app-title">{t("app.history")}</div>
-              {elevenCredits && (
-                <div className="app-header-credits">
-                  {t("app.creditsRemaining")}{" "}
-                  <strong>
-                    {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                  </strong>
-                </div>
-              )}
+      <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
+        {!token && <HiarteCornerBrand />}
+        <div className="app-shell-header">
+          {isTwitchConnected && rewardsTab === "history" && (
+            <div className="app-header-main">
+              <div className="app-header-main-top">
+                <div className="app-title">{t("app.history")}</div>
+                {elevenCredits && (
+                  <div className="app-header-credits">
+                    {t("app.creditsRemaining")}{" "}
+                    <strong>
+                      {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
+                    </strong>
+                  </div>
+                )}
+              </div>
+              <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
             </div>
-            <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
-          </div>
-        )}
-        {isTwitchConnected && rewardsTab === "rewards" && (
-          <div className="app-header-main">
-            <div className="app-header-main-top">
-              <div className="app-title">{t("app.rewardsManagement")}</div>
-              {elevenCredits && (
-                <div className="app-header-credits">
-                  {t("app.creditsRemaining")}{" "}
-                  <strong>
-                    {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                  </strong>
-                </div>
-              )}
+          )}
+          {isTwitchConnected && rewardsTab === "rewards" && (
+            <div className="app-header-main">
+              <div className="app-header-main-top">
+                <div className="app-title">{t("app.rewardsManagement")}</div>
+                {elevenCredits && (
+                  <div className="app-header-credits">
+                    {t("app.creditsRemaining")}{" "}
+                    <strong>
+                      {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
+                    </strong>
+                  </div>
+                )}
+              </div>
+              <p className="app-subtitle">{t("app.rewardsSubtitle")}</p>
             </div>
-            <p className="app-subtitle">
-              {t("app.rewardsSubtitle")}
-            </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <main className="app-main">
-        {!token && <TwitchLoginCard />}
-        {token && (
-          <RewardsCard
-            token={token}
-            activeTab={rewardsTab}
-            onMissingRewardVoiceChange={setHasMissingRewardVoice}
+        <main className="app-main">
+          {!token && <TwitchLoginCard />}
+          {token && (
+            <RewardsCard
+              token={token}
+              activeTab={rewardsTab}
+              onMissingRewardVoiceChange={setHasMissingRewardVoice}
+            />
+          )}
+        </main>
+
+        {isTwitchConnected && (
+          <footer className="app-footer">
+            <div className="app-header-main-tabs">
+              <button
+                type="button"
+                className={
+                  rewardsTab === "history"
+                    ? "app-header-tab app-header-tab-active"
+                    : "app-header-tab"
+                }
+                onClick={() => handleTabChange("history")}
+              >
+                <span className="app-header-tab-icon">
+                  <img src="/house.svg" alt="" aria-hidden="true" />
+                </span>
+                <span>{t("app.home")}</span>
+              </button>
+              <button
+                type="button"
+                className={`${rewardsTab === "rewards" ? "app-header-tab app-header-tab-active" : "app-header-tab"}${
+                  hasMissingRewardVoice ? " app-header-tab-rewards-error" : ""
+                }`}
+                onClick={() => handleTabChange("rewards")}
+              >
+                <span className="app-header-tab-icon">
+                  <img src="/reward.svg" alt="" aria-hidden="true" />
+                </span>
+                <span>{t("app.rewards")}</span>
+              </button>
+            </div>
+            <div className="app-header-icons">
+              <button
+                type="button"
+                className="header-settings-btn"
+                title={t("app.twitchSession")}
+                aria-label={t("app.twitchSessionAria")}
+                onClick={() => setTwitchOpen(true)}
+              >
+                <img src="/twitch.svg" alt="Twitch" />
+              </button>
+              <button
+                type="button"
+                className={
+                  !hasElevenKey
+                    ? "header-settings-btn header-settings-btn-eleven-missing"
+                    : showElevenError
+                      ? "header-settings-btn header-settings-btn-eleven-error"
+                      : "header-settings-btn"
+                }
+                title={t("app.elevenSettings")}
+                aria-label={
+                  isFullyLinked
+                    ? t("app.elevenConnected")
+                    : !hasElevenKey
+                      ? t("app.elevenKeyMissing")
+                      : showElevenError
+                        ? t("app.elevenKeyInvalid")
+                        : t("app.elevenToComplete")
+                }
+                onClick={() => setSettingsOpen(true)}
+              >
+                <img
+                  src={isFullyLinked ? "/link.svg" : "/unlink.svg"}
+                  alt={isFullyLinked ? t("app.linked") : t("app.unlinked")}
+                />
+              </button>
+              <button
+                type="button"
+                className="header-settings-btn"
+                title={t("settings.titleAbout")}
+                aria-label={t("settings.titleAbout")}
+                onClick={() => setAboutOpen(true)}
+              >
+                <img src="/settings.svg" alt={t("settings.titleAbout")} />
+              </button>
+            </div>
+          </footer>
+        )}
+
+        {settingsOpen && (
+          <SettingsModal
+            onClose={() => setSettingsOpen(false)}
+            onElevenLabsSaved={handleElevenLabsSaved}
           />
         )}
-      </main>
-
-      {isTwitchConnected && (
-        <footer className="app-footer">
-          <div className="app-header-main-tabs">
-            <button
-              type="button"
-              className={
-                rewardsTab === "history"
-                  ? "app-header-tab app-header-tab-active"
-                  : "app-header-tab"
-              }
-              onClick={() => handleTabChange("history")}
-            >
-              <span className="app-header-tab-icon">
-                <img src="/house.svg" alt="" aria-hidden="true" />
-              </span>
-              <span>{t("app.home")}</span>
-            </button>
-            <button
-              type="button"
-              className={`${rewardsTab === "rewards" ? "app-header-tab app-header-tab-active" : "app-header-tab"}${
-                hasMissingRewardVoice ? " app-header-tab-rewards-error" : ""
-              }`}
-              onClick={() => handleTabChange("rewards")}
-            >
-              <span className="app-header-tab-icon">
-                <img src="/reward.svg" alt="" aria-hidden="true" />
-              </span>
-              <span>{t("app.rewards")}</span>
-            </button>
-          </div>
-          <div className="app-header-icons">
-            <button
-              type="button"
-              className="header-settings-btn"
-              title={t("app.twitchSession")}
-              aria-label={t("app.twitchSessionAria")}
-              onClick={() => setTwitchOpen(true)}
-            >
-              <img src="/twitch.svg" alt="Twitch" />
-            </button>
-            <button
-              type="button"
-              className={
-                !hasElevenKey
-                  ? "header-settings-btn header-settings-btn-eleven-missing"
-                  : showElevenError
-                    ? "header-settings-btn header-settings-btn-eleven-error"
-                    : "header-settings-btn"
-              }
-              title={t("app.elevenSettings")}
-              aria-label={
-                isFullyLinked
-                  ? t("app.elevenConnected")
-                  : !hasElevenKey
-                    ? t("app.elevenKeyMissing")
-                    : showElevenError
-                      ? t("app.elevenKeyInvalid")
-                      : t("app.elevenToComplete")
-              }
-              onClick={() => setSettingsOpen(true)}
-            >
-              <img
-                src={isFullyLinked ? "/link.svg" : "/unlink.svg"}
-                alt={isFullyLinked ? t("app.linked") : t("app.unlinked")}
-              />
-            </button>
-            <button
-              type="button"
-              className="header-settings-btn"
-              title={t("settings.titleAbout")}
-              aria-label={t("settings.titleAbout")}
-              onClick={() => setAboutOpen(true)}
-            >
-              <img src="/settings.svg" alt={t("settings.titleAbout")} />
-            </button>
-          </div>
-        </footer>
-      )}
-
-      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
-      {twitchOpen && <TwitchSessionModal onClose={() => setTwitchOpen(false)} />}
-      {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
-      {debugOpen && <DebugModal onClose={() => setDebugOpen(false)} />}
-    </div>
+        {twitchOpen && token && <TwitchSessionModal token={token} onClose={() => setTwitchOpen(false)} />}
+        {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
+        {debugOpen && <DebugModal onClose={() => setDebugOpen(false)} />}
+      </div>
     </ToastProvider>
   );
 };
-

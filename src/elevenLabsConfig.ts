@@ -1,25 +1,50 @@
 /**
- * Configuration globale ElevenLabs : uniquement la clé API.
- * Les voix et paramètres sont définis par reward (voir rewardVoiceConfig).
+ * Configuration globale ElevenLabs : clé API via stockage sécurisé (main + safeStorage).
+ * Cache mémoire pour les appels API synchrones depuis `elevenLabsApi`.
  */
+
+import {
+  migrateLegacySecretsOnce,
+  SECURE_KEY_ELEVENLABS,
+  secureStorageGet,
+  secureStorageSet
+} from "./secureStorageBridge";
 
 export type ElevenLabsConfig = {
   apiKey: string;
 };
 
-const ELEVENLABS_STORAGE_KEY = "h_tts_elevenlabs_config";
+let cachedApiKey = "";
 
-export function loadElevenLabsConfig(): ElevenLabsConfig {
+/** Cache en mémoire (rempli par `hydrateElevenLabsFromSecureStorage`). */
+export function getCachedElevenLabsApiKey(): string {
+  return cachedApiKey;
+}
+
+export async function hydrateElevenLabsFromSecureStorage(): Promise<ElevenLabsConfig> {
+  await migrateLegacySecretsOnce();
+  const raw = await secureStorageGet(SECURE_KEY_ELEVENLABS);
+  if (!raw) {
+    cachedApiKey = "";
+    return { apiKey: "" };
+  }
   try {
-    const raw = localStorage.getItem(ELEVENLABS_STORAGE_KEY);
-    if (!raw) return { apiKey: "" };
     const parsed = JSON.parse(raw) as Partial<ElevenLabsConfig>;
-    return { apiKey: parsed.apiKey ?? "" };
+    cachedApiKey = parsed.apiKey ?? "";
+    return { apiKey: cachedApiKey };
   } catch {
+    cachedApiKey = "";
     return { apiKey: "" };
   }
 }
 
-export function saveElevenLabsConfig(config: ElevenLabsConfig): void {
-  localStorage.setItem(ELEVENLABS_STORAGE_KEY, JSON.stringify(config));
+export async function saveElevenLabsConfig(config: ElevenLabsConfig): Promise<void> {
+  cachedApiKey = config.apiKey ?? "";
+  const payload = JSON.stringify({ apiKey: cachedApiKey });
+  await secureStorageSet(SECURE_KEY_ELEVENLABS, payload);
+}
+
+/** Lecture synchrone du cache (après hydratation au démarrage ou après sauvegarde). */
+export function loadElevenLabsConfig(): ElevenLabsConfig {
+  return { apiKey: cachedApiKey };
 }

@@ -101,8 +101,9 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
 
   const handleLogout = () => {
     window.localStorage.removeItem(TWITCH_LAST_PROFILE_KEY);
-    clearStoredToken();
-    window.location.reload();
+    void clearStoredToken().then(() => {
+      window.location.reload();
+    });
   };
 
   const scopeChips = [

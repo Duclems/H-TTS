@@ -1,16 +1,16 @@
 import { useEffect } from "react";
 import { AuthenticatedTokenCard } from "./AuthenticatedTokenCard";
-import { getStoredToken } from "../../twitchAuth";
+import type { TwitchTokenResponse } from "../../twitchAuth";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useI18n } from "../context/I18nContext";
 
 type Props = {
+  token: TwitchTokenResponse;
   onClose: () => void;
 };
 
-export const TwitchSessionModal = ({ onClose }: Props) => {
+export const TwitchSessionModal = ({ token, onClose }: Props) => {
   const { t } = useI18n();
-  const token = getStoredToken();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

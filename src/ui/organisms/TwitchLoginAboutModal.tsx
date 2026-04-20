@@ -73,7 +73,7 @@ export const TwitchLoginAboutModal = ({ onClose }: Props) => {
           <p className="card-text about-hiarte-text">
             {t("about.hiarteBodyMore")}{" "}
             <a
-              href="https://www.hiarte.fr"
+              href="https://www.hiarte.fr/"
               target="_blank"
               rel="noreferrer"
               className="about-link"

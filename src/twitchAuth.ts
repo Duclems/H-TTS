@@ -1,4 +1,10 @@
 import { TWITCH_CLIENT_ID, TWITCH_REDIRECT_URI, TWITCH_SCOPES } from "./config";
+import {
+  migrateLegacySecretsOnce,
+  SECURE_KEY_TWITCH_TOKEN,
+  secureStorageGet,
+  secureStorageSet
+} from "./secureStorageBridge";
 
 const TWITCH_AUTHORIZE_URL = "https://id.twitch.tv/oauth2/authorize";
 
@@ -10,7 +16,6 @@ export type TwitchTokenResponse = {
 };
 
 const STATE_KEY = "twitch_oauth_state";
-const TOKEN_KEY = "twitch_oauth_token";
 
 function generateRandomState(length = 32): string {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -37,6 +42,17 @@ export function buildTwitchAuthorizeUrl(): string {
   });
 
   return `${TWITCH_AUTHORIZE_URL}?${params.toString()}`;
+}
+
+/**
+ * L’utilisateur a refusé / annulé l’autorisation sur la page Twitch (flux implicit).
+ * Twitch renvoie typiquement `#error=access_denied&state=...`.
+ */
+export function isOAuthImplicitAccessDenied(hash: string): boolean {
+  const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
+  if (!trimmed) return false;
+  const params = new URLSearchParams(trimmed);
+  return params.get("error") === "access_denied";
 }
 
 export function parseHashFragment(hash: string): TwitchTokenResponse | null {
@@ -72,12 +88,14 @@ export function validateState(returnedState?: string | null): boolean {
   return ok;
 }
 
-export function storeToken(token: TwitchTokenResponse): void {
-  localStorage.setItem(TOKEN_KEY, JSON.stringify(token));
+export async function storeToken(token: TwitchTokenResponse): Promise<void> {
+  await migrateLegacySecretsOnce();
+  await secureStorageSet(SECURE_KEY_TWITCH_TOKEN, JSON.stringify(token));
 }
 
-export function getStoredToken(): TwitchTokenResponse | null {
-  const raw = localStorage.getItem(TOKEN_KEY);
+export async function getStoredToken(): Promise<TwitchTokenResponse | null> {
+  await migrateLegacySecretsOnce();
+  const raw = await secureStorageGet(SECURE_KEY_TWITCH_TOKEN);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as TwitchTokenResponse;
@@ -86,7 +104,6 @@ export function getStoredToken(): TwitchTokenResponse | null {
   }
 }
 
-export function clearStoredToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
+export async function clearStoredToken(): Promise<void> {
+  await secureStorageSet(SECURE_KEY_TWITCH_TOKEN, null);
 }
-

@@ -17,6 +17,32 @@ img {
 }
 
 /* Plein écran : page de connexion Twitch (contenu centré) */
+.app-shell--login {
+  position: relative;
+}
+
+.app-login-hiarte-brand {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 2;
+  display: block;
+  line-height: 0;
+  opacity: 0.92;
+  transition: opacity 0.15s ease;
+}
+
+.app-login-hiarte-brand:hover {
+  opacity: 1;
+}
+
+.app-login-hiarte-brand img {
+  height: 34px;
+  width: auto;
+  max-width: 110px;
+  object-fit: contain;
+}
+
 .app-shell--login .app-shell-header {
   display: none;
 }
@@ -229,4 +255,18 @@ img {
 .app-header-tab:hover .app-header-tab-icon img {
   filter: brightness(0) invert(1);
   animation: header-btn-rotate 0.5s ease-in-out;
+}
+
+/* Lien autour du logo Hi-TTS (page projet Hiarte) */
+.hi-tts-project-link {
+  display: inline-flex;
+  line-height: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hi-tts-project-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 0.35rem;
 }

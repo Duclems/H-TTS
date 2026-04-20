@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { loadElevenLabsConfig, saveElevenLabsConfig } from "../../elevenLabsConfig";
+import {
+  getCachedElevenLabsApiKey,
+  hydrateElevenLabsFromSecureStorage,
+  saveElevenLabsConfig
+} from "../../elevenLabsConfig";
 import { fetchElevenUser } from "../../elevenLabsApi";
 import { Avatar } from "../atoms/Avatar";
 import { Button } from "../atoms/Button";
@@ -13,15 +17,15 @@ import { useI18n } from "../context/I18nContext";
 
 const LAST_USER_KEY = "h_tts_eleven_last_user";
 
-function getInitialApiKey(): string {
-  return loadElevenLabsConfig().apiKey ?? "";
-}
-
 type ElevenUserInfo = {
   name: string;
   avatarUrl: string | null;
   remainingCharacters: number | null;
   characterLimit: number | null;
+};
+
+type Props = {
+  onSaved?: () => void;
 };
 
 function saveLastUserInfo(info: ElevenUserInfo | null): void {
@@ -36,64 +40,52 @@ function saveLastUserInfo(info: ElevenUserInfo | null): void {
   }
 }
 
-function getInitialUserInfo(): ElevenUserInfo | null {
-  if (!getInitialApiKey().trim()) return null;
-  try {
-    const raw = window.localStorage.getItem(LAST_USER_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as ElevenUserInfo;
-    if (typeof parsed?.name !== "string") return null;
-    return {
-      name: parsed.name,
-      avatarUrl: typeof parsed.avatarUrl === "string" ? parsed.avatarUrl : null,
-      remainingCharacters:
-        typeof parsed.remainingCharacters === "number" ? parsed.remainingCharacters : null,
-      characterLimit: typeof parsed.characterLimit === "number" ? parsed.characterLimit : null
-    };
-  } catch {
-    return null;
-  }
-}
-
-export const ElevenLabsCard = () => {
+export const ElevenLabsCard = ({ onSaved }: Props) => {
   const { addToast } = useToast();
   const { t } = useI18n();
-  const [apiKey, setApiKey] = useState(getInitialApiKey);
-  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(getInitialUserInfo);
-  const [loadingUser, setLoadingUser] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    const cfg = loadElevenLabsConfig();
-    setApiKey(cfg.apiKey);
-
-    if (!cfg.apiKey.trim()) {
-      setUserInfo(null);
-      saveLastUserInfo(null);
-      setLoadingUser(false);
-      setHasError(false);
-      return;
-    }
-
-    const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
-    if (invalidKey && invalidKey === cfg.apiKey) {
-      setUserInfo(null);
-      saveLastUserInfo(null);
-      setLoadingUser(false);
-      setHasError(true);
-      return;
-    }
+    let cancelled = false;
 
     void (async () => {
+      await hydrateElevenLabsFromSecureStorage();
+      if (cancelled) return;
+
+      const cfgKey = getCachedElevenLabsApiKey();
+      setApiKey(cfgKey);
+
+      if (!cfgKey.trim()) {
+        setUserInfo(null);
+        saveLastUserInfo(null);
+        setLoadingUser(false);
+        setHasError(false);
+        return;
+      }
+
+      const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
+      if (invalidKey && invalidKey === cfgKey) {
+        setUserInfo(null);
+        saveLastUserInfo(null);
+        setLoadingUser(false);
+        setHasError(true);
+        return;
+      }
+
       setLoadingUser(true);
       setHasError(false);
       const user = await fetchElevenUser();
+      if (cancelled) return;
+
       if (!user) {
         setUserInfo(null);
         saveLastUserInfo(null);
         setLoadingUser(false);
         setHasError(true);
-        window.localStorage.setItem("h_tts_eleven_invalid_key", cfg.apiKey);
+        window.localStorage.setItem("h_tts_eleven_invalid_key", cfgKey);
         return;
       }
 
@@ -116,12 +108,17 @@ export const ElevenLabsCard = () => {
       setHasError(false);
       window.localStorage.removeItem("h_tts_eleven_invalid_key");
     })();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [t]);
 
   const handleSave = async () => {
     const trimmed = apiKey.trim();
-    saveElevenLabsConfig({ apiKey: trimmed });
+    await saveElevenLabsConfig({ apiKey: trimmed });
     addToast(t("eleven.cardKeySaved"));
+    onSaved?.();
 
     if (!trimmed) {
       setUserInfo(null);
@@ -243,12 +240,11 @@ export const ElevenLabsCard = () => {
           disableLabelClick
         />
       </div>
-      
 
       <Button
         variant={saveButtonDanger ? "danger" : "primary"}
         style={{ marginTop: "0.9rem" }}
-        onClick={handleSave}
+        onClick={() => void handleSave()}
       >
         {t("eleven.save")}
       </Button>

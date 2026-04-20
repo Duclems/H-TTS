@@ -36,8 +36,8 @@
     "hiarteLink": "En savoir plus sur Hiarte",
     "privacyTitle": "Politique de confidentialité",
     "privacyIntro": "L’application utilise uniquement les informations nécessaires à son fonctionnement avec les services Twitch et ElevenLabs.",
-    "privacyTwitch": "1. Données liées à Twitch\nLors de la connexion à Twitch, un token OAuth est stocké localement dans l'application, via le localStorage. Ce token permet à l'application d'accéder à certaines informations de ton compte, comme ton profil ou tes rewards, sans te demander de te reconnecter à chaque utilisation.\n\nCe mode de stockage implique qu’en cas d’accès à l'application ou d’exécution de scripts malveillants, ce token pourrait théoriquement être consulté ou utilisé par un tiers.\n\n Faites attention à ce que vous installez sur votre machine.",
-    "privacyEleven": "2. Données liées à ElevenLabs\nLa clé API ElevenLabs est enregistrée localement dans la configuration de l’application. Elle est utilisée uniquement afin d’effectuer les requêtes nécessaires vers l’API officielle d’ElevenLabs.\n\nCette clé est sensible. Elle ne doit jamais être partagée. Toute personne disposant d’un accès à ton ordinateur, à tes fichiers de configuration ou à l’environnement d’exécution de l’application peut potentiellement l’utiliser.\n\n Faites attention à ce que vous installez sur votre machine.",
+    "privacyTwitch": "1. Données liées à Twitch\nSur l’application desktop, le token OAuth est enregistré hors du navigateur, chiffré avec le stockage sécurisé du système, puis déchiffré uniquement dans le processus principal. Il n’est pas conservé en clair dans le localStorage.\n\nUn accès complet à ta session Windows ou à des logiciels malveillants reste un risque : fais attention à ce que tu installes sur ta machine.",
+    "privacyEleven": "2. Données liées à ElevenLabs\nLa clé API est traitée comme le token Twitch : stockage chiffré côté application desktop lorsque le système le permet, usage uniquement pour les appels à l’API ElevenLabs.\n\nCette clé est sensible : ne la partage jamais. Toute personne avec un accès privilégié à ta machine peut en théorie l’extraire depuis la mémoire ou les sauvegardes.",
     "privacyTransmission": "3. Transmission des données\nL’application n’envoie pas de données vers un serveur tiers non prévu. Les seules communications externes effectuées sont celles nécessaires au fonctionnement avec les API officielles de Twitch et d’ElevenLabs.",
     "privacyStorage": "4. Stockage local\nLes informations de connexion et de configuration mentionnées ci-dessus sont conservées localement sur ta machine. Elles ne sont pas centralisées sur un serveur géré par l’application elle-même.",
     "footerApp": "Hi-TTS",
@@ -47,7 +47,7 @@
     "title": "Connexion à Twitch",
     "intro": "L'application a besoin d'une connexion à Twitch pour accéder à la suite.",
     "cta": "Se connecter avec Twitch",
-    "tokenNote": "Hi-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement dans l'application pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
+    "tokenNote": "Hi-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement (chiffré avec le système quand c’est possible) pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
     "aboutPrivacyButton": "À propos et politique de confidentialité"
   },
   "eleven": {
@@ -62,7 +62,7 @@
     "permissionTts": "Text to Speech",
     "permissionVoices": "Voix",
     "permissionUser": "Utilisateur",
-    "keyStoredNote": "Ta clé est stockée localement dans l'application. Ne la partage jamais.",
+    "keyStoredNote": "Ta clé est enregistrée hors du navigateur (chiffrement système quand disponible). Ne la partage jamais.",
     "apiKeyLabel": "Clé API ElevenLabs",
     "save": "Sauvegarder"
   },

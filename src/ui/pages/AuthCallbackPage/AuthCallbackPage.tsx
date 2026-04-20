@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { parseHashFragment, storeToken, validateState } from "../../../twitchAuth";
+import {
+  isOAuthImplicitAccessDenied,
+  parseHashFragment,
+  storeToken,
+  validateState
+} from "../../../twitchAuth";
 import { useI18n } from "../../context/I18nContext";
 
 export const AuthCallbackPage = () => {
@@ -8,10 +13,22 @@ export const AuthCallbackPage = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
+
+    if (isOAuthImplicitAccessDenied(hash)) {
+      window.location.replace("/");
+      return;
+    }
+
     const parsed = parseHashFragment(hash);
 
     if (!parsed) {
-      setErrorKey("authCallback.errorOAuth");
+      const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
+      const params = new URLSearchParams(trimmed);
+      if (params.get("error")) {
+        setErrorKey("authCallback.errorOAuth");
+        return;
+      }
+      window.location.replace("/");
       return;
     }
 
@@ -21,10 +38,10 @@ export const AuthCallbackPage = () => {
       return;
     }
 
-    storeToken(parsed);
-
-    // Nettoie le fragment de l’URL puis retourne à la page d’accueil
-    window.location.replace("/");
+    void storeToken(parsed).then(() => {
+      // Nettoie le fragment de l’URL puis retourne à la page d’accueil
+      window.location.replace("/");
+    });
   }, []);
 
   const handleBackHome = () => {

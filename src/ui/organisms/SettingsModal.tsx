@@ -5,9 +5,10 @@ import { useI18n } from "../context/I18nContext";
 
 type Props = {
   onClose: () => void;
+  onElevenLabsSaved?: () => void;
 };
 
-export const SettingsModal = ({ onClose }: Props) => {
+export const SettingsModal = ({ onClose, onElevenLabsSaved }: Props) => {
   const { t } = useI18n();
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export const SettingsModal = ({ onClose }: Props) => {
         <ModalHeader titleId="settings-modal-title" title={t("settings.elevenTitle")} onClose={onClose} closeAriaLabel={t("modal.close")} />
 
         <div className="settings-modal-body">
-          <ElevenLabsCard />
+          <ElevenLabsCard onSaved={onElevenLabsSaved} />
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
 import { TwitchLoginAboutModal } from "./TwitchLoginAboutModal";
 import pkg from "../../../package.json";
+import { HIARTE_HI_TTS_PROJECT_URL } from "../../config";
 
 export const TwitchLoginCard = () => {
   const { t } = useI18n();
@@ -46,11 +47,16 @@ export const TwitchLoginCard = () => {
 
       <footer className="twitch-login-footer">
         <div className="twitch-login-footer-row">
-          <img
-            src="/logos/hi-tts-animated.svg"
-            alt={t("about.footerApp")}
-            className="about-footer-logo"
-          />
+          <a
+            href={HIARTE_HI_TTS_PROJECT_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="hi-tts-project-link"
+            style={{ width: 48, height: 48, flexShrink: 0, display: "block" }}
+            aria-label={t("about.footerApp")}
+          >
+            <img src="/logos/hi-tts-animated.svg" alt="" className="about-footer-logo" />
+          </a>
           <div className="about-footer-meta">
             <div className="about-footer-title-row">
               <div className="about-footer-title">{t("about.footerApp")}</div>

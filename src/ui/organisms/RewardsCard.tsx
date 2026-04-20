@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
+import { HIARTE_HI_TTS_PROJECT_URL } from "../../config";
 import {
   fetchCurrentUser,
   fetchCustomRewardsResult,
@@ -785,11 +786,19 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
             gap: "0.6rem"
           }}
         >
-          <img
-            src="/logos/hi-tts-animated.svg"
-            alt={t("rewards.loadingAlt")}
-            style={{ width: "112px", height: "112px", opacity: 0.95 }}
-          />
+          <a
+            href={HIARTE_HI_TTS_PROJECT_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="hi-tts-project-link"
+            aria-label={t("about.footerApp")}
+          >
+            <img
+              src="/logos/hi-tts-animated.svg"
+              alt=""
+              style={{ width: "112px", height: "112px", opacity: 0.95 }}
+            />
+          </a>
         </div>
       )}
       {error && <p className="error-text">{error}</p>}
@@ -823,11 +832,19 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                     gap: "0.6rem"
                   }}
                 >
-                  <img
-                    src="/logos/hi-tts-animated.svg"
-                    alt={t("rewards.animationAlt")}
-                    style={{ width: "104px", height: "104px"}}
-                  />
+                  <a
+                    href={HIARTE_HI_TTS_PROJECT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hi-tts-project-link"
+                    aria-label={t("about.footerApp")}
+                  >
+                    <img
+                      src="/logos/hi-tts-animated.svg"
+                      alt=""
+                      style={{ width: "104px", height: "104px" }}
+                    />
+                  </a>
                   <p
                     className="card-text"
                     style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}
@@ -925,11 +942,19 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
                       gap: "0.6rem"
                     }}
                   >
-                    <img
-                      src="/logos/hi-tts-animated.svg"
-                      alt={t("rewards.animationAlt")}
-                      style={{ width: "104px", height: "104px", opacity: 0.9 }}
-                    />
+                    <a
+                      href={HIARTE_HI_TTS_PROJECT_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hi-tts-project-link"
+                      aria-label={t("about.footerApp")}
+                    >
+                      <img
+                        src="/logos/hi-tts-animated.svg"
+                        alt=""
+                        style={{ width: "104px", height: "104px", opacity: 0.9 }}
+                      />
+                    </a>
                     <p
                       className="card-text"
                       style={{ textAlign: "center", fontSize: "0.8rem", maxWidth: "260px" }}

@@ -3,6 +3,7 @@ import { ModalHeader } from "../molecules/ModalHeader";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
 import pkg from "../../../package.json";
+import { HIARTE_HI_TTS_PROJECT_URL } from "../../config";
 
 type Props = {
   onClose: () => void;
@@ -82,7 +83,7 @@ export const AboutModal = ({ onClose }: Props) => {
             {t("about.hiarteBodyMore")}
             {" "}
             <a
-              href="https://www.hiarte.fr"
+              href="https://www.hiarte.fr/"
               target="_blank"
               rel="noreferrer"
               className="about-link"
@@ -106,11 +107,16 @@ export const AboutModal = ({ onClose }: Props) => {
 
         <footer className="settings-modal-footer">
           <div className="about-footer-row">
-            <img
-              src="/logos/hi-tts-animated.svg"
-              alt={t("about.footerApp")}
-              className="about-footer-logo"
-            />
+            <a
+              href={HIARTE_HI_TTS_PROJECT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="hi-tts-project-link"
+              style={{ width: 48, height: 48, flexShrink: 0, display: "block" }}
+              aria-label={t("about.footerApp")}
+            >
+              <img src="/logos/hi-tts-animated.svg" alt="" className="about-footer-logo" />
+            </a>
             <div className="about-footer-meta">
               <div className="about-footer-title-row">
                 <div className="about-footer-title">{t("about.footerApp")}</div>
