@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
 import {
   fetchCurrentUser,
-  fetchCustomRewards,
+  fetchCustomRewardsResult,
   fetchRewardRedemptions,
+  fetchRewardRedemptionsResult,
+  updateRewardRedemptionStatus,
   type TwitchCustomReward,
+  type TwitchHelixErr,
   type TwitchRewardRedemption,
   createCustomReward,
   fetchUserByLogin
@@ -28,6 +31,68 @@ type Props = {
 };
 
 const REDEEM_REFRESH_INTERVAL_MS = 5_000;
+const POLL_BACKOFF_MAX_MS = 120_000;
+
+function sleepMs(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** Délai avant prochaine tentative après erreur Helix / réseau. */
+function pollBackoffDelayMs(err: TwitchHelixErr, consecutiveFailures: number): number {
+  if (err.retryAfterMs != null && err.retryAfterMs > 0) {
+    return Math.min(POLL_BACKOFF_MAX_MS, err.retryAfterMs);
+  }
+  if (err.network) {
+    return Math.min(POLL_BACKOFF_MAX_MS, 2_000 * 2 ** Math.min(Math.max(0, consecutiveFailures - 1), 6));
+  }
+  if (err.status === 429) return Math.min(POLL_BACKOFF_MAX_MS, 10_000);
+  if (err.status >= 500) return Math.min(POLL_BACKOFF_MAX_MS, 5_000);
+  return Math.min(POLL_BACKOFF_MAX_MS, 15_000);
+}
+
+/** Rewards pour lesquels on interroge les redemptions (évite N appels pour les rewards désactivés). */
+function rewardsActiveForPoll(all: TwitchCustomReward[]): TwitchCustomReward[] {
+  return all.filter((r) => r.is_enabled);
+}
+
+const AUDIO_COMPLETED_KEY = "h_tts_redeem_audio_completed_ids";
+const FULFILL_COMPLETED_KEY = "h_tts_redeem_fulfill_completed_ids";
+const RECENT_FULFILLED_KEY = "h_tts_recent_fulfilled_redemptions";
+const RECENT_FULFILLED_MAX = 5;
+
+function readStringIdSet(key: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(key);
+    return new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+function persistStringIdSet(key: string, set: Set<string>) {
+  localStorage.setItem(key, JSON.stringify(Array.from(set)));
+}
+
+function readRecentFulfilledRedemptions(): TwitchRewardRedemption[] {
+  try {
+    const raw = localStorage.getItem(RECENT_FULFILLED_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as TwitchRewardRedemption[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecentFulfilledRedemption(redemption: TwitchRewardRedemption) {
+  try {
+    const prev = readRecentFulfilledRedemptions().filter((r) => r.id !== redemption.id);
+    const next = [redemption, ...prev].slice(0, RECENT_FULFILLED_MAX);
+    localStorage.setItem(RECENT_FULFILLED_KEY, JSON.stringify(next));
+  } catch {
+    // ignore storage errors
+  }
+}
 
 export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Props) => {
   const { t } = useI18n();
@@ -45,6 +110,9 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
     Record<string, { chatText?: string; emotes: ParsedEmote[] }>
   >({});
   const [userAvatars, setUserAvatars] = useState<Record<string, string | null>>({});
+  const [recentFulfilledRedemptions, setRecentFulfilledRedemptions] = useState<
+    TwitchRewardRedemption[]
+  >(() => readRecentFulfilledRedemptions());
 
   useEffect(() => {
     let cancelled = false;
@@ -77,16 +145,54 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           });
         });
 
-        const rewardsData = await fetchCustomRewards(token.access_token, user.id);
-        if (cancelled) return;
+        let rewardsData: TwitchCustomReward[] | null = null;
+        for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
+          const rr = await fetchCustomRewardsResult(token.access_token, user.id);
+          if (cancelled) return;
+          if (rr.ok) {
+            rewardsData = rr.data;
+            break;
+          }
+          if (attempt < 5) {
+            await sleepMs(pollBackoffDelayMs(rr, attempt + 1));
+          }
+        }
+        if (!rewardsData) {
+          setError(t("rewards.errorFetch"));
+          return;
+        }
 
         setRewards(rewardsData);
 
         const allRedemptions: TwitchRewardRedemption[] = [];
-        for (const reward of rewardsData) {
-          const r = await fetchRewardRedemptions(token.access_token, user.id, reward.id);
-          if (cancelled) return;
-          allRedemptions.push(...r);
+        for (const reward of rewardsActiveForPoll(rewardsData)) {
+          let chunk: TwitchRewardRedemption[] | null = null;
+          for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
+            const rr = await fetchRewardRedemptionsResult(
+              token.access_token,
+              user.id,
+              reward.id
+            );
+            if (cancelled) return;
+            if (rr.ok) {
+              chunk = rr.data;
+              break;
+            }
+            if (attempt < 5) {
+              await sleepMs(pollBackoffDelayMs(rr, attempt + 1));
+            }
+          }
+          if (chunk) {
+            allRedemptions.push(...chunk);
+          } else {
+            logDebug({
+              timestamp: Date.now(),
+              type: "reward",
+              source: "rewards-initial",
+              message: "Giving up on redemptions for one reward after retries.",
+              details: { rewardId: reward.id },
+            });
+          }
         }
         setRedemptions(allRedemptions);
       } catch (e) {
@@ -119,68 +225,193 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
     }
   }, []);
 
-  // Rafraîchissement périodique de tous les rewards et redemptions
+  // Rafraîchissement périodique : liste complète des rewards en UI, mais redemptions uniquement pour les rewards actifs (is_enabled).
+  // Backoff (429 / 5xx / réseau) via setTimeout récursif au lieu d’un intervalle fixe.
   useEffect(() => {
     if (!broadcasterId) return;
 
     let cancelled = false;
-    const intervalId = window.setInterval(async () => {
+    let timeoutId = 0;
+    let consecutiveFailures = 0;
+
+    const schedule = (delayMs: number) => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => void tick(), delayMs);
+    };
+
+    const tick = async () => {
+      if (cancelled) return;
       try {
-        const rewardsData = await fetchCustomRewards(token.access_token, broadcasterId);
+        const rewardsRes = await fetchCustomRewardsResult(token.access_token, broadcasterId);
         if (cancelled) return;
-        setRewards(rewardsData);
+        if (!rewardsRes.ok) {
+          consecutiveFailures += 1;
+          logDebug({
+            timestamp: Date.now(),
+            type: "reward",
+            source: "rewards-poll",
+            message: "Helix error while fetching custom rewards; backing off.",
+            details: {
+              status: rewardsRes.status,
+              network: rewardsRes.network ?? false,
+              retryAfterMs: rewardsRes.retryAfterMs,
+              nextDelayMs: pollBackoffDelayMs(rewardsRes, consecutiveFailures),
+            },
+          });
+          schedule(pollBackoffDelayMs(rewardsRes, consecutiveFailures));
+          return;
+        }
+
+        consecutiveFailures = 0;
+        setRewards(rewardsRes.data);
 
         const allRedemptions: TwitchRewardRedemption[] = [];
-        for (const reward of rewardsData) {
-          const r = await fetchRewardRedemptions(token.access_token, broadcasterId, reward.id);
+        for (const reward of rewardsActiveForPoll(rewardsRes.data)) {
+          const redRes = await fetchRewardRedemptionsResult(
+            token.access_token,
+            broadcasterId,
+            reward.id
+          );
           if (cancelled) return;
-          allRedemptions.push(...r);
+          if (!redRes.ok) {
+            consecutiveFailures += 1;
+            logDebug({
+              timestamp: Date.now(),
+              type: "reward",
+              source: "rewards-poll",
+              message: "Helix error while fetching redemptions; backing off.",
+              details: {
+                rewardId: reward.id,
+                status: redRes.status,
+                network: redRes.network ?? false,
+                retryAfterMs: redRes.retryAfterMs,
+                nextDelayMs: pollBackoffDelayMs(redRes, consecutiveFailures),
+              },
+            });
+            schedule(pollBackoffDelayMs(redRes, consecutiveFailures));
+            return;
+          }
+          allRedemptions.push(...redRes.data);
         }
+
+        consecutiveFailures = 0;
         setRedemptions(allRedemptions);
+        schedule(REDEEM_REFRESH_INTERVAL_MS);
       } catch (error) {
+        consecutiveFailures += 1;
         logDebug({
           timestamp: Date.now(),
           type: "reward",
           source: "rewards-poll",
-          message: "Error while refreshing Twitch rewards/redemptions.",
+          message: "Unexpected error while refreshing Twitch rewards/redemptions.",
           details:
             error instanceof Error
               ? { name: error.name, message: error.message }
               : String(error),
         });
-        // on garde les anciennes valeurs en cas d'erreur temporaire
+        const syntheticErr: TwitchHelixErr = { ok: false, status: 0, network: true };
+        schedule(pollBackoffDelayMs(syntheticErr, consecutiveFailures));
       }
-    }, REDEEM_REFRESH_INTERVAL_MS);
+    };
+
+    schedule(REDEEM_REFRESH_INTERVAL_MS);
 
     return () => {
       cancelled = true;
-      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
     };
   }, [token.access_token, broadcasterId]);
 
   // Lecture audio via ElevenLabs des nouvelles redemptions (fenêtre de 30 secondes)
   useEffect(() => {
-    if (redemptions.length === 0) return;
+    if (redemptions.length === 0 || !broadcasterId) return;
 
-    const PROCESSED_KEY = "h_tts_eleven_processed_redemptions";
-    const raw = localStorage.getItem(PROCESSED_KEY);
-    const processed = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+    let cancelled = false;
 
-    const now = Date.now();
-    const newlyProcessed: string[] = [];
+    const fulfillRedemption = async (redemption: TwitchRewardRedemption) => {
+      const ok = await updateRewardRedemptionStatus(
+        token.access_token,
+        broadcasterId,
+        redemption.reward.id,
+        [redemption.id],
+        "FULFILLED"
+      );
+      if (!ok) {
+        logDebug({
+          timestamp: Date.now(),
+          type: "redeem",
+          source: "redeem-fulfill",
+          message: "Failed to mark Twitch redemption as FULFILLED (will retry).",
+          details: {
+            redemptionId: redemption.id,
+            rewardId: redemption.reward.id,
+          },
+        });
+        return false;
+      }
 
-    for (const redemption of redemptions) {
-      if (processed.has(redemption.id)) continue;
-      if (!redemption.user_input || !redemption.user_input.trim()) continue;
+      const fulfilled: TwitchRewardRedemption = { ...redemption, status: "FULFILLED" };
+      pushRecentFulfilledRedemption(fulfilled);
+      setRecentFulfilledRedemptions(readRecentFulfilledRedemptions());
 
-      const redeemedAt = new Date(redemption.redeemed_at).getTime();
-      if (Number.isNaN(redeemedAt)) continue;
+      logDebug({
+        timestamp: Date.now(),
+        type: "redeem",
+        source: "redeem-fulfill",
+        message: "Twitch redemption marked as FULFILLED after TTS playback.",
+        details: {
+          redemptionId: redemption.id,
+          rewardId: redemption.reward.id,
+        },
+      });
+      return true;
+    };
 
-      // On ne déclenche que pour les redemptions apparues dans les 30 dernières secondes
-      if (now - redeemedAt <= 30_000) {
+    const run = async () => {
+      const audioDone = readStringIdSet(AUDIO_COMPLETED_KEY);
+      const fulfillDone = readStringIdSet(FULFILL_COMPLETED_KEY);
+
+      for (const redemption of redemptions) {
+        if (cancelled) return;
+
+        if (fulfillDone.has(redemption.id)) {
+          continue;
+        }
+
+        if (audioDone.has(redemption.id)) {
+          const ok = await fulfillRedemption(redemption);
+          if (ok) {
+            fulfillDone.add(redemption.id);
+            persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+          }
+          continue;
+        }
+
+        if (!redemption.user_input || !redemption.user_input.trim()) {
+          audioDone.add(redemption.id);
+          fulfillDone.add(redemption.id);
+          persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+          persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+          continue;
+        }
+
+        const redeemedAt = new Date(redemption.redeemed_at).getTime();
+        if (Number.isNaN(redeemedAt)) continue;
+
+        const now = Date.now();
+        const isFresh = now - redeemedAt <= 30_000;
+
+        if (!isFresh) {
+          // Ne pas rejouer le TTS pour d'anciennes redemptions encore listées comme UNFULFILLED.
+          audioDone.add(redemption.id);
+          fulfillDone.add(redemption.id);
+          persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+          persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+          continue;
+        }
+
         const voiceConfig = loadRewardVoiceConfig(redemption.reward.id);
 
-        // On nettoie le texte pour ElevenLabs : suppression des emotes
         const { emotes, chatText } = getEmoteMatchForRedemption(redemption);
         const baseText = (chatText ?? redemption.user_input ?? "").toString();
 
@@ -220,6 +451,10 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
               rewardId: redemption.reward.id,
             },
           });
+          audioDone.add(redemption.id);
+          fulfillDone.add(redemption.id);
+          persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+          persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
           continue;
         }
 
@@ -247,19 +482,40 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           },
         });
 
-        void speakWithElevenLabsFromText(cleanedText, voiceConfig);
+        const tts = await speakWithElevenLabsFromText(cleanedText, voiceConfig);
+        if (!tts.playedToEnd) {
+          continue;
+        }
+
+        audioDone.add(redemption.id);
+        persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+
+        const ok = await fulfillRedemption(redemption);
+        if (ok) {
+          fulfillDone.add(redemption.id);
+          persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+        }
       }
+    };
 
-      processed.add(redemption.id);
-      newlyProcessed.push(redemption.id);
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [redemptions, broadcasterId, token.access_token]);
+
+  const byId = new Map<string, TwitchRewardRedemption>();
+  for (const r of redemptions) {
+    byId.set(r.id, r);
+  }
+  for (const r of recentFulfilledRedemptions) {
+    if (!byId.has(r.id)) {
+      byId.set(r.id, r);
     }
+  }
 
-    if (newlyProcessed.length > 0) {
-      localStorage.setItem(PROCESSED_KEY, JSON.stringify(Array.from(processed)));
-    }
-  }, [redemptions]);
-
-  const visibleRedemptions = [...redemptions]
+  const visibleRedemptions = [...byId.values()]
     .slice()
     .sort((a, b) => {
       const ta = new Date(a.redeemed_at).getTime();

@@ -131,7 +131,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
     }
 
     const result = await speakWithElevenLabsFromText(t("rewardVoice.saved"), cfg);
-    if (!result.ok && result.status === 402) {
+    if (!result.httpOk && result.status === 402) {
       addToast(
         <>
           {t("rewardVoice.errorEleven")}{" "}
@@ -162,7 +162,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       testText.trim() || t("rewardVoice.testPhrase"),
       cfg
     );
-    if (!result.ok && result.status === 402) {
+    if (!result.httpOk && result.status === 402) {
       addToast(
         <>
           {t("rewardVoice.errorEleven")}{" "}

@@ -46,6 +46,52 @@ type HelixResponse<T> = {
   data: T[];
 };
 
+/** Résultat d’un GET Helix avec infos pour backoff (429, réseau). */
+export type TwitchHelixOk<T> = { ok: true; data: T; status: number };
+export type TwitchHelixErr = {
+  ok: false;
+  status: number;
+  /** Délais issu de l’en-tête `Retry-After` (ms), si présent. */
+  retryAfterMs?: number;
+  network?: boolean;
+};
+export type TwitchHelixResult<T> = TwitchHelixOk<T> | TwitchHelixErr;
+
+function parseRetryAfterMs(res: Response): number | undefined {
+  const raw = res.headers.get("Retry-After");
+  if (!raw) return undefined;
+  const asSec = Number(raw);
+  if (Number.isFinite(asSec) && asSec >= 0) {
+    return Math.round(asSec * 1000);
+  }
+  const asDate = Date.parse(raw);
+  if (!Number.isNaN(asDate)) {
+    return Math.max(0, asDate - Date.now());
+  }
+  return undefined;
+}
+
+async function helixGetJson<Element>(
+  accessToken: string,
+  url: string
+): Promise<TwitchHelixResult<Element[]>> {
+  try {
+    const res = await fetch(url, { headers: buildAuthHeaders(accessToken) });
+    const status = res.status;
+    if (res.ok) {
+      const body = (await res.json()) as HelixResponse<Element>;
+      return { ok: true, data: body.data ?? [], status };
+    }
+    return {
+      ok: false,
+      status,
+      retryAfterMs: parseRetryAfterMs(res)
+    };
+  } catch {
+    return { ok: false, status: 0, network: true };
+  }
+}
+
 type CreateRewardPayload = {
   title: string;
   cost: number;
@@ -120,27 +166,46 @@ export async function fetchFollowersCount(
  * @param onlyManageable - Si true (défaut), ne retourne que les rewards que ce client ID peut lire/gérer
  * (créés via cette app). Si false, retourne tous les rewards de la chaîne.
  */
-export async function fetchCustomRewards(
+export async function fetchCustomRewardsResult(
   accessToken: string,
   broadcasterId: string,
   onlyManageable = true
-): Promise<TwitchCustomReward[]> {
+): Promise<TwitchHelixResult<TwitchCustomReward[]>> {
   const params = new URLSearchParams({
     broadcaster_id: broadcasterId,
     only_manageable_rewards: onlyManageable ? "true" : "false"
   });
 
-  const res = await fetch(
-    `https://api.twitch.tv/helix/channel_points/custom_rewards?${params.toString()}`,
-    {
-      headers: buildAuthHeaders(accessToken)
-    }
+  return helixGetJson<TwitchCustomReward>(
+    accessToken,
+    `https://api.twitch.tv/helix/channel_points/custom_rewards?${params.toString()}`
   );
+}
 
-  if (!res.ok) return [];
+export async function fetchCustomRewards(
+  accessToken: string,
+  broadcasterId: string,
+  onlyManageable = true
+): Promise<TwitchCustomReward[]> {
+  const r = await fetchCustomRewardsResult(accessToken, broadcasterId, onlyManageable);
+  return r.ok ? r.data : [];
+}
 
-  const body = (await res.json()) as HelixResponse<TwitchCustomReward>;
-  return body.data;
+export async function fetchRewardRedemptionsResult(
+  accessToken: string,
+  broadcasterId: string,
+  rewardId: string
+): Promise<TwitchHelixResult<TwitchRewardRedemption[]>> {
+  const params = new URLSearchParams({
+    broadcaster_id: broadcasterId,
+    reward_id: rewardId,
+    status: "UNFULFILLED" // par défaut : les réclamations en attente
+  });
+
+  return helixGetJson<TwitchRewardRedemption>(
+    accessToken,
+    `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?${params.toString()}`
+  );
 }
 
 export async function fetchRewardRedemptions(
@@ -148,23 +213,41 @@ export async function fetchRewardRedemptions(
   broadcasterId: string,
   rewardId: string
 ): Promise<TwitchRewardRedemption[]> {
+  const r = await fetchRewardRedemptionsResult(accessToken, broadcasterId, rewardId);
+  return r.ok ? r.data : [];
+}
+
+/**
+ * Met à jour le statut d'une ou plusieurs redemptions (ex. FULFILLED, CANCELED).
+ * Nécessite le scope `channel:manage:redemptions`.
+ */
+export async function updateRewardRedemptionStatus(
+  accessToken: string,
+  broadcasterId: string,
+  rewardId: string,
+  redemptionIds: string[],
+  status: "FULFILLED" | "CANCELED"
+): Promise<boolean> {
+  if (redemptionIds.length === 0) return true;
+
   const params = new URLSearchParams({
     broadcaster_id: broadcasterId,
     reward_id: rewardId,
-    status: "UNFULFILLED" // par défaut : les réclamations en attente
+    status
   });
+  for (const id of redemptionIds) {
+    params.append("id", id);
+  }
 
   const res = await fetch(
     `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?${params.toString()}`,
     {
+      method: "PATCH",
       headers: buildAuthHeaders(accessToken)
     }
   );
 
-  if (!res.ok) return [];
-
-  const body = (await res.json()) as HelixResponse<TwitchRewardRedemption>;
-  return body.data;
+  return res.ok;
 }
 
 export async function createCustomReward(

@@ -470,24 +470,24 @@
 }
 
 .rewards-list-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.045);
   border-radius: 999px;
 }
 
 .rewards-list-container::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.25);
+  background-color: rgba(252, 252, 252, 0.32);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 .rewards-list-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.4);
+  background-color: rgba(252, 252, 252, 0.48);
 }
 
 .rewards-list-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.35) transparent;
+  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
 }
 
 .rewards-history-container {
@@ -501,24 +501,24 @@
 }
 
 .rewards-history-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.045);
   border-radius: 999px;
 }
 
 .rewards-history-container::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.25);
+  background-color: rgba(252, 252, 252, 0.32);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 .rewards-history-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.4);
+  background-color: rgba(252, 252, 252, 0.48);
 }
 
 .rewards-history-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.35) transparent;
+  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
 }
 
 .rewards-history-item {

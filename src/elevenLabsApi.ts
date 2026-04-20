@@ -144,16 +144,43 @@ export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> 
 const IS_DEV = import.meta.env.DEV;
 
 export type ElevenTtsResult = {
-  ok: boolean;
+  /** Requête ElevenLabs HTTP réussie (audio reçu). */
+  httpOk: boolean;
+  /** Lecture audio allée au bout (`ended`). */
+  playedToEnd: boolean;
   status?: number;
 };
+
+function waitForAudioPlaybackEnd(audio: HTMLAudioElement, objectUrl: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onError);
+    };
+
+    const onEnded = () => {
+      cleanup();
+      URL.revokeObjectURL(objectUrl);
+      resolve();
+    };
+
+    const onError = () => {
+      cleanup();
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Audio playback error"));
+    };
+
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("error", onError);
+  });
+}
 
 export async function speakWithElevenLabsFromText(
   text: string,
   voiceConfig: RewardVoiceConfig | null
 ): Promise<ElevenTtsResult> {
   const trimmed = text.trim();
-  if (!trimmed) return;
+  if (!trimmed) return { httpOk: false, playedToEnd: false };
 
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -167,7 +194,7 @@ export async function speakWithElevenLabsFromText(
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Clé API manquante, aucun appel effectué.");
     }
-    return { ok: false };
+    return { httpOk: false, playedToEnd: false };
   }
 
   if (!voiceConfig?.voiceId) {
@@ -181,7 +208,7 @@ export async function speakWithElevenLabsFromText(
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Aucune voix configurée pour ce reward, TTS ignoré.");
     }
-    return { ok: false };
+    return { httpOk: false, playedToEnd: false };
   }
 
   const { voiceId, modelId, stability, similarityBoost, style, speed } = voiceConfig;
@@ -228,7 +255,7 @@ export async function speakWithElevenLabsFromText(
         // eslint-disable-next-line no-console
         console.log("[ElevenLabs] Erreur HTTP", res.status, res.statusText);
       }
-      return { ok: false, status: res.status };
+      return { httpOk: false, playedToEnd: false, status: res.status };
     }
 
     const blob = await res.blob();
@@ -238,14 +265,10 @@ export async function speakWithElevenLabsFromText(
     }
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
-    audio.onended = () => {
-      URL.revokeObjectURL(url);
-      if (IS_DEV) {
-        // eslint-disable-next-line no-console
-        console.log("[ElevenLabs] Lecture audio terminée.");
-      }
-    };
-    await audio.play().catch((err) => {
+    const playback = waitForAudioPlaybackEnd(audio, url);
+    try {
+      await audio.play();
+    } catch (err) {
       logDebug({
         timestamp: Date.now(),
         type: "eleven",
@@ -257,8 +280,20 @@ export async function speakWithElevenLabsFromText(
         // eslint-disable-next-line no-console
         console.log("[ElevenLabs] Impossible de lancer la lecture audio", err);
       }
-    });
-    return { ok: true, status: res.status };
+      URL.revokeObjectURL(url);
+      return { httpOk: true, playedToEnd: false, status: res.status };
+    }
+
+    try {
+      await playback;
+      if (IS_DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[ElevenLabs] Lecture audio terminée.");
+      }
+      return { httpOk: true, playedToEnd: true, status: res.status };
+    } catch {
+      return { httpOk: true, playedToEnd: false, status: res.status };
+    }
   } catch (e) {
     logDebug({
       timestamp: Date.now(),
@@ -271,6 +306,6 @@ export async function speakWithElevenLabsFromText(
       // eslint-disable-next-line no-console
       console.log("[ElevenLabs] Erreur réseau ou inattendue", e);
     }
-    return { ok: false };
+    return { httpOk: false, playedToEnd: false };
   }
 }

@@ -106,27 +106,27 @@
 
 /* Thème et variables globales */
 :root {
-  --bg: #030101;
-  --bg-raised: #0a0504;
-  --bg-hover: #1a0e09;
+  --bg: #0b0705;
+  --bg-raised: #140e0a;
+  --bg-hover: #261812;
   --text: #ffffff;
-  --text-muted: #ffffffa2;
-  --border: #28160e;
-  --border-main:#20120c;
-  --accent: #f6e6df;
-  --accent-soft: #1a0e09;
-  --success: rgb(35, 93, 26);
-  --saved: #11280e;
-  --saved-hover: rgb(35, 93, 26);
-  --danger: #280e0e;
-  --danger-hover: rgb(93, 26, 26);
-  --missing: #281a0e;
-  --missing-hover: rgb(93, 51, 26);
-  --overlay: rgba(0, 0, 0, 0.65);
-  --range-progress: #622f0f;
-  --range-dot: #99440e;
-  --range-progress-hover: #b84f0e;
-  --switch-main: #99440e;
+  --text-muted: #ffffffbc;
+  --border: #3a2418;
+  --border-main: #2e1c14;
+  --accent: #f8ebe5;
+  --accent-soft: #241812;
+  --success: rgb(46, 108, 36);
+  --saved: #1a3a14;
+  --saved-hover: rgb(46, 108, 36);
+  --danger: #381818;
+  --danger-hover: rgb(112, 40, 40);
+  --missing: #382518;
+  --missing-hover: rgb(112, 64, 40);
+  --overlay: rgba(0, 0, 0, 0.52);
+  --range-progress: #703818;
+  --range-dot: #a84e18;
+  --range-progress-hover: #c85a18;
+  --switch-main: #a84e18;
 }
 
 body {
@@ -187,7 +187,7 @@ body {
 /* Scrollbars globaux */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(252, 252, 252, 0.35) transparent;
+  scrollbar-color: rgba(252, 252, 252, 0.42) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -200,12 +200,12 @@ html {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 252, 252, 0.4);
+  background-color: rgba(252, 252, 252, 0.48);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(252, 252, 252, 0.6);
+  background-color: rgba(252, 252, 252, 0.62);
 }
