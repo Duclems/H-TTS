@@ -2,7 +2,6 @@ import { useState } from "react";
 import { buildTwitchAuthorizeUrl } from "../../twitchAuth";
 import { Button } from "../atoms/Button";
 import { CardTitle } from "../atoms/CardTitle";
-import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
 import { TwitchLoginAboutModal } from "./TwitchLoginAboutModal";
 import pkg from "../../../package.json";
@@ -19,11 +18,6 @@ export const TwitchLoginCard = () => {
 
   return (
     <section className="card twitch-login-card">
-      <div className="twitch-login-card-lang">
-        <span className="twitch-login-card-lang-label">{t("language.label")}</span>
-        <LanguageSelector />
-      </div>
-
       <div className="twitch-login-main-cta">
         <CardTitle>{t("twitchLogin.title")}</CardTitle>
         <p className="card-text twitch-login-intro">

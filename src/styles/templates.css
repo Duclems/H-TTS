@@ -26,10 +26,14 @@ img {
   top: 0.65rem;
   left: 0.65rem;
   z-index: 2;
-  display: block;
-  line-height: 0;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  line-height: 1;
   opacity: 0.92;
   transition: opacity 0.15s ease;
+  text-decoration: none;
 }
 
 .app-login-hiarte-brand:hover {
@@ -41,20 +45,72 @@ img {
   width: auto;
   max-width: 110px;
   object-fit: contain;
+  display: block;
 }
 
+/* Même blanc que les paths du logo hiarte.svg (#ffffff) */
+.app-login-hiarte-arte-word {
+  font-family: "MuseoModerno Black", "Figtree", sans-serif;
+  font-size: 1.65rem;
+  font-weight: normal;
+  color: #ffffff;
+  letter-spacing: 0.22em;
+  margin-left: 0.06em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Bandeau haut (connexion / boot) : même fond et séparation que le footer de la carte Twitch */
 .app-shell--login .app-shell-header {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border-main);
+  background-color: var(--bg-subtle);
+  align-items: stretch;
 }
 
-.app-shell--login .app-main { 
+.app-login-shell-header-inner {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.app-shell--login .app-shell-header .app-login-hiarte-brand {
+  position: static;
+  flex-shrink: 0;
+  z-index: auto;
+}
+
+.app-login-shell-header-lang {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.app-shell--login .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  min-height: 100vh;
-  height: 100vh;
+  min-height: 0;
+  height: auto;
+  overflow-y: auto;
+}
+
+.app-shell--login .app-main.app-main--splash {
+  justify-content: center;
+  align-items: center;
 }
 
 .app-shell-header {

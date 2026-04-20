@@ -11,23 +11,9 @@ import { AboutModal } from "./organisms/AboutModal";
 import { useI18n } from "./context/I18nContext";
 import { DebugModal } from "./organisms/DebugModal";
 import { HIARTE_HI_TTS_PROJECT_URL } from "../config";
+import { LoginPageHeader } from "./organisms/LoginPageHeader";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000;
-
-function HiarteCornerBrand() {
-  const { t } = useI18n();
-  return (
-    <a
-      href="https://www.hiarte.fr/"
-      target="_blank"
-      rel="noreferrer"
-      className="app-login-hiarte-brand"
-      aria-label={t("about.hiarteLink")}
-    >
-      <img src="/logos/hiarte.svg" alt="" />
-    </a>
-  );
-}
 
 export const App = () => {
   const { t } = useI18n();
@@ -166,29 +152,25 @@ export const App = () => {
   if (bootLoading) {
     return (
       <ToastProvider>
-        <div
-          className="app-shell app-shell--login"
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <HiarteCornerBrand />
-          <a
-            href={HIARTE_HI_TTS_PROJECT_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="hi-tts-project-link"
-            aria-label={t("about.footerApp")}
-          >
-            <img
-              src="/logos/hi-tts-animated.svg"
-              alt=""
-              style={{ width: "112px", height: "112px", opacity: 0.95 }}
-            />
-          </a>
+        <div className="app-shell app-shell--login">
+          <header className="app-shell-header">
+            <LoginPageHeader />
+          </header>
+          <main className="app-main app-main--splash">
+            <a
+              href={HIARTE_HI_TTS_PROJECT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="hi-tts-project-link"
+              aria-label={t("about.footerApp")}
+            >
+              <img
+                src="/logos/hi-tts-animated.svg"
+                alt=""
+                style={{ width: "112px", height: "112px", opacity: 0.95 }}
+              />
+            </a>
+          </main>
         </div>
       </ToastProvider>
     );
@@ -197,39 +179,44 @@ export const App = () => {
   return (
     <ToastProvider>
       <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
-        {!token && <HiarteCornerBrand />}
         <div className="app-shell-header">
-          {isTwitchConnected && rewardsTab === "history" && (
-            <div className="app-header-main">
-              <div className="app-header-main-top">
-                <div className="app-title">{t("app.history")}</div>
-                {elevenCredits && (
-                  <div className="app-header-credits">
-                    {t("app.creditsRemaining")}{" "}
-                    <strong>
-                      {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                    </strong>
+          {!token ? (
+            <LoginPageHeader />
+          ) : (
+            <>
+              {isTwitchConnected && rewardsTab === "history" && (
+                <div className="app-header-main">
+                  <div className="app-header-main-top">
+                    <div className="app-title">{t("app.history")}</div>
+                    {elevenCredits && (
+                      <div className="app-header-credits">
+                        {t("app.creditsRemaining")}{" "}
+                        <strong>
+                          {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
+                        </strong>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
-            </div>
-          )}
-          {isTwitchConnected && rewardsTab === "rewards" && (
-            <div className="app-header-main">
-              <div className="app-header-main-top">
-                <div className="app-title">{t("app.rewardsManagement")}</div>
-                {elevenCredits && (
-                  <div className="app-header-credits">
-                    {t("app.creditsRemaining")}{" "}
-                    <strong>
-                      {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                    </strong>
+                  <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
+                </div>
+              )}
+              {isTwitchConnected && rewardsTab === "rewards" && (
+                <div className="app-header-main">
+                  <div className="app-header-main-top">
+                    <div className="app-title">{t("app.rewardsManagement")}</div>
+                    {elevenCredits && (
+                      <div className="app-header-credits">
+                        {t("app.creditsRemaining")}{" "}
+                        <strong>
+                          {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
+                        </strong>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <p className="app-subtitle">{t("app.rewardsSubtitle")}</p>
-            </div>
+                  <p className="app-subtitle">{t("app.rewardsSubtitle")}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 

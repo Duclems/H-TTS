@@ -98,6 +98,15 @@
   font-display: swap;
 }
 
+/* MuseoModerno Black — mot « ARTE » à côté du logo Hiarte (page connexion) */
+@font-face {
+  font-family: "MuseoModerno Black";
+  src: url("/fonts/static/MuseoModerno-SemiBold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
