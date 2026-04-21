@@ -1,7 +1,3 @@
-/**
- * Configuration voix ElevenLabs pour un reward Twitch (stockée par reward.id).
- */
-
 export type RewardVoiceConfig = {
   voiceId: string;
   modelId: string;
@@ -43,11 +39,6 @@ export function loadRewardVoiceConfig(rewardId: string): RewardVoiceConfig | nul
   return { ...DEFAULT_REWARD_VOICE_CONFIG, ...cfg };
 }
 
-/**
- * Lit l'intégralité des configs en un seul parse localStorage et applique les
- * valeurs par défaut. À privilégier quand on doit consulter plusieurs rewards
- * dans la même boucle (évite N lectures + N JSON.parse redondants).
- */
 export function loadAllRewardVoiceConfigs(): Record<string, RewardVoiceConfig> {
   const all = loadAll();
   const result: Record<string, RewardVoiceConfig> = {};

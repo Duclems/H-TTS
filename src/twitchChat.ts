@@ -93,13 +93,8 @@ function parseEmotesFromTmi(message: string, emotesTag: unknown): ParsedEmote[] 
 export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
   const username = channelLogin.toLowerCase();
 
-  // Si on est déjà connecté au même channel, ne rien faire.
   if (started && startedChannel === username) return;
-
-  // Si on est connecté à un autre channel (changement de compte), on disconnecte proprement.
-  if (started) {
-    stopTwitchChatLogger();
-  }
+  if (started) stopTwitchChatLogger();
 
   started = true;
   startedChannel = username;
@@ -135,7 +130,6 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
       console.log("[Hi-TTS][IRC]", payload);
     }
 
-    // En prod : éviter un log par message sur un chat chargé ; garder les messages liés à un reward (rares).
     if (IS_DEV || payload.rewardId) {
       logDebug({
         timestamp: Date.now(),
@@ -186,10 +180,6 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     });
 }
 
-/**
- * Déconnecte le client IRC et remet le module à l'état initial.
- * Sans effet si aucune connexion n'est active.
- */
 export function stopTwitchChatLogger(): void {
   if (!started) return;
   const previousClient = client;
@@ -200,9 +190,7 @@ export function stopTwitchChatLogger(): void {
 
   if (previousClient) {
     try {
-      previousClient.disconnect().catch(() => {
-        /* disconnection error is not actionable */
-      });
+      previousClient.disconnect().catch(() => undefined);
     } catch {
       /* ignore */
     }

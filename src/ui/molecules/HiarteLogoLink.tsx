@@ -2,7 +2,6 @@ import { useI18n } from "../context/I18nContext";
 
 type Props = {
   className?: string;
-  /** `header` : barre des modales ; `section` : bloc logo + texte « À propos » */
   variant?: "section" | "header";
 };
 

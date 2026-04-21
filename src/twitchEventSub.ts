@@ -3,11 +3,6 @@ import { logDebug } from "./debugLog";
 
 const EVENT_SUB_WS_URL = "wss://eventsub.wss.twitch.tv/ws";
 
-/**
- * Event "channel.channel_points_custom_reward_redemption.add|update" renvoyé
- * par EventSub. Format différent du retour Helix (casing minuscule pour le
- * status, `user_name` au lieu de `user_display_name`, reward minimal).
- */
 export type EventSubRedeemEvent = {
   id: string;
   broadcaster_user_id: string;
@@ -27,11 +22,6 @@ export type EventSubRedeemEvent = {
   };
 };
 
-/**
- * Event "channel.channel_points_custom_reward.add|update|remove" renvoyé par
- * EventSub. Suffit à reconstruire un `TwitchCustomReward` quand on reçoit
- * une création/modification externe.
- */
 export type EventSubRewardEvent = {
   id: string;
   broadcaster_user_id: string;
@@ -74,9 +64,7 @@ export type EventSubHandlers = {
   onRewardAdd?: (event: EventSubRewardEvent) => void;
   onRewardUpdate?: (event: EventSubRewardEvent) => void;
   onRewardRemove?: (event: EventSubRewardEvent) => void;
-  /** Subscriptions nouvellement créées après perte de connexion : l'app
-   * devrait refaire un fetch Helix pour rattraper les events manqués. Pas
-   * appelé lors d'un `session_reconnect` (la sub migre sans perte). */
+  // Fired only after a true disconnect+resubscribe (not on a session_reconnect migration).
   onReconnect?: () => void;
 };
 
@@ -87,7 +75,6 @@ type ConnectOptions = {
 };
 
 export type EventSubConnection = {
-  /** Ferme la WS et annule les reconnects en cours. Idempotent. */
   stop: () => void;
 };
 
@@ -109,8 +96,7 @@ export function connectEventSub({
   handlers
 }: ConnectOptions): EventSubConnection {
   let activeWs: WebSocket | null = null;
-  // Utilisé uniquement pendant une migration `session_reconnect` : on garde
-  // l'ancienne WS ouverte jusqu'à réception du welcome sur la nouvelle.
+  // Holds the new WS during a session_reconnect migration; old WS stays up until new one welcomes.
   let pendingWs: WebSocket | null = null;
   let stopped = false;
   let reconnectTimer: number | null = null;
@@ -127,7 +113,6 @@ export function connectEventSub({
   const scheduleReconnect = () => {
     if (stopped) return;
     reconnectAttempts += 1;
-    // Backoff exponentiel capé à 30 s : 1, 2, 4, 8, 16, 30, 30…
     const delayMs = Math.min(30_000, 1_000 * 2 ** Math.min(reconnectAttempts - 1, 5));
     clearReconnectTimer();
     reconnectTimer = window.setTimeout(() => {
@@ -178,9 +163,7 @@ export function connectEventSub({
       const sessionId = msg.payload?.session?.id;
       if (!sessionId) return;
 
-      // Cas migration Twitch (session_reconnect) : on adopte la nouvelle WS
-      // et on ferme l'ancienne. Les subs ont été migrées par Twitch, on ne
-      // recrée rien, on ne notifie pas onReconnect.
+      // session_reconnect migration: adopt the new WS, close the old one, no resubscribe.
       if (pendingWs === incomingWs) {
         const old = activeWs;
         activeWs = incomingWs;
@@ -195,7 +178,6 @@ export function connectEventSub({
         return;
       }
 
-      // Première connexion ou reconnect après perte : on recrée les subs.
       activeWs = incomingWs;
       reconnectAttempts = 0;
       const wasFirst = isFirstSession;
@@ -209,16 +191,11 @@ export function connectEventSub({
       return;
     }
 
-    if (messageType === "session_keepalive") {
-      // Simple ping Twitch. Rien à faire, la connexion est vivante.
-      return;
-    }
+    if (messageType === "session_keepalive") return;
 
     if (messageType === "session_reconnect") {
       const reconnectUrl = msg.payload?.session?.reconnect_url;
       if (!reconnectUrl) return;
-      // On ouvre la nouvelle WS ; on fermera l'ancienne à la réception du
-      // welcome sur la nouvelle.
       openConnection(reconnectUrl, true);
       return;
     }
@@ -291,8 +268,6 @@ export function connectEventSub({
     socket.onclose = () => {
       if (stopped) return;
       if (socket === pendingWs) {
-        // La WS de migration est tombée avant son welcome → on abandonne
-        // la migration et on garde l'ancienne (encore active).
         pendingWs = null;
         return;
       }

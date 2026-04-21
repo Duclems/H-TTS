@@ -15,9 +15,7 @@
     "elevenKeyInvalid": "ElevenLabs key invalid or permissions incomplete",
     "elevenToComplete": "ElevenLabs settings to complete",
     "linked": "Linked",
-    "unlinked": "Not linked",
-    "settings": "Settings",
-    "settingsAria": "Show settings"
+    "unlinked": "Not linked"
   },
   "modal": {
     "close": "Close"
@@ -29,7 +27,6 @@
   },
   "about": {
     "title": "About",
-    "hiarteTitle": "About Hiarte",
     "hiTtsIntro": "Hi-TTS aims to make Text-to-Speech simple, reliable and pleasant to use by linking your Twitch rewards to ElevenLabs voices, while staying transparent about how your data is handled.",
     "hiarteBodyMain": "Hi-TTS is built and maintained by Hiarte, an independent studio creating tools and experiences for content creators and streamers.",
     "hiarteBodyMore": "If you want to discover other available apps, see ongoing projects or learn more about the company, you can find all the information on Hiarte's website.",
@@ -68,18 +65,15 @@
   },
   "rewards": {
     "errorProfile": "Unable to fetch your Twitch profile (check scopes).",
-    "errorFetch": "Error fetching rewards/redemptions.",
     "errorCreate": "Unable to create reward. Check scopes, that you own the channel, and that channel points / custom rewards are enabled (and that your channel is eligible).",
     "errorCreateShort": "Error creating reward.",
-    "loadingAlt": "Loading Hi-TTS",
     "creating": "Creating reward",
     "createCta": "Create Hi-TTS reward",
     "empty": "No Hi-TTS rewards yet. Create your first reward to start triggering TTS on your stream.",
     "points": "channel points",
     "settings": "Settings",
     "historyEmpty": "When a viewer uses a Hi-TTS reward, it will appear here",
-    "rewardPrompt": "Reward created by Hi-TTS app.",
-    "animationAlt": "Hi-TTS animation"
+    "rewardPrompt": "Reward created by Hi-TTS app."
   },
   "rewardVoice": {
     "modalTitle": "Voice settings",

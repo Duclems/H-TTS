@@ -39,7 +39,6 @@ export const AuthCallbackPage = () => {
     }
 
     void storeToken(parsed).then(() => {
-      // Nettoie le fragment de l’URL puis retourne à la page d’accueil
       window.location.replace("/");
     });
   }, []);

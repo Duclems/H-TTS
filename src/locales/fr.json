@@ -15,9 +15,7 @@
     "elevenKeyInvalid": "Clé ElevenLabs invalide ou autorisations incomplètes",
     "elevenToComplete": "Paramètres ElevenLabs à compléter",
     "linked": "Lié",
-    "unlinked": "Non lié",
-    "settings": "Paramètres",
-    "settingsAria": "Afficher les paramètres"
+    "unlinked": "Non lié"
   },
   "modal": {
     "close": "Fermer"
@@ -29,7 +27,6 @@
   },
   "about": {
     "title": "À propos",
-    "hiarteTitle": "À propos de Hiarte",
     "hiTtsIntro": "Hi-TTS a pour objectif de rendre le Text-to-Speech simple, fiable et agréable à utiliser en liant tes rewards Twitch à des voix ElevenLabs, tout en restant transparent sur l'utilisation de tes données.",
     "hiarteBodyMain": "Hi-TTS est conçu et maintenu par Hiarte, un studio indépendant qui crée des outils et expériences pour les créateurs de contenu et les streamers.",
     "hiarteBodyMore": "Si tu souhaites découvrir les autres applications disponibles, voir les projets en cours ou en savoir plus sur l'entreprise, tu peux retrouver toutes les infos sur le site de Hiarte.",
@@ -68,18 +65,15 @@
   },
   "rewards": {
     "errorProfile": "Impossible de récupérer ton profil Twitch (vérifie les scopes).",
-    "errorFetch": "Erreur lors de la récupération des rewards/redemptions.",
     "errorCreate": "Impossible de créer le reward. Vérifie les scopes, que tu es bien le propriétaire de la chaîne et que les points de chaîne / custom rewards sont activés (et que ta chaîne est éligible).",
     "errorCreateShort": "Erreur lors de la création du reward.",
-    "loadingAlt": "Chargement Hi-TTS",
     "creating": "Création du reward",
     "createCta": "Créer un reward Hi-TTS",
     "empty": "Aucun reward Hi-TTS pour le moment. Crée ton premier reward pour commencer à déclencher le TTS sur ton stream.",
     "points": "points de chaîne",
     "settings": "Paramètres",
     "historyEmpty": "Dès qu'un viewer utilise un reward Hi-TTS, il apparaîtra ici",
-    "rewardPrompt": "Reward générée par l'app Hi-TTS.",
-    "animationAlt": "Animation Hi-TTS"
+    "rewardPrompt": "Reward générée par l'app Hi-TTS."
   },
   "rewardVoice": {
     "modalTitle": "Paramétrage de la voix",

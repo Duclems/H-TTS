@@ -50,17 +50,12 @@ export async function fetchElevenVoices(): Promise<ElevenVoice[]> {
   if (!apiKey) return [];
 
   try {
+    // voice_type=saved => voix présentes dans la bibliothèque "Mes Voix" de l'utilisateur.
     const res = await fetch(
-      // On récupère les voix de la bibliothèque de l’utilisateur ("Mes Voix").
-      // voice_type=saved = toutes les voix non-default + les voix par défaut
-      // ajoutées à une collection (ce qui correspond à ce que l’utilisateur
-      // a explicitement ajouté dans sa bibliothèque).
       "https://api.elevenlabs.io/v2/voices?page_size=100&voice_type=saved",
       {
-      method: "GET",
-      headers: {
-        "xi-api-key": apiKey
-        }
+        method: "GET",
+        headers: { "xi-api-key": apiKey }
       }
     );
 
@@ -73,16 +68,10 @@ export async function fetchElevenVoices(): Promise<ElevenVoice[]> {
   }
 }
 
-/**
- * Lance la synthèse TTS ElevenLabs avec la config voix fournie (par ex. celle du reward).
- * La clé API est toujours lue depuis la config globale (page ElevenLabs).
- */
 const IS_DEV = import.meta.env.DEV;
 
 export type ElevenTtsResult = {
-  /** Requête ElevenLabs HTTP réussie (audio reçu). */
   httpOk: boolean;
-  /** Lecture audio allée au bout (`ended`). */
   playedToEnd: boolean;
   status?: number;
 };

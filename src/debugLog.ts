@@ -10,11 +10,6 @@ export type DebugLogEntry = {
 
 const MAX_ENTRIES = 200;
 
-// Buffer interne muté en place (push + shift). On en produit un snapshot
-// immuable (`slice()`) avant de notifier les listeners : React (DebugModal) a
-// besoin d'une nouvelle référence pour détecter le changement d'état, mais on
-// évite le double coût de l'ancienne version (`[...entries, entry].slice(-200)`
-// → 2 allocations + une copie complète à chaque log).
 const buffer: DebugLogEntry[] = [];
 const listeners: ((all: DebugLogEntry[]) => void)[] = [];
 

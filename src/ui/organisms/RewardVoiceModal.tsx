@@ -47,7 +47,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
       map[rewardId] = label;
       localStorage.setItem(VOICE_LABEL_CACHE_KEY, JSON.stringify(map));
     } catch {
-      // ignore localStorage failures
+      /* ignore */
     }
   };
 
@@ -80,7 +80,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
         setLastVoiceLabel(map[rewardId]);
       }
     } catch {
-      // ignore localStorage failures
+      /* ignore */
     }
 
     void (async () => {

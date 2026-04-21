@@ -46,12 +46,10 @@ type HelixResponse<T> = {
   data: T[];
 };
 
-/** Résultat d’un GET Helix avec infos pour backoff (429, réseau). */
 export type TwitchHelixOk<T> = { ok: true; data: T; status: number };
 export type TwitchHelixErr = {
   ok: false;
   status: number;
-  /** Délais issu de l’en-tête `Retry-After` (ms), si présent. */
   retryAfterMs?: number;
   network?: boolean;
 };
@@ -115,12 +113,6 @@ function buildAuthHeaders(accessToken: string): HeadersInit {
   };
 }
 
-/**
- * Crée un abonnement EventSub lié à une session WebSocket.
- * Doit être appelé après réception du `session_welcome` (pour récupérer le
- * `sessionId`). Pour les reconnects Twitch (`session_reconnect`), la sub est
- * migrée automatiquement côté Twitch → inutile de la recréer.
- */
 export async function createEventSubSubscription(
   accessToken: string,
   sessionId: string,
@@ -199,11 +191,6 @@ export async function fetchFollowersCount(
   return typeof body.total === "number" ? body.total : null;
 }
 
-/**
- * Récupère les custom rewards de la chaîne.
- * @param onlyManageable - Si true (défaut), ne retourne que les rewards que ce client ID peut lire/gérer
- * (créés via cette app). Si false, retourne tous les rewards de la chaîne.
- */
 export async function fetchCustomRewardsResult(
   accessToken: string,
   broadcasterId: string,
@@ -228,7 +215,7 @@ export async function fetchRewardRedemptionsResult(
   const params = new URLSearchParams({
     broadcaster_id: broadcasterId,
     reward_id: rewardId,
-    status: "UNFULFILLED" // par défaut : les réclamations en attente
+    status: "UNFULFILLED"
   });
 
   return helixGetJson<TwitchRewardRedemption>(
@@ -237,10 +224,6 @@ export async function fetchRewardRedemptionsResult(
   );
 }
 
-/**
- * Met à jour le statut d'une ou plusieurs redemptions (ex. FULFILLED, CANCELED).
- * Nécessite le scope `channel:manage:redemptions`.
- */
 export async function updateRewardRedemptionStatus(
   accessToken: string,
   broadcasterId: string,

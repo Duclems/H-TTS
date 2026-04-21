@@ -43,10 +43,6 @@ export function buildTwitchAuthorizeUrl(): string {
   return `${TWITCH_AUTHORIZE_URL}?${params.toString()}`;
 }
 
-/**
- * L’utilisateur a refusé / annulé l’autorisation sur la page Twitch (flux implicit).
- * Twitch renvoie typiquement `#error=access_denied&state=...`.
- */
 export function isOAuthImplicitAccessDenied(hash: string): boolean {
   const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
   if (!trimmed) return false;

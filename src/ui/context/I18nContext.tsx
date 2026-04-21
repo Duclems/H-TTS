@@ -7,12 +7,6 @@ export type Locale = "fr" | "en";
 
 type MessagesTree = Record<string, unknown>;
 
-/**
- * Aplatit récursivement un arbre de messages i18n `{ a: { b: "x" } }` en map
- * plate `{ "a.b": "x" }`. Écrit dans `out` pour éviter les allocations
- * intermédiaires. Ignore les valeurs non-string (objets non terminaux sont
- * traversés, tableaux et autres types primitifs sont ignorés).
- */
 function flattenInto(tree: MessagesTree, out: Record<string, string>, prefix = ""): void {
   for (const [key, value] of Object.entries(tree)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
@@ -24,11 +18,6 @@ function flattenInto(tree: MessagesTree, out: Record<string, string>, prefix = "
   }
 }
 
-/**
- * Map plate `"a.b.c" → "texte"` calculée UNE fois au chargement du module.
- * Un appel à `t("a.b.c")` devient un simple accès O(1) au lieu de `split(".")`
- * suivi d'un parcours de l'arbre à chaque render.
- */
 const flatMessages: Record<Locale, Record<string, string>> = {
   fr: {},
   en: {}
@@ -49,7 +38,7 @@ function getStoredLocale(): Locale {
     const stored = localStorage.getItem(STORAGE_KEY_LOCALE);
     if (stored === "fr" || stored === "en") return stored;
   } catch {
-    // ignore
+    /* ignore */
   }
   return "fr";
 }
@@ -62,7 +51,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY_LOCALE, next);
     } catch {
-      // ignore
+      /* ignore */
     }
   }, []);
 

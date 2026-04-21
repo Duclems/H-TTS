@@ -1,8 +1,3 @@
-/**
- * Configuration globale ElevenLabs : clé API via stockage sécurisé (main + safeStorage).
- * Cache mémoire pour les appels API synchrones depuis `elevenLabsApi`.
- */
-
 import {
   migrateLegacySecretsOnce,
   SECURE_KEY_ELEVENLABS,
@@ -16,7 +11,6 @@ export type ElevenLabsConfig = {
 
 let cachedApiKey = "";
 
-/** Cache en mémoire (rempli par `hydrateElevenLabsFromSecureStorage`). */
 export function getCachedElevenLabsApiKey(): string {
   return cachedApiKey;
 }

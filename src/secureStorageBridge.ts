@@ -1,8 +1,3 @@
-/**
- * Pont vers le stockage chiffré Electron (preload → IPC → main).
- * Hors Electron (ex. navigateur seul sur le port Vite), repli localStorage de secours pour le dev.
- */
-
 import { STORAGE_KEY_LEGACY_ELEVEN_CONFIG } from "./storageKeys";
 
 export const SECURE_KEY_TWITCH_TOKEN = "hi_tts_secure_tw_token";
@@ -55,9 +50,6 @@ export async function secureStorageSet(key: string, value: string | null): Promi
   }
 }
 
-/**
- * Migre les anciennes valeurs localStorage vers le stockage sécurisé (une fois par session).
- */
 let migrationDone = false;
 
 export async function migrateLegacySecretsOnce(): Promise<void> {

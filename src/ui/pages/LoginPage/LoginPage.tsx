@@ -5,8 +5,8 @@ import { CardTitle } from "../../atoms/CardTitle";
 import { useI18n } from "../../context/I18nContext";
 import { TwitchLoginAboutModal } from "../../organisms/TwitchLoginAboutModal";
 import { AppShellLogin } from "../../templates/AppShellLogin";
+import { HiTtsLogoLink } from "../../atoms/HiTtsLogoLink";
 import pkg from "../../../../package.json";
-import { HIARTE_HI_TTS_PROJECT_URL } from "../../../config";
 
 export const LoginPage = () => {
   const { t } = useI18n();
@@ -40,16 +40,10 @@ export const LoginPage = () => {
 
         <footer className="twitch-login-footer">
           <div className="twitch-login-footer-row">
-            <a
-              href={HIARTE_HI_TTS_PROJECT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="hi-tts-project-link"
-              style={{ width: 48, height: 48, flexShrink: 0, display: "block" }}
-              aria-label={t("about.footerApp")}
-            >
-              <img src="/logos/hi-tts-animated.svg" alt="" className="about-footer-logo" />
-            </a>
+            <HiTtsLogoLink
+              imgClassName="about-footer-logo"
+              linkStyle={{ width: 48, height: 48, flexShrink: 0, display: "block" }}
+            />
             <div className="about-footer-meta">
               <div className="about-footer-title-row">
                 <div className="about-footer-title">{t("about.footerApp")}</div>
