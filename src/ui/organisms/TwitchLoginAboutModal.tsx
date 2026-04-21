@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { HiarteLogoLink } from "../molecules/HiarteLogoLink";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useI18n } from "../context/I18nContext";
 
@@ -63,11 +64,7 @@ export const TwitchLoginAboutModal = ({ onClose }: Props) => {
           </section>
 
           <section className="about-hiarte">
-            <img
-              src="/logos/hiarte.svg"
-              alt="Hiarte"
-              className="about-hiarte-logo"
-            />
+            <HiarteLogoLink variant="section" />
             <p className="card-text about-hiarte-text-main">{t("about.hiarteBodyMain")}</p>
           </section>
           <p className="card-text about-hiarte-text">

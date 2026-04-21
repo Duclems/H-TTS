@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { HiarteLogoLink } from "../molecules/HiarteLogoLink";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { LanguageSelector } from "../molecules/LanguageSelector";
 import { useI18n } from "../context/I18nContext";
@@ -56,7 +57,11 @@ export const AboutModal = ({ onClose }: Props) => {
             title={t("settings.title")}
             onClose={onClose}
             closeAriaLabel={t("modal.close")}
-            rightContent={<LanguageSelector />}
+            rightContent={
+              <>
+                <LanguageSelector />
+              </>
+            }
           />
         </header>
 
@@ -70,11 +75,7 @@ export const AboutModal = ({ onClose }: Props) => {
           </section>
 
           <section className="about-hiarte">
-            <img
-              src="/logos/hiarte.svg"
-              alt="Hiarte"
-              className="about-hiarte-logo"
-            />
+            <HiarteLogoLink variant="section" />
             <p className="card-text about-hiarte-text-main">
               {t("about.hiarteBodyMain")}
             </p>

@@ -10,7 +10,14 @@ export default defineConfig({
     /* Electron embarque un Chromium récent ; évite l’échec esbuild (destructuring) avec la cible legacy par défaut de Vite 6 */
     target: "es2022"
   },
+  /* En dev, le pré-bundle des deps (react-router, etc.) utilisait encore chrome87 → même cible que le build */
+  optimizeDeps: {
+    esbuildOptions: {
+      target: "es2022"
+    }
+  },
   esbuild: {
-    charset: "utf8"
+    charset: "utf8",
+    target: "es2022"
   }
 });

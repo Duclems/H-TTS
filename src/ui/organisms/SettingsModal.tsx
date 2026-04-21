@@ -32,7 +32,12 @@ export const SettingsModal = ({ onClose, onElevenLabsSaved }: Props) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader titleId="settings-modal-title" title={t("settings.elevenTitle")} onClose={onClose} closeAriaLabel={t("modal.close")} />
+        <ModalHeader
+          titleId="settings-modal-title"
+          title={t("settings.elevenTitle")}
+          onClose={onClose}
+          closeAriaLabel={t("modal.close")}
+        />
 
         <div className="settings-modal-body">
           <ElevenLabsCard onSaved={onElevenLabsSaved} />
