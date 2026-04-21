@@ -121,8 +121,8 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
 
     logDebug({
       timestamp: Date.now(),
-      type: payload.rewardId ? "redeem" : "tmi",
-      source: "tmi-message",
+      type: payload.rewardId ? "redeem" : "other",
+      source: "chat-message",
       message: payload.rewardId
         ? `Chat message linked to a reward redemption received on #${username}.`
         : `Chat message received on #${username}.`,
@@ -143,8 +143,8 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     .then(() => {
       logDebug({
         timestamp: Date.now(),
-        type: "tmi",
-        source: "tmi-connect",
+        type: "system",
+        source: "chat-connect",
         message: `Connected to Twitch chat for #${username}.`,
       });
       if (IS_DEV) {
@@ -155,8 +155,8 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     .catch((err: unknown) => {
       logDebug({
         timestamp: Date.now(),
-        type: "tmi",
-        source: "tmi-connect",
+        type: "system",
+        source: "chat-connect",
         message: `Failed to connect to Twitch chat for #${username}.`,
         details: err instanceof Error ? { name: err.name, message: err.message } : String(err),
       });

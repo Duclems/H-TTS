@@ -11,6 +11,8 @@ const PORT = 55510;
 
 let serverStarted = false;
 let mainWindow = null;
+/** Version du correctif en cours de téléchargement (pour l’UI ; `releaseName` GitHub est souvent vide). */
+let pendingUpdateVersion = "";
 
 /** Aligné sur `electron/preload.cjs` (ALLOWED_KEYS). */
 const SECURE_STORAGE_KEYS = new Set(["hi_tts_secure_tw_token", "hi_tts_secure_eleven"]);
@@ -293,6 +295,7 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on("update-available", (info) => {
+    pendingUpdateVersion = typeof info?.version === "string" ? info.version.trim() : "";
     // eslint-disable-next-line no-console
     console.log("[Hi-TTS] Mise à jour disponible", info.version);
 
@@ -327,10 +330,11 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+    const fromRelease =
+      typeof releaseName === "string" && releaseName.trim() ? releaseName.trim() : "";
+    const fromUpdaterInfo = String(autoUpdater.updateInfo?.version ?? "").trim();
     const downloadedVersion =
-      typeof releaseName === "string" && releaseName.trim()
-        ? releaseName.trim()
-        : "new version";
+      pendingUpdateVersion || fromRelease || fromUpdaterInfo || "";
 
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.setProgressBar(-1);
@@ -342,12 +346,15 @@ function setupAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
       title: "Mise à jour Hi-TTS",
-      message: `Une nouvelle version de Hi-TTS a été téléchargée (${downloadedVersion}).`,
-      detail: "Redémarrer l'application pour appliquer la mise à jour."
+      message: downloadedVersion
+        ? `Une nouvelle version de Hi-TTS a été téléchargée (v${downloadedVersion}).`
+        : "Une nouvelle version de Hi-TTS a été téléchargée.",
+      detail:
+        "L’application va se fermer : la mise à jour s’installe en arrière-plan (sans assistant NSIS), puis Hi-TTS redémarre."
     });
 
     if (result === 0) {
-      autoUpdater.quitAndInstall();
+      autoUpdater.quitAndInstall(true, true);
     }
   });
 
@@ -357,13 +364,6 @@ function setupAutoUpdater() {
     }
     // eslint-disable-next-line no-console
     console.log("[Hi-TTS] Aucune mise à jour disponible.");
-    dialog.showMessageBox({
-      type: "info",
-      title: "Mise à jour Hi-TTS",
-      message: "Aucune mise à jour disponible pour le moment.",
-    }).catch(() => {
-      // ignore dialog errors
-    });
   });
 
   // Vérifie au démarrage, déclenche les événements ci-dessus

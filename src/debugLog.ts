@@ -1,4 +1,4 @@
-export type DebugLogType = "reward" | "redeem" | "tmi" | "eleven" | "system" | "auth" | "other";
+export type DebugLogType = "reward" | "redeem" | "eleven" | "system" | "auth" | "other";
 
 export type DebugLogEntry = {
   timestamp: number;

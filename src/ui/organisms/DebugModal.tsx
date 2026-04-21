@@ -30,7 +30,7 @@ export const DebugModal = ({ onClose }: Props) => {
   }, []);
 
   const availableTypes = useMemo(() => {
-    const base: DebugLogType[] = ["reward", "redeem", "tmi", "eleven", "system", "auth", "other"];
+    const base: DebugLogType[] = ["reward", "redeem", "eleven", "system", "auth", "other"];
     return base.filter((type) => logs.some((log) => log.type === type));
   }, [logs]);
 
@@ -55,7 +55,6 @@ export const DebugModal = ({ onClose }: Props) => {
                 <option value="all">{t("debug.selectPlaceholder")}</option>
                 {availableTypes.includes("reward") && <option value="reward">{t("debug.categoryReward")}</option>}
                 {availableTypes.includes("redeem") && <option value="redeem">{t("debug.categoryRedeem")}</option>}
-                {availableTypes.includes("tmi") && <option value="tmi">{t("debug.categoryTmi")}</option>}
                 {availableTypes.includes("eleven") && <option value="eleven">{t("debug.categoryEleven")}</option>}
                 {availableTypes.includes("system") && <option value="system">{t("debug.categorySystem")}</option>}
                 {availableTypes.includes("auth") && <option value="auth">{t("debug.categoryAuth")}</option>}

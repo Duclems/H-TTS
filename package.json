@@ -1,6 +1,6 @@
 {
   "name": "hi-tts",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Hi-TTS • TTS ElevenLabs pour rewards Twitch en desktop.",
   "author": "Hiarte <contact@hiarte.fr>",
   "license": "MIT",
@@ -29,10 +29,10 @@
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "concurrently": "^8.2.0",
-    "electron": "^35.7.5",
+    "electron": "^39.8.8",
     "electron-builder": "^26.8.1",
     "typescript": "^5.6.0",
-    "vite": "^5.4.0",
+    "vite": "^6.4.2",
     "wait-on": "^7.2.0"
   },
   "overrides": {

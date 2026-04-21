@@ -6,6 +6,10 @@ export default defineConfig({
   server: {
     port: 55510
   },
+  build: {
+    /* Electron embarque un Chromium récent ; évite l’échec esbuild (destructuring) avec la cible legacy par défaut de Vite 6 */
+    target: "es2022"
+  },
   esbuild: {
     charset: "utf8"
   }
