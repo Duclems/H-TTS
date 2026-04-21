@@ -8,6 +8,7 @@ const IS_DEV = import.meta.env.DEV;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let client: any | null = null;
 let started = false;
+let startedChannel: string | null = null;
 
 type StartOptions = {
   channelLogin: string;
@@ -93,10 +94,18 @@ function parseEmotesFromTmi(message: string, emotesTag: unknown): ParsedEmote[] 
 }
 
 export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
-  if (started) return;
-  started = true;
-
   const username = channelLogin.toLowerCase();
+
+  // Si on est déjà connecté au même channel, ne rien faire.
+  if (started && startedChannel === username) return;
+
+  // Si on est connecté à un autre channel (changement de compte), on disconnecte proprement.
+  if (started) {
+    stopTwitchChatLogger();
+  }
+
+  started = true;
+  startedChannel = username;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   client = new (tmi as any).Client({
@@ -175,5 +184,41 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
         console.warn("[Hi-TTS][IRC] Échec de connexion au chat Twitch", err);
       }
     });
+}
+
+/**
+ * Déconnecte le client IRC et remet le module à l'état initial.
+ * Sans effet si aucune connexion n'est active.
+ */
+export function stopTwitchChatLogger(): void {
+  if (!started) return;
+  const previousClient = client;
+  const previousChannel = startedChannel;
+  client = null;
+  started = false;
+  startedChannel = null;
+
+  if (previousClient) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const result = previousClient.disconnect();
+      if (result && typeof result.catch === "function") {
+        result.catch(() => {
+          /* disconnection error is not actionable */
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+
+    logDebug({
+      timestamp: Date.now(),
+      type: "system",
+      source: "chat-disconnect",
+      message: previousChannel
+        ? `Disconnected from Twitch chat for #${previousChannel}.`
+        : "Disconnected from Twitch chat.",
+    });
+  }
 }
 

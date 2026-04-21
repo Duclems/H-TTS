@@ -3,7 +3,7 @@ import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
 import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
 import { getCachedElevenLabsApiKey, hydrateElevenLabsFromSecureStorage } from "../elevenLabsConfig";
-import { fetchElevenUser, checkElevenPermissions } from "../elevenLabsApi";
+import { fetchElevenUser, fetchElevenVoices } from "../elevenLabsApi";
 import { ToastProvider } from "./context/ToastContext";
 import { SettingsModal } from "./organisms/SettingsModal";
 import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
@@ -69,7 +69,10 @@ export const App = () => {
         return;
       }
 
-      const user = await fetchElevenUser();
+      // Un seul round-trip : user (credits + validité) ET voices (perm TTS)
+      // en parallèle. Évite la chaîne séquentielle fetchElevenUser →
+      // checkElevenPermissions (qui refetchait aussi l'user).
+      const [user, voices] = await Promise.all([fetchElevenUser(), fetchElevenVoices()]);
       if (cancelled) return;
 
       const sub = user?.subscription;
@@ -84,14 +87,13 @@ export const App = () => {
         setElevenCredits(null);
       }
 
-      if (user) {
-        const checks = await checkElevenPermissions();
-        if (!cancelled) {
-          setElevenPermissionsOk(checks.user && checks.voices && checks.tts);
-        }
-      } else {
+      if (!user) {
         setElevenPermissionsOk(null);
+        return;
       }
+
+      const hasVoices = voices.length > 0;
+      setElevenPermissionsOk(hasVoices);
     };
 
     if (bootLoading) return;

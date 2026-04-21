@@ -115,6 +115,44 @@ function buildAuthHeaders(accessToken: string): HeadersInit {
   };
 }
 
+/**
+ * Crée un abonnement EventSub lié à une session WebSocket.
+ * Doit être appelé après réception du `session_welcome` (pour récupérer le
+ * `sessionId`). Pour les reconnects Twitch (`session_reconnect`), la sub est
+ * migrée automatiquement côté Twitch → inutile de la recréer.
+ */
+export async function createEventSubSubscription(
+  accessToken: string,
+  sessionId: string,
+  type: string,
+  condition: Record<string, string>,
+  version = "1"
+): Promise<TwitchHelixResult<unknown>> {
+  try {
+    const res = await fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
+      method: "POST",
+      headers: {
+        ...buildAuthHeaders(accessToken),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        type,
+        version,
+        condition,
+        transport: { method: "websocket", session_id: sessionId }
+      })
+    });
+    const status = res.status;
+    if (res.ok) {
+      const body = await res.json().catch(() => null);
+      return { ok: true, data: body, status };
+    }
+    return { ok: false, status, retryAfterMs: parseRetryAfterMs(res) };
+  } catch {
+    return { ok: false, status: 0, network: true };
+  }
+}
+
 export async function fetchCurrentUser(accessToken: string): Promise<TwitchUser | null> {
   const res = await fetch("https://api.twitch.tv/helix/users", {
     headers: buildAuthHeaders(accessToken)

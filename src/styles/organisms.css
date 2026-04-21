@@ -600,3 +600,117 @@
   height: 20px;
   display: block;
 }
+
+/* Splash (chargement initial des rewards) */
+.rewards-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 1rem 1.6rem;
+  gap: 0.6rem;
+}
+
+.rewards-splash-logo {
+  width: 112px;
+  height: 112px;
+  opacity: 0.95;
+}
+
+.rewards-create-btn {
+  margin-top: 0;
+}
+
+/* Empty state partagé (pas de rewards, historique vide) */
+.rewards-empty-state {
+  margin-top: 1.2rem;
+  border-radius: 0.9rem;
+  padding: 1.2rem 0.9rem;
+  border: 1px dashed var(--border);
+  background-color: var(--empty-state-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.rewards-empty-state-history {
+  margin-top: 0;
+  padding: 1.4rem 1rem;
+}
+
+.rewards-empty-state-logo {
+  width: 104px;
+  height: 104px;
+}
+
+.rewards-empty-state-logo-faded {
+  opacity: 0.9;
+}
+
+.rewards-empty-state-text {
+  text-align: center;
+  font-size: 0.8rem;
+  max-width: 260px;
+}
+
+/* Carte d'un reward (dans l'onglet rewards) */
+.rewards-reward-item-header {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rewards-reward-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--reward-swatch-fallback);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.rewards-reward-swatch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rewards-reward-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewards-reward-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.rewards-reward-cost {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.rewards-reward-settings-btn {
+  margin-top: 0;
+  width: auto;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.rewards-reward-prompt {
+  margin-top: 0.4rem;
+}
+
+/* Emote inline dans le message d'un redeem historique */
+.rewards-emote-inline {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin: 0 2px;
+  border-radius: 4px;
+}

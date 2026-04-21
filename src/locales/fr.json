@@ -2,7 +2,7 @@
   "app": {
     "history": "Historique",
     "creditsRemaining": "Crédits restants",
-    "redeemsRefresh": "Les redeems sont rafraîchis toutes les <strong>5&nbsp;secondes</strong> et il peut se déclencher jusqu’à <strong>30&nbsp;secondes</strong> après son apparition.",
+    "redeemsRefresh": "Les redeems arrivent <strong>en temps réel</strong> via Twitch EventSub et sont joués dès leur réception.",
     "rewardsManagement": "Gestion des rewards",
     "rewardsSubtitle": "Crée et paramètrer ici vos rewards Hi-TTS utilisés pour déclencher le TTS sur ton stream.",
     "home": "Accueil",

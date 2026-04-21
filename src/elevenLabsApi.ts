@@ -7,7 +7,7 @@ type ElevenSubscription = {
   character_limit: number;
 };
 
-type ElevenUser = {
+export type ElevenUser = {
   first_name?: string;
   subscription?: ElevenSubscription;
   profile_picture?: string;
@@ -119,15 +119,23 @@ export type ElevenPermissionChecks = {
 /**
  * Vérifie les autorisations ElevenLabs (Utilisateur, Voix).
  * On ne fait pas d'appel TTS de test pour éviter les 402 (Payment Required) en console.
+ *
+ * @param cachedUser Si l'appelant a déjà chargé l'utilisateur (cas typique :
+ * `App.tsx` qui a besoin des `subscription` credits), on le passe ici pour
+ * éviter un second `fetchElevenUser()`.
  */
-export async function checkElevenPermissions(): Promise<ElevenPermissionChecks> {
+export async function checkElevenPermissions(
+  cachedUser?: ElevenUser | null
+): Promise<ElevenPermissionChecks> {
   const apiKey = getApiKey();
   if (!apiKey) {
     return { user: false, voices: false, tts: false };
   }
 
-  const user = await fetchElevenUser();
-  const voices = await fetchElevenVoices();
+  const [user, voices] = await Promise.all([
+    cachedUser !== undefined ? Promise.resolve(cachedUser) : fetchElevenUser(),
+    fetchElevenVoices()
+  ]);
   const hasVoices = voices.length > 0;
 
   return {
