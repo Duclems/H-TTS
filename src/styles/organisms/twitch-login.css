@@ -78,3 +78,45 @@
   align-items: center;
   gap: 0.6rem;
 }
+
+.twitch-login-device-code-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.twitch-login-device-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border-main);
+  border-radius: 999px;
+  background: var(--bg-subtle);
+  text-align: center;
+  user-select: all;
+  margin-bottom: 0.55rem;
+}
+
+.twitch-login-device-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+}
+
+.twitch-login-device-action {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.twitch-login-device-error {
+  color: var(--color-danger, #e24a4a);
+  font-size: 0.78rem;
+  margin-top: 0.4rem;
+}

@@ -1,86 +1,106 @@
-import { TWITCH_CLIENT_ID, TWITCH_REDIRECT_URI, TWITCH_SCOPES } from "./config";
+import { TWITCH_CLIENT_ID, TWITCH_SCOPES } from "./config";
 import {
   migrateLegacySecretsOnce,
   SECURE_KEY_TWITCH_TOKEN,
   secureStorageGet,
   secureStorageSet
 } from "./secureStorageBridge";
-import { STORAGE_KEY_TWITCH_OAUTH_STATE as STATE_KEY } from "./storageKeys";
-
-const TWITCH_AUTHORIZE_URL = "https://id.twitch.tv/oauth2/authorize";
 
 export type TwitchTokenResponse = {
   access_token: string;
-  scope: string[];
+  refresh_token: string | null;
   token_type: string;
-  state?: string;
+  scope: string[];
+  expires_in: number;
+  expires_at: number;
 };
 
-function generateRandomState(length = 32): string {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  const array = new Uint32Array(length);
-  window.crypto.getRandomValues(array);
-  for (let i = 0; i < length; i += 1) {
-    result += chars[array[i] % chars.length];
+export type DeviceFlowStart = {
+  sessionId: string;
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+  interval: number;
+};
+
+type IpcResult<T> = { ok: true; data: T } | { ok: false; error: string; status?: number };
+
+declare global {
+  interface Window {
+    hiTtsTwitchOAuth?: {
+      start: (args: {
+        clientId: string;
+        scopes: string;
+      }) => Promise<IpcResult<DeviceFlowStart>>;
+      waitForToken: (sessionId: string) => Promise<IpcResult<TwitchTokenResponse>>;
+      cancel: (sessionId: string) => Promise<boolean>;
+      refresh: (args: {
+        clientId: string;
+        refreshToken: string;
+      }) => Promise<IpcResult<TwitchTokenResponse>>;
+      openVerification: (url: string) => Promise<boolean>;
+    };
   }
-  return result;
 }
 
-export function buildTwitchAuthorizeUrl(): string {
-  const state = generateRandomState();
-  localStorage.setItem(STATE_KEY, state);
+function getBridge(): NonNullable<Window["hiTtsTwitchOAuth"]> {
+  const bridge = typeof window !== "undefined" ? window.hiTtsTwitchOAuth : undefined;
+  if (!bridge) {
+    throw new Error(
+      "Le pont d'authentification Twitch n'est pas disponible. Cette version doit être lancée depuis l'application Electron Hi-TTS."
+    );
+  }
+  return bridge;
+}
 
-  const params = new URLSearchParams({
-    client_id: TWITCH_CLIENT_ID,
-    redirect_uri: TWITCH_REDIRECT_URI,
-    response_type: "token",
-    scope: TWITCH_SCOPES,
-    state,
-    force_verify: "true"
+export async function startDeviceFlow(): Promise<DeviceFlowStart> {
+  if (!TWITCH_CLIENT_ID) {
+    throw new Error("missing_client_id");
+  }
+  const res = await getBridge().start({
+    clientId: TWITCH_CLIENT_ID,
+    scopes: TWITCH_SCOPES
   });
-
-  return `${TWITCH_AUTHORIZE_URL}?${params.toString()}`;
+  if (!res.ok) throw new Error(res.error);
+  return res.data;
 }
 
-export function isOAuthImplicitAccessDenied(hash: string): boolean {
-  const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
-  if (!trimmed) return false;
-  const params = new URLSearchParams(trimmed);
-  return params.get("error") === "access_denied";
+export async function waitForDeviceToken(sessionId: string): Promise<TwitchTokenResponse> {
+  const res = await getBridge().waitForToken(sessionId);
+  if (!res.ok) throw new Error(res.error);
+  return res.data;
 }
 
-export function parseHashFragment(hash: string): TwitchTokenResponse | null {
-  const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
-  const params = new URLSearchParams(trimmed);
-
-  const accessToken = params.get("access_token");
-  const tokenType = params.get("token_type");
-  const scopeRaw = params.get("scope");
-  const state = params.get("state") ?? undefined;
-
-  if (!accessToken || !tokenType) {
-    return null;
+export async function cancelDeviceFlow(sessionId: string): Promise<void> {
+  try {
+    await getBridge().cancel(sessionId);
+  } catch {
+    /* ignore */
   }
-
-  const scope = scopeRaw ? scopeRaw.split(" ") : [];
-
-  return {
-    access_token: accessToken,
-    token_type: tokenType,
-    scope,
-    state
-  };
 }
 
-export function validateState(returnedState?: string | null): boolean {
-  const stored = localStorage.getItem(STATE_KEY);
-  if (!stored || !returnedState) return false;
-  const ok = stored === returnedState;
-  if (ok) {
-    localStorage.removeItem(STATE_KEY);
+export async function openTwitchVerification(url: string): Promise<boolean> {
+  try {
+    return await getBridge().openVerification(url);
+  } catch {
+    return false;
   }
-  return ok;
+}
+
+export async function refreshTwitchToken(
+  refreshToken: string
+): Promise<TwitchTokenResponse> {
+  if (!TWITCH_CLIENT_ID) throw new Error("missing_client_id");
+  const res = await getBridge().refresh({
+    clientId: TWITCH_CLIENT_ID,
+    refreshToken
+  });
+  if (!res.ok) {
+    const err = new Error(res.error) as Error & { status?: number };
+    if (res.status) err.status = res.status;
+    throw err;
+  }
+  return res.data;
 }
 
 export async function storeToken(token: TwitchTokenResponse): Promise<void> {
@@ -93,7 +113,21 @@ export async function getStoredToken(): Promise<TwitchTokenResponse | null> {
   const raw = await secureStorageGet(SECURE_KEY_TWITCH_TOKEN);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as TwitchTokenResponse;
+    const parsed = JSON.parse(raw) as Partial<TwitchTokenResponse> & {
+      access_token?: unknown;
+    };
+    if (typeof parsed.access_token !== "string" || !parsed.access_token) return null;
+    return {
+      access_token: parsed.access_token,
+      refresh_token:
+        typeof parsed.refresh_token === "string" ? parsed.refresh_token : null,
+      token_type: typeof parsed.token_type === "string" ? parsed.token_type : "bearer",
+      scope: Array.isArray(parsed.scope)
+        ? parsed.scope.filter((s): s is string => typeof s === "string")
+        : [],
+      expires_in: typeof parsed.expires_in === "number" ? parsed.expires_in : 0,
+      expires_at: typeof parsed.expires_at === "number" ? parsed.expires_at : 0
+    };
   } catch {
     return null;
   }
@@ -101,4 +135,34 @@ export async function getStoredToken(): Promise<TwitchTokenResponse | null> {
 
 export async function clearStoredToken(): Promise<void> {
   await secureStorageSet(SECURE_KEY_TWITCH_TOKEN, null);
+}
+
+/**
+ * Renvoie un token valide. Si le token courant est sur le point d'expirer
+ * (moins de `skewSeconds` avant expiration) et qu'un refresh token existe,
+ * tente un refresh silencieux et persiste le résultat.
+ *
+ * - Renvoie `null` si aucun token stocké.
+ * - Renvoie `null` et efface le stockage si le refresh est rejeté (revoqué, etc.).
+ */
+export async function getValidToken(
+  skewSeconds = 120
+): Promise<TwitchTokenResponse | null> {
+  const current = await getStoredToken();
+  if (!current) return null;
+
+  const needsRefresh =
+    current.expires_at > 0 && current.expires_at - Date.now() < skewSeconds * 1000;
+
+  if (!needsRefresh) return current;
+  if (!current.refresh_token) return current;
+
+  try {
+    const refreshed = await refreshTwitchToken(current.refresh_token);
+    await storeToken(refreshed);
+    return refreshed;
+  } catch {
+    await clearStoredToken();
+    return null;
+  }
 }

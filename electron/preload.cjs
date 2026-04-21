@@ -16,6 +16,25 @@ contextBridge.exposeInMainWorld("hiTtsApp", {
   setLocale: (locale) => ipcRenderer.invoke("app-locale:set", locale)
 });
 
+contextBridge.exposeInMainWorld("hiTtsTwitchOAuth", {
+  /**
+   * @param {{ clientId: string, scopes: string }} args
+   * @returns {Promise<{ ok: boolean, data?: { sessionId: string, userCode: string, verificationUri: string, expiresIn: number, interval: number }, error?: string }>}
+   */
+  start: (args) => ipcRenderer.invoke("twitch-oauth:start", args),
+  /**
+   * Attend que l'utilisateur valide l'autorisation côté Twitch.
+   * @param {string} sessionId
+   */
+  waitForToken: (sessionId) => ipcRenderer.invoke("twitch-oauth:wait", sessionId),
+  /** @param {string} sessionId */
+  cancel: (sessionId) => ipcRenderer.invoke("twitch-oauth:cancel", sessionId),
+  /** @param {{ clientId: string, refreshToken: string }} args */
+  refresh: (args) => ipcRenderer.invoke("twitch-oauth:refresh", args),
+  /** @param {string} url */
+  openVerification: (url) => ipcRenderer.invoke("twitch-oauth:open-verification", url)
+});
+
 contextBridge.exposeInMainWorld("hiTtsSecureStorage", {
   /**
    * @param {string} key

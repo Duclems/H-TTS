@@ -2,7 +2,7 @@
   "app": {
     "history": "History",
     "creditsRemaining": "Credits remaining",
-    "redeemsRefresh": "Redeems arrive <strong>in real time</strong> via Twitch EventSub and are played as soon as they come in.",
+    "redeemsRefresh": "Redeems arrive <strong>in real time</strong> and are played as soon as they come in.",
     "rewardsManagement": "Rewards management",
     "rewardsSubtitle": "Create and configure your Hi-TTS rewards here to trigger TTS on your stream.",
     "home": "Home",
@@ -45,7 +45,21 @@
     "intro": "The app needs a Twitch connection to continue.",
     "cta": "Connect with Twitch",
     "tokenNote": "Hi-TTS is a free app by Hiarte. Your Twitch token is stored locally (encrypted by the OS when possible) for your personal use only and is only sent to Twitch. Never share it.",
-    "aboutPrivacyButton": "About and privacy policy"
+    "aboutPrivacyButton": "About and privacy policy",
+    "deviceFlow": {
+      "preparing": "Setting up the secure connection…",
+      "codeLabel": "Activation code",
+      "instructions": "Open the Twitch page below and approve the Hi-TTS connection. The code is pre-filled, you just need to confirm.",
+      "openButton": "Open Twitch page",
+      "reopenButton": "Reopen Twitch page",
+      "waiting": "Waiting for your confirmation on Twitch…",
+      "cancelButton": "Cancel",
+      "retryButton": "Try again",
+      "errorGeneric": "Connection failed. Please try again.",
+      "errorExpired": "The code expired before validation. Please start over.",
+      "errorDenied": "Authorization denied. Approve the Twitch request to continue.",
+      "errorBridge": "Secure authentication is only available inside the Hi-TTS Electron app."
+    }
   },
   "eleven": {
     "cardKeySaved": "Key saved",
@@ -107,13 +121,6 @@
   },
   "twitchSession": {
     "title": "Twitch connection"
-  },
-  "authCallback": {
-    "errorOAuth": "Unable to read Twitch OAuth response.",
-    "errorState": "Security parameter 'state' does not match. Aborting.",
-    "title": "Processing Twitch callback…",
-    "subtitle": "We are processing the OAuth response and will redirect you.",
-    "backHome": "Back to home"
   },
   "tokenCard": {
     "errorProfile": "Unable to fetch your Twitch profile (check scopes).",

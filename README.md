@@ -34,8 +34,7 @@ cp .env.example .env
 
 Puis remplis :
 
-- **`VITE_TWITCH_CLIENT_ID`** : ton client id Twitch (obtenu depuis le portail développeur).
-- **`VITE_TWITCH_REDIRECT_URI`** : doit correspondre exactement à l’URL de callback enregistrée chez Twitch (par ex. `http://localhost:55510/auth/callback`).
+- **`VITE_TWITCH_CLIENT_ID`** : ton client id Twitch (obtenu depuis le portail développeur, configuré en **Client Type: Public** pour autoriser le Device Code Flow).
 - **`VITE_TWITCH_SCOPES`** : scopes Twitch requis, par ex. :
   - `user:read:email`
   - `channel:read:redemptions`
@@ -43,23 +42,27 @@ Puis remplis :
 
 Référence Twitch : [Docs Authentication](https://dev.twitch.tv/docs/authentication/).
 
-### 3. Flow OAuth2 utilisé (Implicit Grant)
+### 3. Flow OAuth2 utilisé (Device Code Flow)
 
-- Utilisation de l’endpoint d’auth Twitch :
+Hi-TTS utilise le **Device Code Flow** de Twitch ([doc officielle](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow)), conçu pour les applications desktop sans backend. Il remplace l'ancien Implicit Grant (déprécié OAuth 2.1) et apporte un **refresh token** (rolling, ~30 jours) pour éviter de se reconnecter toutes les 4 h.
 
-  - `https://id.twitch.tv/oauth2/authorize`
-  - `response_type=token`
-  - `client_id=...`
-  - `redirect_uri=...`
-  - `scope=...`
-  - `state` aléatoire stocké dans `localStorage` (protection CSRF).
+Déroulé :
 
-- Le callback est géré par la page `AuthCallbackPage` qui :
+1. Le processus **main** Electron appelle `POST https://id.twitch.tv/oauth2/device` avec `client_id` + `scopes`.
+2. Twitch renvoie `device_code`, `user_code` et `verification_uri` (contient déjà `user_code` en query string).
+3. L'app affiche `user_code` dans la fenêtre et ouvre `verification_uri` dans le **navigateur système** (via `shell.openExternal`). Twitch n'est donc jamais chargé dans la fenêtre Electron qui expose le preload.
+4. Le main process poll `POST https://id.twitch.tv/oauth2/token` avec `grant_type=urn:ietf:params:oauth:grant-type:device_code` jusqu'à ce que l'utilisateur valide.
+5. Une fois le token obtenu, il est persisté via `safeStorage` (`electron/secureStorage.cjs`). Le `device_code` lui ne sort jamais du main process.
+6. Le refresh est automatique : `App.tsx` programme un timer 5 min avant expiration, et le boot effectue un refresh silencieux si le token stocké est proche de sa deadline. Un échec de refresh purge le token et renvoie sur la page de connexion.
 
-  - Lit le fragment d’URL `#access_token=...`.
-  - Valide le `state`.
-  - Stocke le token dans `localStorage`.
-  - Redirige vers `/`.
+Bridge IPC (renderer ↔ main) exposé via `contextBridge` dans `electron/preload.cjs` sous `window.hiTtsTwitchOAuth`.
+
+Durcissement de navigation dans `electron/navigationGuard.cjs` :
+
+- `will-navigate` / `will-redirect` : tout ce qui n'est pas `http://localhost:55510` est bloqué. Les URLs web légitimes sont redirigées vers le navigateur système, les schemes non-web sont drop.
+- `setWindowOpenHandler` : idem, `deny` par défaut.
+- `will-attach-webview` : webviews désactivées.
+- Permissions navigateur (micro, géoloc, notifications…) : deny global.
 
 ### 4. Structure Atomik React
 
@@ -67,8 +70,8 @@ Organisation simplifiée (**Atomik/Atomic Design**) :
 
 ```text
 src/
-  config.ts                -> Lecture des variables d'env (client_id, scopes, redirect_uri)
-  twitchAuth.ts            -> Logique OAuth Twitch (build URL, parse hash, stockage token)
+  config.ts                -> Lecture des variables d'env (client_id, scopes)
+  twitchAuth.ts            -> Bridge Device Code Flow + refresh + stockage token chiffré
   styles/                  -> Entrée CSS unique `styles/index.css`
     base.css               -> Reset, variables, police Figtree, keyframes globaux
     atoms.css              -> Styles des composants de base (boutons, champs, pills, chips, toasts…)
@@ -87,8 +90,9 @@ src/
                                - SettingsModal, TwitchSessionModal, AboutModal
                                - ElevenLabsCard, RewardVoiceModal
     pages/
-      AuthCallbackPage/
-        AuthCallbackPage.tsx       -> Traitement du retour OAuth Twitch
+      LoginPage/                   -> UI Device Code Flow (user_code + ouverture navigateur)
+      HistoryPage/                 -> Historique des redemptions Hi-TTS
+      RewardsPage/                 -> Gestion des Custom Rewards
 ```
 
 L'application tourne dans une fenêtre **Electron** (`electron/main.cjs`) qui charge le build Vite et expose une icône de tray pour tourner en arrière-plan.
@@ -100,7 +104,7 @@ L'application tourne dans une fenêtre **Electron** (`electron/main.cjs`) qui ch
   - la liste des **Custom Rewards** (`/helix/channel_points/custom_rewards`),
   - les **redemptions UNFULFILLED** pour chaque reward (`/helix/channel_points/custom_rewards/redemptions`).
 
-- Tout cela se fait côté client avec le token OAuth2 obtenu via le flow implicit (voir [Authentication | Twitch Developers](https://dev.twitch.tv/docs/authentication/)).
+- Tout cela se fait côté client avec le token OAuth2 obtenu via le Device Code Flow (voir [Authentication | Twitch Developers](https://dev.twitch.tv/docs/authentication/)).
 
 - Attention : pour que les endpoints Channel Points fonctionnent (pas de 403), il faut :
   - que ta chaîne ait les **points de chaîne activés** (généralement affilié/partner),

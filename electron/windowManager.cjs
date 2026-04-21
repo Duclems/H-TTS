@@ -1,4 +1,4 @@
-const { app, BrowserWindow, nativeTheme, shell } = require("electron");
+const { app, BrowserWindow, nativeTheme } = require("electron");
 const path = require("path");
 const { startStaticServer } = require("./staticServer.cjs");
 
@@ -36,17 +36,20 @@ function createWindow({ port }) {
     }
   });
 
-  win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+  const localOrigins = [`http://localhost:${port}/`, `http://127.0.0.1:${port}/`];
+  const filter = { urls: localOrigins.map((origin) => `${origin}*`) };
+
+  win.webContents.session.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    const isLocal = localOrigins.some((origin) => details.url.startsWith(origin));
+    if (!isLocal) {
+      callback({ requestHeaders: details.requestHeaders });
+      return;
+    }
     const headers = {
       ...details.requestHeaders,
       "X-Hi-TTS-APP": "1"
     };
     callback({ requestHeaders: headers });
-  });
-
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: "deny" };
   });
 
   if (isDev) {

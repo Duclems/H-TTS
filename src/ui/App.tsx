@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
+import {
+  clearStoredToken,
+  getValidToken,
+  refreshTwitchToken,
+  storeToken,
+  type TwitchTokenResponse
+} from "../twitchAuth";
 import {
   getCachedElevenLabsApiKey,
   hydrateElevenLabsFromSecureStorage
@@ -46,7 +52,7 @@ export const App = () => {
     let cancelled = false;
     const run = async () => {
       try {
-        const stored = await getStoredToken();
+        const stored = await getValidToken();
         await hydrateElevenLabsFromSecureStorage();
         if (!cancelled) {
           setToken(stored);
@@ -61,6 +67,32 @@ export const App = () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!token || !token.refresh_token || !token.expires_at) return;
+    const refreshAheadMs = 5 * 60 * 1000;
+    const msUntilRefresh = Math.max(15_000, token.expires_at - Date.now() - refreshAheadMs);
+    let cancelled = false;
+
+    const timer = window.setTimeout(async () => {
+      if (cancelled) return;
+      try {
+        const refreshed = await refreshTwitchToken(token.refresh_token as string);
+        if (cancelled) return;
+        await storeToken(refreshed);
+        setToken(refreshed);
+      } catch {
+        if (cancelled) return;
+        await clearStoredToken();
+        setToken(null);
+      }
+    }, msUntilRefresh);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [token]);
 
   const formatCredits = useCallback((value: number): string => {
     if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;

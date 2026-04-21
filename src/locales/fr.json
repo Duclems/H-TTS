@@ -2,7 +2,7 @@
   "app": {
     "history": "Historique",
     "creditsRemaining": "Crédits restants",
-    "redeemsRefresh": "Les redeems arrivent <strong>en temps réel</strong> via Twitch EventSub et sont joués dès leur réception.",
+    "redeemsRefresh": "Les redeems arrivent <strong>en temps réel</strong> et sont joués dès leur réception.",
     "rewardsManagement": "Gestion des rewards",
     "rewardsSubtitle": "Crée et paramètrer ici vos rewards Hi-TTS utilisés pour déclencher le TTS sur ton stream.",
     "home": "Accueil",
@@ -45,7 +45,21 @@
     "intro": "L'application a besoin d'une connexion à Twitch pour accéder à la suite.",
     "cta": "Se connecter avec Twitch",
     "tokenNote": "Hi-TTS est une application gratuite de Hiarte. Ton token Twitch est stocké localement (chiffré avec le système quand c’est possible) pour ton usage personnel uniquement et n'est envoyé qu'à Twitch. Ne le partage jamais.",
-    "aboutPrivacyButton": "À propos et politique de confidentialité"
+    "aboutPrivacyButton": "À propos et politique de confidentialité",
+    "deviceFlow": {
+      "preparing": "Préparation de la connexion sécurisée…",
+      "codeLabel": "Code d'activation",
+      "instructions": "Ouvre la page Twitch ci-dessous et valide la connexion pour Hi-TTS. Le code est déjà pré-rempli, il n'y a plus qu'à confirmer.",
+      "openButton": "Ouvrir la page Twitch",
+      "reopenButton": "Rouvrir la page Twitch",
+      "waiting": "En attente de ta confirmation sur Twitch…",
+      "cancelButton": "Annuler",
+      "retryButton": "Recommencer",
+      "errorGeneric": "La connexion n'a pas abouti. Réessaie dans un instant.",
+      "errorExpired": "Le code a expiré avant la validation. Recommence la connexion.",
+      "errorDenied": "Autorisation refusée. Valide la demande Twitch pour continuer.",
+      "errorBridge": "L'authentification sécurisée n'est disponible que dans l'application Electron Hi-TTS."
+    }
   },
   "eleven": {
     "cardKeySaved": "Clé sauvegardée",
@@ -107,13 +121,6 @@
   },
   "twitchSession": {
     "title": "Connexion Twitch"
-  },
-  "authCallback": {
-    "errorOAuth": "Impossible de lire la réponse OAuth de Twitch.",
-    "errorState": "Le paramètre de sécurité 'state' ne correspond pas. Abandon.",
-    "title": "Traitement du callback Twitch…",
-    "subtitle": "Nous analysons la réponse OAuth puis te redirigeons.",
-    "backHome": "Revenir à l'accueil"
   },
   "tokenCard": {
     "errorProfile": "Impossible de récupérer ton profil Twitch (vérifie les scopes).",

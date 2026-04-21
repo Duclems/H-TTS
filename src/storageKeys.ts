@@ -1,5 +1,4 @@
 export const STORAGE_KEY_LOCALE = "h_tts_locale";
-export const STORAGE_KEY_TWITCH_OAUTH_STATE = "twitch_oauth_state";
 export const STORAGE_KEY_TWITCH_LAST_PROFILE = "h_tts_twitch_last_profile";
 export const STORAGE_KEY_REDEEM_AUDIO_COMPLETED = "h_tts_redeem_audio_completed_ids";
 export const STORAGE_KEY_REDEEM_FULFILL_COMPLETED = "h_tts_redeem_fulfill_completed_ids";

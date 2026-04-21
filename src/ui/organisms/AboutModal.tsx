@@ -18,6 +18,7 @@ export const AboutModal = ({ onClose }: Props) => {
       titleId="settings-about-modal-title"
       title={t("settings.title")}
       onClose={onClose}
+      mainClassName="settings-modal-main--parametres"
       headerRight={<LanguageSelector />}
       footer={
         <div className="about-footer-row">

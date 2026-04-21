@@ -41,6 +41,11 @@
   border-top: 1px solid var(--border-main);
 }
 
+/* Modale « Paramètres » (à propos) : pas de marge intérieure à droite ; le reste inchangé. */
+.settings-modal-main.settings-modal-main--parametres {
+  padding-right: 0;
+}
+
 .settings-modal-footer {
   flex-shrink: 0;
   padding-bottom: 1rem;
