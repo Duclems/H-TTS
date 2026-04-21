@@ -7,6 +7,15 @@ const ALLOWED_KEYS = ["hi_tts_secure_tw_token", "hi_tts_secure_eleven"];
  * Stockage secrets via le main (safeStorage + fichier userData).
  * Jamais de require("electron") dans le renderer.
  */
+contextBridge.exposeInMainWorld("hiTtsApp", {
+  /**
+   * Persiste la locale pour les boîtes de dialogue natives (processus principal).
+   * @param {"fr" | "en"} locale
+   * @returns {Promise<void>}
+   */
+  setLocale: (locale) => ipcRenderer.invoke("app-locale:set", locale)
+});
+
 contextBridge.exposeInMainWorld("hiTtsSecureStorage", {
   /**
    * @param {string} key

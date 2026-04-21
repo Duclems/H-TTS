@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
 import { HIARTE_HI_TTS_PROJECT_URL } from "../../config";
 import {
@@ -16,6 +16,7 @@ import {
 import {
   startTwitchChatLogger,
   addTwitchChatListener,
+  removeTwitchChatListener,
   type ChatMessageWithEmotes,
   type ParsedEmote
 } from "../../twitchChat";
@@ -66,6 +67,32 @@ const AUDIO_COMPLETED_KEY = "h_tts_redeem_audio_completed_ids";
 const FULFILL_COMPLETED_KEY = "h_tts_redeem_fulfill_completed_ids";
 const RECENT_FULFILLED_KEY = "h_tts_recent_fulfilled_redemptions";
 const RECENT_FULFILLED_MAX = 5;
+
+/** Évite plusieurs appels ElevenLabs pour le même redeem si l’effet se relance pendant le `await` (poll, Strict Mode, etc.). */
+const redeemTtsInFlightIds = new Set<string>();
+
+const REDEEM_FP_SEP = "\u001f";
+const REDEEM_ROW_SEP = "\u001e";
+
+/** Empreinte stable pour éviter `setRedemptions` (et l’effet TTS) quand Helix renvoie les mêmes redeems. */
+function getRedemptionsFingerprint(list: TwitchRewardRedemption[]): string {
+  if (list.length === 0) return "";
+  return [...list]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map((r) =>
+      [
+        r.id,
+        r.redeemed_at,
+        r.status,
+        r.reward.id,
+        r.user_login,
+        r.user_display_name,
+        r.reward.title,
+        r.user_input ?? ""
+      ].join(REDEEM_FP_SEP)
+    )
+    .join(REDEEM_ROW_SEP);
+}
 
 function readStringIdSet(key: string): Set<string> {
   try {
@@ -124,6 +151,16 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
   useEffect(() => {
     let cancelled = false;
 
+    const onTwitchChatMessage = (msg: ChatMessageWithEmotes) => {
+      setChatMessages((prev) => {
+        const next = [...prev, msg];
+        if (next.length > 200) {
+          next.shift();
+        }
+        return next;
+      });
+    };
+
     const run = async () => {
       try {
         setLoading(true);
@@ -134,6 +171,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           setError(t("rewards.errorProfile"));
           return;
         }
+        if (cancelled) return;
 
         setBroadcasterId(user.id);
 
@@ -141,16 +179,9 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         startTwitchChatLogger({
           channelLogin: user.login
         });
+        if (cancelled) return;
 
-        addTwitchChatListener((msg) => {
-          setChatMessages((prev) => {
-            const next = [...prev, msg];
-            if (next.length > 200) {
-              next.shift();
-            }
-            return next;
-          });
-        });
+        addTwitchChatListener(onTwitchChatMessage);
 
         let rewardsData: TwitchCustomReward[] | null = null;
         let lastRewardsErr: TwitchHelixErr | null = null;
@@ -216,7 +247,11 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
             });
           }
         }
-        setRedemptions(allRedemptions);
+        setRedemptions((prev) =>
+          getRedemptionsFingerprint(prev) === getRedemptionsFingerprint(allRedemptions)
+            ? prev
+            : allRedemptions
+        );
       } catch (e) {
         logDebug({
           timestamp: Date.now(),
@@ -238,6 +273,7 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
 
     return () => {
       cancelled = true;
+      removeTwitchChatListener(onTwitchChatMessage);
     };
   }, [token.access_token]);
 
@@ -325,7 +361,11 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
         }
 
         consecutiveFailures = 0;
-        setRedemptions(allRedemptions);
+        setRedemptions((prev) =>
+          getRedemptionsFingerprint(prev) === getRedemptionsFingerprint(allRedemptions)
+            ? prev
+            : allRedemptions
+        );
         schedule(REDEEM_REFRESH_INTERVAL_MS);
       } catch (error) {
         consecutiveFailures += 1;
@@ -488,42 +528,51 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
           continue;
         }
 
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          console.log("[Hi-TTS] Nouvelle redemption à lire via ElevenLabs", {
-            id: redemption.id,
-            rewardId: redemption.reward.id,
-            user: redemption.user_display_name || redemption.user_login,
-            rawText: redemption.user_input,
-            cleanedText
-          });
-        }
-
-        logDebug({
-          timestamp: Date.now(),
-          type: "redeem",
-          source: "redeem-tts",
-          message: "Starting ElevenLabs TTS for a new redemption.",
-          details: {
-            redemptionId: redemption.id,
-            rewardId: redemption.reward.id,
-            user: redemption.user_display_name || redemption.user_login,
-            text: cleanedText,
-          },
-        });
-
-        const tts = await speakWithElevenLabsFromText(cleanedText, voiceConfig);
-        if (!tts.playedToEnd) {
+        if (redeemTtsInFlightIds.has(redemption.id)) {
           continue;
         }
+        redeemTtsInFlightIds.add(redemption.id);
 
-        audioDone.add(redemption.id);
-        persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+        try {
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.log("[Hi-TTS] Nouvelle redemption à lire via ElevenLabs", {
+              id: redemption.id,
+              rewardId: redemption.reward.id,
+              user: redemption.user_display_name || redemption.user_login,
+              rawText: redemption.user_input,
+              cleanedText
+            });
+          }
 
-        const ok = await fulfillRedemption(redemption);
-        if (ok) {
-          fulfillDone.add(redemption.id);
-          persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+          logDebug({
+            timestamp: Date.now(),
+            type: "redeem",
+            source: "redeem-tts",
+            message: "Starting ElevenLabs TTS for a new redemption.",
+            details: {
+              redemptionId: redemption.id,
+              rewardId: redemption.reward.id,
+              user: redemption.user_display_name || redemption.user_login,
+              text: cleanedText,
+            },
+          });
+
+          const tts = await speakWithElevenLabsFromText(cleanedText, voiceConfig);
+          if (!tts.playedToEnd) {
+            continue;
+          }
+
+          audioDone.add(redemption.id);
+          persistStringIdSet(AUDIO_COMPLETED_KEY, audioDone);
+
+          const ok = await fulfillRedemption(redemption);
+          if (ok) {
+            fulfillDone.add(redemption.id);
+            persistStringIdSet(FULFILL_COMPLETED_KEY, fulfillDone);
+          }
+        } finally {
+          redeemTtsInFlightIds.delete(redemption.id);
         }
       }
     };
@@ -535,25 +584,26 @@ export const RewardsCard = ({ token, activeTab, onMissingRewardVoiceChange }: Pr
     };
   }, [redemptions, broadcasterId, token.access_token]);
 
-  const byId = new Map<string, TwitchRewardRedemption>();
-  for (const r of redemptions) {
-    byId.set(r.id, r);
-  }
-  for (const r of recentFulfilledRedemptions) {
-    if (!byId.has(r.id)) {
+  const visibleRedemptions = useMemo(() => {
+    const byId = new Map<string, TwitchRewardRedemption>();
+    for (const r of redemptions) {
       byId.set(r.id, r);
     }
-  }
-
-  const visibleRedemptions = [...byId.values()]
-    .slice()
-    .sort((a, b) => {
-      const ta = new Date(a.redeemed_at).getTime();
-      const tb = new Date(b.redeemed_at).getTime();
-      if (Number.isNaN(ta) || Number.isNaN(tb)) return 0;
-      return tb - ta; // plus récents en premier
-    })
-    .slice(0, 5);
+    for (const r of recentFulfilledRedemptions) {
+      if (!byId.has(r.id)) {
+        byId.set(r.id, r);
+      }
+    }
+    return [...byId.values()]
+      .slice()
+      .sort((a, b) => {
+        const ta = new Date(a.redeemed_at).getTime();
+        const tb = new Date(b.redeemed_at).getTime();
+        if (Number.isNaN(ta) || Number.isNaN(tb)) return 0;
+        return tb - ta; // plus récents en premier
+      })
+      .slice(0, 5);
+  }, [redemptions, recentFulfilledRedemptions]);
 
   // Charge les avatars des utilisateurs présents dans les 5 derniers redemptions visibles
   useEffect(() => {

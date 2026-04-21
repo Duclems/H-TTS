@@ -5,6 +5,7 @@ const express = require("express");
 const { autoUpdater } = require("electron-updater");
 const net = require("net");
 const { exec } = require("child_process");
+const { getDialogStrings, writeStoredLocaleSync } = require("./mainLocale.cjs");
 
 const isDev = !app.isPackaged;
 const PORT = 55510;
@@ -63,6 +64,13 @@ function unpackSecret(entry) {
     return safeStorage.decryptString(Buffer.from(entry.d, "base64"));
   }
   return entry.d;
+}
+
+function registerLocaleIpc() {
+  ipcMain.handle("app-locale:set", (_event, locale) => {
+    if (locale !== "fr" && locale !== "en") return;
+    writeStoredLocaleSync(app, locale);
+  });
 }
 
 function registerSecureStorageIpc() {
@@ -231,13 +239,12 @@ function createWindow() {
         const ok = await freePortIfNeeded(PORT);
         if (!ok) {
           if (mainWindow && !mainWindow.isDestroyed()) {
+            const L = getDialogStrings(app);
             dialog
               .showMessageBox({
                 type: "error",
-                title: "HI-TTS",
-                message:
-                  `Port ${PORT} is already in use and could not be freed automatically.\n\n` +
-                  "Please close other HI-TTS instances (and any dev server) and restart the app."
+                title: L.portInUseTitle,
+                message: L.portInUseMessage(PORT)
               })
               .catch(() => {});
           }
@@ -254,13 +261,12 @@ function createWindow() {
           // eslint-disable-next-line no-console
           console.error("[Hi-TTS] Express listen error", err);
           if (mainWindow && !mainWindow.isDestroyed()) {
+            const L = getDialogStrings(app);
             dialog
               .showMessageBox({
                 type: "error",
-                title: "HI-TTS",
-                message:
-                  "Unable to start the internal server (port already in use). " +
-                  "Please close other instances and restart."
+                title: L.serverStartErrorTitle,
+                message: L.serverStartErrorMessage
               })
               .catch(() => {});
           }
@@ -299,13 +305,14 @@ function setupAutoUpdater() {
     // eslint-disable-next-line no-console
     console.log("[Hi-TTS] Mise à jour disponible", info.version);
 
+    const L = getDialogStrings(app);
     const result = dialog.showMessageBoxSync({
       type: "info",
-      buttons: ["Télécharger maintenant", "Plus tard"],
+      buttons: [L.downloadNow, L.later],
       defaultId: 0,
       cancelId: 1,
-      title: "Mise à jour Hi-TTS",
-      message: `Une nouvelle version de Hi-TTS est disponible (${info.version}).`,
+      title: L.updateTitle,
+      message: L.updateAvailable(String(info.version ?? "")),
     });
 
     if (result === 0) {
@@ -340,17 +347,14 @@ function setupAutoUpdater() {
       mainWindow.setProgressBar(-1);
     }
 
+    const L = getDialogStrings(app);
     const result = dialog.showMessageBoxSync({
       type: "info",
-      buttons: ["Redémarrer maintenant", "Plus tard"],
+      buttons: [L.installNow, L.later],
       defaultId: 0,
       cancelId: 1,
-      title: "Mise à jour Hi-TTS",
-      message: downloadedVersion
-        ? `Une nouvelle version de Hi-TTS a été téléchargée (v${downloadedVersion}).`
-        : "Une nouvelle version de Hi-TTS a été téléchargée.",
-      detail:
-        "L’application va se fermer : la mise à jour s’installe en arrière-plan (sans assistant NSIS), puis Hi-TTS redémarre."
+      title: L.updateTitle,
+      message: L.updateDownloaded(downloadedVersion)
     });
 
     if (result === 0) {
@@ -374,6 +378,7 @@ function setupAutoUpdater() {
 }
 
 app.whenReady().then(() => {
+  registerLocaleIpc();
   registerSecureStorageIpc();
 
   // Supprime complètement la barre de menus (File / Edit / View / Window / Help)

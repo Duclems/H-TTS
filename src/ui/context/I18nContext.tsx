@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import fr from "../../locales/fr.json";
 import en from "../../locales/en.json";
 
@@ -52,6 +52,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    const bridge = window.hiTtsApp?.setLocale;
+    if (bridge) {
+      void bridge(locale);
+    }
+  }, [locale]);
 
   const t = useCallback(
     (key: string): string => {

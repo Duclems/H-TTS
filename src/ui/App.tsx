@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
 import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
@@ -120,7 +120,7 @@ export const App = () => {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const formatCredits = (value: number): string => {
+  const formatCredits = useCallback((value: number): string => {
     if (value >= 1_000_000) {
       return `${(value / 1_000_000).toFixed(2)}M`;
     }
@@ -128,7 +128,7 @@ export const App = () => {
       return `${(value / 1_000).toFixed(1)}k`;
     }
     return `${value}`;
-  };
+  }, []);
 
   const isTwitchConnected = !!token;
   const isFullyLinked =

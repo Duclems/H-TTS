@@ -45,6 +45,13 @@ export function addTwitchChatListener(listener: (msg: ChatMessageWithEmotes) => 
   listeners.push(listener);
 }
 
+export function removeTwitchChatListener(listener: (msg: ChatMessageWithEmotes) => void): void {
+  const idx = listeners.indexOf(listener);
+  if (idx >= 0) {
+    listeners.splice(idx, 1);
+  }
+}
+
 function parseEmotesFromTmi(message: string, emotesTag: unknown): ParsedEmote[] {
   if (!emotesTag || typeof emotesTag !== "object") return [];
 
@@ -119,19 +126,22 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
       console.log("[Hi-TTS][IRC]", payload);
     }
 
-    logDebug({
-      timestamp: Date.now(),
-      type: payload.rewardId ? "redeem" : "other",
-      source: "chat-message",
-      message: payload.rewardId
-        ? `Chat message linked to a reward redemption received on #${username}.`
-        : `Chat message received on #${username}.`,
-      details: {
-        channel,
-        user: payload.userDisplayName || payload.userLogin,
-        hasRewardId: !!payload.rewardId,
-      },
-    });
+    // En prod : éviter un log par message sur un chat chargé ; garder les messages liés à un reward (rares).
+    if (IS_DEV || payload.rewardId) {
+      logDebug({
+        timestamp: Date.now(),
+        type: payload.rewardId ? "redeem" : "other",
+        source: "chat-message",
+        message: payload.rewardId
+          ? `Chat message linked to a reward redemption received on #${username}.`
+          : `Chat message received on #${username}.`,
+        details: {
+          channel,
+          user: payload.userDisplayName || payload.userLogin,
+          hasRewardId: !!payload.rewardId,
+        },
+      });
+    }
 
     for (const listener of listeners) {
       listener(payload);
