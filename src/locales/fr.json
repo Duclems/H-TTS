@@ -132,5 +132,10 @@
     "label": "Langue",
     "fr": "Français",
     "en": "English"
+  },
+  "security": {
+    "encryptionUnavailableTitle": "Chiffrement système indisponible",
+    "encryptionUnavailableTwitch": "Le stockage sécurisé de l'OS n'est pas accessible : ton token Twitch est enregistré en clair dans le dossier applicatif. Configure un trousseau système (keyring) ou évite d'utiliser ce compte sur cette machine.",
+    "encryptionUnavailableEleven": "Le stockage sécurisé de l'OS n'est pas accessible : ta clé API ElevenLabs est enregistrée en clair dans le dossier applicatif. Configure un trousseau système (keyring) ou révoque la clé après usage."
   }
 }

@@ -2,7 +2,9 @@ import { FormField } from "../molecules/FormField";
 import { TokenChipRow } from "../molecules/TokenChipRow";
 import type { ChipItem } from "../molecules/TokenChipRow";
 import { UserHeader } from "../molecules/UserHeader";
+import { SecurityWarning } from "../molecules/SecurityWarning";
 import { useI18n } from "../context/I18nContext";
+import { useSecureStorageEncryption } from "../hooks/useSecureStorageEncryption";
 import type { ElevenUserInfo } from "../hooks/useElevenLabsForm";
 
 type Props = {
@@ -15,6 +17,7 @@ type Props = {
 
 export const ElevenLabsCard = ({ apiKey, setApiKey, userInfo, loadingUser, hasError }: Props) => {
   const { t } = useI18n();
+  const encryptionAvailable = useSecureStorageEncryption();
 
   const permissionChips: ChipItem[] = [
     { label: t("eleven.permissionTts") },
@@ -62,6 +65,9 @@ export const ElevenLabsCard = ({ apiKey, setApiKey, userInfo, loadingUser, hasEr
       <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.25rem", opacity: 0.8 }}>
         {t("eleven.keyStoredNote")}
       </p>
+      {encryptionAvailable === false ? (
+        <SecurityWarning messageKey="security.encryptionUnavailableEleven" />
+      ) : null}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.4rem" }}>
         <FormField
           id="eleven-api-key"

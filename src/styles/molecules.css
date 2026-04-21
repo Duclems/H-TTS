@@ -287,6 +287,44 @@
   border-color: var(--range-progress-hover);
 }
 
+/* Bandeau d'avertissement (fallback clair du stockage sécurisé, etc.) */
+.security-warning {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.5rem 0.65rem;
+  margin-top: 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-danger, #e24a4a);
+  background-color: color-mix(in srgb, var(--color-danger, #e24a4a) 12%, transparent);
+  color: var(--text);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.security-warning-icon {
+  font-size: 0.9rem;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.security-warning-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.security-warning-title {
+  font-weight: 600;
+  color: var(--color-danger, #e24a4a);
+}
+
+.security-warning-text {
+  color: var(--text);
+  opacity: 0.92;
+}
+
 /* Conteneur des toasts (pop-up depuis le haut) */
 .toast-container {
   position: fixed;

@@ -28,12 +28,21 @@ async function writeSecretsStore(store) {
   await fsp.writeFile(p, JSON.stringify(store), "utf8");
 }
 
+let plaintextFallbackWarned = false;
+
 function packSecret(plain) {
   if (safeStorage.isEncryptionAvailable()) {
     return {
       e: true,
       d: safeStorage.encryptString(plain).toString("base64")
     };
+  }
+  if (!plaintextFallbackWarned) {
+    plaintextFallbackWarned = true;
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[Hi-TTS] safeStorage encryption unavailable on this system; secrets will be written in plain text to hi-tts-secrets.json. See README for OS keyring requirements."
+    );
   }
   return { e: false, d: plain };
 }

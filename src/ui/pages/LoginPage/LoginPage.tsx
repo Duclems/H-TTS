@@ -13,6 +13,8 @@ import { useI18n } from "../../context/I18nContext";
 import { TwitchLoginAboutModal } from "../../organisms/TwitchLoginAboutModal";
 import { AppShellLogin } from "../../templates/AppShellLogin";
 import { HiTtsLogoLink } from "../../atoms/HiTtsLogoLink";
+import { SecurityWarning } from "../../molecules/SecurityWarning";
+import { useSecureStorageEncryption } from "../../hooks/useSecureStorageEncryption";
 import pkg from "../../../../package.json";
 
 type DeviceFlowStatus =
@@ -45,6 +47,7 @@ export const LoginPage = () => {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [status, setStatus] = useState<DeviceFlowStatus>({ kind: "idle" });
   const activeSessionRef = useRef<string | null>(null);
+  const encryptionAvailable = useSecureStorageEncryption();
 
   useEffect(() => {
     return () => {
@@ -183,6 +186,9 @@ export const LoginPage = () => {
         <div className="twitch-login-main-cta">
           <CardTitle>{t("twitchLogin.title")}</CardTitle>
           <p className="card-text twitch-login-intro">{t("twitchLogin.intro")}</p>
+          {encryptionAvailable === false ? (
+            <SecurityWarning messageKey="security.encryptionUnavailableTwitch" />
+          ) : null}
           {renderBody()}
         </div>
 
