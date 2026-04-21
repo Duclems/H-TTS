@@ -11,6 +11,7 @@ import { Button } from "../atoms/Button";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useToast } from "../context/ToastContext";
 import { useI18n } from "../context/I18nContext";
+import { useEscapeToClose } from "../hooks/useEscapeToClose";
 import { STORAGE_KEY_REWARD_VOICE_LABELS as VOICE_LABEL_CACHE_KEY } from "../../storageKeys";
 
 type Props = {
@@ -36,17 +37,7 @@ export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const [voicesLoading, setVoicesLoading] = useState(true);
   const [lastVoiceLabel, setLastVoiceLabel] = useState("");
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  useEscapeToClose(onClose);
 
   const saveLastVoiceLabel = (label: string) => {
     setLastVoiceLabel(label);

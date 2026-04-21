@@ -42,24 +42,5 @@ export const STORAGE_KEY_REWARD_VOICE_LABELS = "h_tts_reward_voice_labels";
 export const STORAGE_KEY_ELEVEN_LAST_USER = "h_tts_eleven_last_user";
 
 /** Marqueur : la dernière clé API ElevenLabs saisie est connue comme invalide. */
-export const STORAGE_KEY_ELEVEN_INVALID_KEY = "h_tts_eleven_invalid_key";
-
 /** Ancienne clé de stockage ElevenLabs (non-chiffrée) — migrée vers secureStorage. */
 export const STORAGE_KEY_LEGACY_ELEVEN_CONFIG = "h_tts_elevenlabs_config";
-
-/**
- * Ensemble des clés "data" (purgeables lors d'une déconnexion ou d'un reset).
- * N'inclut PAS la locale (UI) ni l'état OAuth éphémère.
- */
-export const ALL_PURGEABLE_STORAGE_KEYS: readonly string[] = [
-  STORAGE_KEY_TWITCH_LAST_PROFILE,
-  STORAGE_KEY_REDEEM_AUDIO_COMPLETED,
-  STORAGE_KEY_REDEEM_FULFILL_COMPLETED,
-  STORAGE_KEY_RECENT_FULFILLED_REDEMPTIONS,
-  STORAGE_KEY_EMOTES_BY_REDEMPTION,
-  STORAGE_KEY_REWARD_VOICE_CONFIGS,
-  STORAGE_KEY_REWARD_VOICE_LABELS,
-  STORAGE_KEY_ELEVEN_LAST_USER,
-  STORAGE_KEY_ELEVEN_INVALID_KEY,
-  STORAGE_KEY_LEGACY_ELEVEN_CONFIG
-] as const;

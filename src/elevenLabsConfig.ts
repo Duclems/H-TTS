@@ -43,8 +43,3 @@ export async function saveElevenLabsConfig(config: ElevenLabsConfig): Promise<vo
   const payload = JSON.stringify({ apiKey: cachedApiKey });
   await secureStorageSet(SECURE_KEY_ELEVENLABS, payload);
 }
-
-/** Lecture synchrone du cache (après hydratation au démarrage ou après sauvegarde). */
-export function loadElevenLabsConfig(): ElevenLabsConfig {
-  return { apiKey: cachedApiKey };
-}

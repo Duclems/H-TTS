@@ -6,7 +6,7 @@ type Props = {
 };
 
 export const Avatar = ({ src, initial, alt = "", className = "" }: Props) => {
-  const wrapClass = className ? `eleven-user-avatar ${className}` : "eleven-user-avatar";
+  const wrapClass = className ? `avatar ${className}` : "avatar";
   if (src) {
     return (
       <div className={wrapClass}>

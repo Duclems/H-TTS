@@ -1,6 +1,5 @@
-import { useEffect } from "react";
 import { ElevenLabsCard } from "./ElevenLabsCard";
-import { ModalHeader } from "../molecules/ModalHeader";
+import { Modal } from "../molecules/Modal";
 import { useI18n } from "../context/I18nContext";
 
 type Props = {
@@ -11,38 +10,14 @@ type Props = {
 export const SettingsModal = ({ onClose, onElevenLabsSaved }: Props) => {
   const { t } = useI18n();
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
   return (
-    <div
-      className="modal-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="settings-modal-title"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+    <Modal
+      titleId="settings-modal-title"
+      title={t("settings.elevenTitle")}
+      onClose={onClose}
+      mainClassName="settings-modal-body"
     >
-      <div className="panel modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
-        <ModalHeader
-          titleId="settings-modal-title"
-          title={t("settings.elevenTitle")}
-          onClose={onClose}
-          closeAriaLabel={t("modal.close")}
-        />
-
-        <div className="settings-modal-body">
-          <ElevenLabsCard onSaved={onElevenLabsSaved} />
-        </div>
-      </div>
-    </div>
+      <ElevenLabsCard onSaved={onElevenLabsSaved} />
+    </Modal>
   );
 };

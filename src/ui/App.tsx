@@ -1,75 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
-import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
-import { getCachedElevenLabsApiKey, hydrateElevenLabsFromSecureStorage } from "../elevenLabsConfig";
-import { fetchElevenUser, fetchElevenVoices } from "../elevenLabsApi";
+import {
+  getCachedElevenLabsApiKey,
+  hydrateElevenLabsFromSecureStorage
+} from "../elevenLabsConfig";
 import { ToastProvider } from "./context/ToastContext";
+import { TwitchRewardsProvider } from "./context/TwitchRewardsContext";
+import { useI18n } from "./context/I18nContext";
+import { useDebugShortcut } from "./hooks/useDebugShortcut";
+import { useElevenLabsHealth } from "./hooks/useElevenLabsHealth";
+import { AboutModal } from "./organisms/AboutModal";
+import { DebugModal } from "./organisms/DebugModal";
 import { SettingsModal } from "./organisms/SettingsModal";
 import { TwitchSessionModal } from "./organisms/TwitchSessionModal";
-import { AboutModal } from "./organisms/AboutModal";
-import { useI18n } from "./context/I18nContext";
-import { DebugModal } from "./organisms/DebugModal";
-import { HIARTE_HI_TTS_PROJECT_URL } from "../config";
-import { LoginPageHeader } from "./organisms/LoginPageHeader";
+import { HistoryPage } from "./pages/HistoryPage/HistoryPage";
+import { LoginPage } from "./pages/LoginPage/LoginPage";
+import { SplashPage } from "./pages/LoginPage/SplashPage";
+import { RewardsPage } from "./pages/RewardsPage/RewardsPage";
+import {
+  AppHeaderMain,
+  AppShellAuthenticated
+} from "./templates/AppShellAuthenticated";
 
-const ELEVEN_CHECK_INTERVAL_MS = 10_000;
-
-type AppHeaderMainProps = {
-  title: string;
-  /** Sous-titre texte brut. Ignoré si `subtitleHtml` est fourni. */
-  subtitle?: string;
-  /**
-   * Sous-titre avec un sous-ensemble HTML whitelisté (`<strong>`, `<br>`).
-   * Contenu provient EXCLUSIVEMENT des fichiers de locales embarqués dans le
-   * bundle (`src/locales/*.json`) — donc contrôlé par nous, pas par
-   * l'utilisateur ou une source distante. Voir `renderTrustedSubtitle`.
-   */
-  subtitleHtml?: string;
-  credits: { remaining: number; limit: number } | null;
-  formatCredits: (value: number) => string;
-  creditsLabel: string;
-};
-
-/**
- * Rend un sous-titre i18n pouvant contenir `<strong>` ou `<br>`. Comme ces
- * chaînes viennent des JSON de locales intégrés au bundle (jamais d'une source
- * externe), on se permet `dangerouslySetInnerHTML` pour préserver la mise en
- * forme légère. Si un jour on charge des locales distantes (OTA, fichier
- * utilisateur), il faudra remplacer cet appel par un mini-parseur qui ne laisse
- * passer que la whitelist d'éléments.
- */
-const renderTrustedSubtitle = (html: string) => (
-  <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: html }} />
-);
-
-const AppHeaderMain = ({
-  title,
-  subtitle,
-  subtitleHtml,
-  credits,
-  formatCredits,
-  creditsLabel
-}: AppHeaderMainProps) => (
-  <div className="app-header-main">
-    <div className="app-header-main-top">
-      <div className="app-title">{title}</div>
-      {credits && (
-        <div className="app-header-credits">
-          {creditsLabel}{" "}
-          <strong>
-            {formatCredits(credits.remaining)} / {formatCredits(credits.limit)}
-          </strong>
-        </div>
-      )}
-    </div>
-    {subtitleHtml
-      ? renderTrustedSubtitle(subtitleHtml)
-      : subtitle
-        ? <p className="app-subtitle">{subtitle}</p>
-        : null}
-  </div>
-);
+type TabId = "history" | "rewards";
 
 export const App = () => {
   const { t } = useI18n();
@@ -79,125 +32,51 @@ export const App = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [twitchOpen, setTwitchOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [isElevenValid, setIsElevenValid] = useState<boolean | null>(null);
-  const [elevenPermissionsOk, setElevenPermissionsOk] = useState<boolean | null>(null);
-  const [rewardsTab, setRewardsTab] = useState<"history" | "rewards">("history");
-  const [hasMissingRewardVoice, setHasMissingRewardVoice] = useState(false);
-  const [elevenCredits, setElevenCredits] = useState<{ remaining: number; limit: number } | null>(
-    null
-  );
   const [debugOpen, setDebugOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>("history");
+  const [hasMissingRewardVoice, setHasMissingRewardVoice] = useState(false);
   const mainRef = useRef<HTMLElement | null>(null);
+
+  const toggleDebug = useCallback(() => setDebugOpen((prev) => !prev), []);
+  useDebugShortcut(toggleDebug);
+
+  const elevenHealth = useElevenLabsHealth(elevenApiKey, !bootLoading);
 
   useEffect(() => {
     let cancelled = false;
-
     const run = async () => {
       try {
-        const t = await getStoredToken();
+        const stored = await getStoredToken();
         await hydrateElevenLabsFromSecureStorage();
         if (!cancelled) {
-          setToken(t);
+          setToken(stored);
           setElevenApiKey(getCachedElevenLabsApiKey());
         }
       } finally {
-        if (!cancelled) {
-          setBootLoading(false);
-        }
+        if (!cancelled) setBootLoading(false);
       }
     };
-
     void run();
-
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const checkEleven = async () => {
-      const trimmed = elevenApiKey.trim();
-      if (!trimmed) {
-        setIsElevenValid(false);
-        setElevenPermissionsOk(null);
-        setElevenCredits(null);
-        return;
-      }
-
-      // Un seul round-trip : user (credits + validité) ET voices (perm TTS)
-      // en parallèle. Évite la chaîne séquentielle fetchElevenUser →
-      // checkElevenPermissions (qui refetchait aussi l'user).
-      const [user, voices] = await Promise.all([fetchElevenUser(), fetchElevenVoices()]);
-      if (cancelled) return;
-
-      const sub = user?.subscription;
-      const hasCreditsInfo =
-        !!sub && typeof sub.character_limit === "number" && typeof sub.character_count === "number";
-
-      setIsElevenValid(!!user && hasCreditsInfo);
-      if (hasCreditsInfo && sub) {
-        const remaining = Math.max(0, sub.character_limit - sub.character_count);
-        setElevenCredits({ remaining, limit: sub.character_limit });
-      } else {
-        setElevenCredits(null);
-      }
-
-      if (!user) {
-        setElevenPermissionsOk(null);
-        return;
-      }
-
-      const hasVoices = voices.length > 0;
-      setElevenPermissionsOk(hasVoices);
-    };
-
-    if (bootLoading) return;
-
-    void checkEleven();
-
-    const intervalId = setInterval(() => {
-      void checkEleven();
-    }, ELEVEN_CHECK_INTERVAL_MS);
-
-    return () => {
-      cancelled = true;
-      clearInterval(intervalId);
-    };
-  }, [elevenApiKey, bootLoading]);
-
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (event.key?.toLowerCase() === "h" && event.ctrlKey && event.shiftKey && event.altKey) {
-        event.preventDefault();
-        setDebugOpen((prev) => !prev);
-      }
-    };
-
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
   }, []);
 
   const formatCredits = useCallback((value: number): string => {
-    if (value >= 1_000_000) {
-      return `${(value / 1_000_000).toFixed(2)}M`;
-    }
-    if (value >= 1_000) {
-      return `${(value / 1_000).toFixed(1)}k`;
-    }
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+    if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
     return `${value}`;
   }, []);
 
   const isTwitchConnected = !!token;
   const isFullyLinked =
-    isTwitchConnected && !!isElevenValid && elevenPermissionsOk !== false;
+    isTwitchConnected && !!elevenHealth.isValid && elevenHealth.permissionsOk !== false;
   const hasElevenKey = !!elevenApiKey.trim();
   const showElevenError =
-    !hasElevenKey || isElevenValid === false || elevenPermissionsOk === false;
+    !hasElevenKey || elevenHealth.isValid === false || elevenHealth.permissionsOk === false;
 
-  const handleTabChange = (tab: "history" | "rewards") => {
-    setRewardsTab(tab);
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
     mainRef.current?.scrollTo({ top: 0, behavior: "auto" });
   };
 
@@ -208,149 +87,63 @@ export const App = () => {
   if (bootLoading) {
     return (
       <ToastProvider>
-        <div className="app-shell app-shell--login">
-          <header className="app-shell-header">
-            <LoginPageHeader />
-          </header>
-          <main className="app-main app-main--splash">
-            <a
-              href={HIARTE_HI_TTS_PROJECT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="hi-tts-project-link"
-              aria-label={t("about.footerApp")}
-            >
-              <img
-                src="/logos/hi-tts-animated.svg"
-                alt=""
-                style={{ width: "112px", height: "112px", opacity: 0.95 }}
-              />
-            </a>
-          </main>
-        </div>
+        <SplashPage />
       </ToastProvider>
     );
   }
 
+  if (!token) {
+    return (
+      <ToastProvider>
+        <LoginPage />
+      </ToastProvider>
+    );
+  }
+
+  const header =
+    activeTab === "history" ? (
+      <AppHeaderMain
+        title={t("app.history")}
+        subtitleHtml={t("app.redeemsRefresh")}
+        credits={elevenHealth.credits}
+        formatCredits={formatCredits}
+        creditsLabel={t("app.creditsRemaining")}
+      />
+    ) : (
+      <AppHeaderMain
+        title={t("app.rewardsManagement")}
+        subtitle={t("app.rewardsSubtitle")}
+        credits={elevenHealth.credits}
+        formatCredits={formatCredits}
+        creditsLabel={t("app.creditsRemaining")}
+      />
+    );
+
   return (
     <ToastProvider>
-      <div className={`app-shell${!token ? " app-shell--login" : ""}`}>
-        <div className="app-shell-header">
-          {!token ? (
-            <LoginPageHeader />
+      <TwitchRewardsProvider token={token}>
+        <AppShellAuthenticated
+          ref={mainRef}
+          header={header}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          hasMissingRewardVoice={hasMissingRewardVoice}
+          isFullyLinked={isFullyLinked}
+          hasElevenKey={hasElevenKey}
+          showElevenError={showElevenError}
+          onOpenTwitch={() => setTwitchOpen(true)}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onOpenAbout={() => setAboutOpen(true)}
+        >
+          {activeTab === "history" ? (
+            <HistoryPage />
           ) : (
-            <>
-              {isTwitchConnected && rewardsTab === "history" && (
-                <AppHeaderMain
-                  title={t("app.history")}
-                  subtitleHtml={t("app.redeemsRefresh")}
-                  credits={elevenCredits}
-                  formatCredits={formatCredits}
-                  creditsLabel={t("app.creditsRemaining")}
-                />
-              )}
-              {isTwitchConnected && rewardsTab === "rewards" && (
-                <AppHeaderMain
-                  title={t("app.rewardsManagement")}
-                  subtitle={t("app.rewardsSubtitle")}
-                  credits={elevenCredits}
-                  formatCredits={formatCredits}
-                  creditsLabel={t("app.creditsRemaining")}
-                />
-              )}
-            </>
-          )}
-        </div>
-
-        <main className="app-main" ref={mainRef}>
-          {!token && <TwitchLoginCard />}
-          {token && (
-            <RewardsCard
+            <RewardsPage
               token={token}
-              activeTab={rewardsTab}
               onMissingRewardVoiceChange={setHasMissingRewardVoice}
             />
           )}
-        </main>
-
-        {isTwitchConnected && (
-          <footer className="app-footer">
-            <div className="app-header-main-tabs">
-              <button
-                type="button"
-                className={
-                  rewardsTab === "history"
-                    ? "app-header-tab app-header-tab-active"
-                    : "app-header-tab"
-                }
-                onClick={() => handleTabChange("history")}
-              >
-                <span className="app-header-tab-icon">
-                  <img src="/house.svg" alt="" aria-hidden="true" />
-                </span>
-                <span>{t("app.home")}</span>
-              </button>
-              <button
-                type="button"
-                className={`${rewardsTab === "rewards" ? "app-header-tab app-header-tab-active" : "app-header-tab"}${
-                  hasMissingRewardVoice ? " app-header-tab-rewards-error" : ""
-                }`}
-                onClick={() => handleTabChange("rewards")}
-              >
-                <span className="app-header-tab-icon">
-                  <img src="/reward.svg" alt="" aria-hidden="true" />
-                </span>
-                <span>{t("app.rewards")}</span>
-              </button>
-            </div>
-            <div className="app-header-icons">
-              <button
-                type="button"
-                className="header-settings-btn"
-                title={t("app.twitchSession")}
-                aria-label={t("app.twitchSessionAria")}
-                onClick={() => setTwitchOpen(true)}
-              >
-                <img src="/twitch.svg" alt="Twitch" />
-              </button>
-              <button
-                type="button"
-                className={
-                  !hasElevenKey
-                    ? "header-settings-btn header-settings-btn-eleven-missing"
-                    : showElevenError
-                      ? "header-settings-btn header-settings-btn-eleven-error"
-                      : "header-settings-btn"
-                }
-                title={t("app.elevenSettings")}
-                aria-label={
-                  isFullyLinked
-                    ? t("app.elevenConnected")
-                    : !hasElevenKey
-                      ? t("app.elevenKeyMissing")
-                      : showElevenError
-                        ? t("app.elevenKeyInvalid")
-                        : t("app.elevenToComplete")
-                }
-                onClick={() => setSettingsOpen(true)}
-              >
-                <img
-                  src={isFullyLinked ? "/link.svg" : "/unlink.svg"}
-                  alt={isFullyLinked ? t("app.linked") : t("app.unlinked")}
-                />
-              </button>
-              <button
-                type="button"
-                className="header-settings-btn"
-                title={t("settings.titleAbout")}
-                aria-label={t("settings.titleAbout")}
-                onClick={() => setAboutOpen(true)}
-              >
-                <img src="/settings.svg" alt={t("settings.titleAbout")} />
-              </button>
-            </div>
-          </footer>
-        )}
+        </AppShellAuthenticated>
 
         {settingsOpen && (
           <SettingsModal
@@ -358,10 +151,10 @@ export const App = () => {
             onElevenLabsSaved={handleElevenLabsSaved}
           />
         )}
-        {twitchOpen && token && <TwitchSessionModal token={token} onClose={() => setTwitchOpen(false)} />}
+        {twitchOpen && <TwitchSessionModal token={token} onClose={() => setTwitchOpen(false)} />}
         {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
         {debugOpen && <DebugModal onClose={() => setDebugOpen(false)} />}
-      </div>
+      </TwitchRewardsProvider>
     </ToastProvider>
   );
 };

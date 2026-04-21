@@ -20,10 +20,6 @@ function getBridge(): Window["hiTtsSecureStorage"] | undefined {
   return window.hiTtsSecureStorage;
 }
 
-export function hasSecureStorageBridge(): boolean {
-  return typeof getBridge()?.get === "function";
-}
-
 export async function secureStorageGet(key: string): Promise<string | null> {
   const bridge = getBridge();
   if (bridge) {

@@ -220,15 +220,6 @@ export async function fetchCustomRewardsResult(
   );
 }
 
-export async function fetchCustomRewards(
-  accessToken: string,
-  broadcasterId: string,
-  onlyManageable = true
-): Promise<TwitchCustomReward[]> {
-  const r = await fetchCustomRewardsResult(accessToken, broadcasterId, onlyManageable);
-  return r.ok ? r.data : [];
-}
-
 export async function fetchRewardRedemptionsResult(
   accessToken: string,
   broadcasterId: string,
@@ -244,15 +235,6 @@ export async function fetchRewardRedemptionsResult(
     accessToken,
     `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?${params.toString()}`
   );
-}
-
-export async function fetchRewardRedemptions(
-  accessToken: string,
-  broadcasterId: string,
-  rewardId: string
-): Promise<TwitchRewardRedemption[]> {
-  const r = await fetchRewardRedemptionsResult(accessToken, broadcasterId, rewardId);
-  return r.ok ? r.data : [];
 }
 
 /**

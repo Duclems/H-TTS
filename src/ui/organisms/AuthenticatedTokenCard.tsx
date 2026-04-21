@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import type { CSSProperties } from "react";
 import type { TwitchTokenResponse } from "../../twitchAuth";
 import { clearStoredToken } from "../../twitchAuth";
 import { fetchCurrentUser, fetchFollowersCount, type TwitchUser } from "../../twitchApi";
-import { Avatar } from "../atoms/Avatar";
 import { Button } from "../atoms/Button";
-import { Skeleton } from "../atoms/Skeleton";
 import { TokenChipRow } from "../molecules/TokenChipRow";
+import { UserHeader } from "../molecules/UserHeader";
 import { useI18n } from "../context/I18nContext";
 import { STORAGE_KEY_TWITCH_LAST_PROFILE as TWITCH_LAST_PROFILE_KEY } from "../../storageKeys";
 
@@ -113,40 +111,19 @@ export const AuthenticatedTokenCard = ({ token }: Props) => {
   return (
     <section className="card">
       {error && <p className="error-text">{error}</p>}
-      <div className="eleven-user-header">
-        {!user ? (
-          <div className="eleven-user-avatar">
-            <Skeleton variant="avatar" />
-          </div>
-        ) : (
-          <Avatar
-            src={user.profile_image_url}
-            initial={user.display_name || user.login}
-            alt={user.display_name || user.login}
-          />
-        )}
-        <div className="eleven-user-meta">
-          <div className="eleven-user-name-row">
-            {loading && !user ? (
-              <Skeleton variant="line" lineSize="main" style={{ "--skeleton-line-height": "10px" } as CSSProperties} />
-            ) : user ? (
-              <div className="eleven-user-name">{user.display_name || user.login}</div>
-            ) : null}
-            {loading && !user ? (
-              <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "8px" } as CSSProperties} />
-            ) : user && typeof followersCount === "number" ? (
-              <div className="eleven-user-followers">
-                • {followersCount.toLocaleString()} {t("tokenCard.followers")}
-              </div>
-            ) : null}
-          </div>
-          {loading && !user ? (
-            <Skeleton variant="line" lineSize="small" style={{ "--skeleton-line-height": "6px" } as CSSProperties} />
-          ) : user ? (
-            <div className="eleven-user-credits">@{user.login}</div>
-          ) : null}
-        </div>
-      </div>
+      <UserHeader
+        loading={loading && !user}
+        avatarUrl={user?.profile_image_url}
+        name={user ? user.display_name || user.login : undefined}
+        nameSuffix={
+          user && typeof followersCount === "number" ? (
+            <div className="eleven-user-followers">
+              • {followersCount.toLocaleString()} {t("tokenCard.followers")}
+            </div>
+          ) : undefined
+        }
+        meta={user ? <div className="eleven-user-credits">@{user.login}</div> : undefined}
+      />
 
       <TokenChipRow chips={scopeChips} />
 
