@@ -219,7 +219,7 @@ function mapEventSubReward(event: EventSubRewardEvent): TwitchCustomReward {
 
 const redeemTtsInFlightIds = new Set<string>();
 
-export type TwitchRewardsState = {
+type TwitchRewardsState = {
   loading: boolean;
   error: string | null;
   broadcasterId: string | null;

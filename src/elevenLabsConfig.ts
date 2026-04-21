@@ -5,7 +5,7 @@ import {
   secureStorageSet
 } from "./secureStorageBridge";
 
-export type ElevenLabsConfig = {
+type ElevenLabsConfig = {
   apiKey: string;
 };
 

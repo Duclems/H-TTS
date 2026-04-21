@@ -3,7 +3,7 @@ import { fetchElevenUser, fetchElevenVoices } from "../../elevenLabsApi";
 
 const ELEVEN_CHECK_INTERVAL_MS = 30_000;
 
-export type ElevenLabsHealth = {
+type ElevenLabsHealth = {
   isValid: boolean | null;
   permissionsOk: boolean | null;
   credits: { remaining: number; limit: number } | null;

@@ -14,7 +14,7 @@ export const AboutContent = () => {
       </section>
 
       <section className="about-hiarte">
-        <HiarteLogoLink variant="section" />
+        <HiarteLogoLink />
         <p className="card-text about-hiarte-text-main">{t("about.hiarteBodyMain")}</p>
       </section>
       <p className="card-text about-hiarte-text">

@@ -58,7 +58,7 @@ export function getDefaultRewardVoiceConfig(): RewardVoiceConfig {
   return { ...DEFAULT_REWARD_VOICE_CONFIG };
 }
 
-export type ModelOption = { id: string; label: string };
+type ModelOption = { id: string; label: string };
 
 export const MODEL_OPTIONS: ModelOption[] = [
   { id: "eleven_v3", label: "Eleven v3 (multilingue, expressif)" },

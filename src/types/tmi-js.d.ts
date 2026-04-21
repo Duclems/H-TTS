@@ -1,5 +1,5 @@
 declare module "tmi.js" {
-  export interface TmiMessageTags {
+  interface TmiMessageTags {
     "display-name"?: string;
     username?: string;
     "custom-reward-id"?: string;
@@ -7,14 +7,14 @@ declare module "tmi.js" {
     [key: string]: unknown;
   }
 
-  export type TmiMessageHandler = (
+  type TmiMessageHandler = (
     channel: string,
     tags: TmiMessageTags,
     message: string,
     self: boolean
   ) => void;
 
-  export interface TmiClientOptions {
+  interface TmiClientOptions {
     options?: { debug?: boolean };
     connection?: {
       secure?: boolean;

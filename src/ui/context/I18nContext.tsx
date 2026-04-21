@@ -3,7 +3,7 @@ import fr from "../../locales/fr.json";
 import en from "../../locales/en.json";
 import { STORAGE_KEY_LOCALE } from "../../storageKeys";
 
-export type Locale = "fr" | "en";
+type Locale = "fr" | "en";
 
 type MessagesTree = Record<string, unknown>;
 

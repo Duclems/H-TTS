@@ -29,13 +29,7 @@ export const Modal = ({
 }: Props) => {
   useEscapeToClose(onClose);
 
-  const panelClass = [
-    "panel",
-    "modal-content",
-    "settings-modal-content",
-    footer ? "settings-modal-has-footer" : null,
-    contentClassName
-  ]
+  const panelClass = ["panel", "modal-content", "settings-modal-content", contentClassName]
     .filter(Boolean)
     .join(" ");
 

@@ -89,26 +89,6 @@
   border-color: var(--danger-hover);
 }
 
-/* Pills / badges */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.7rem;
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  background-color: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid var(--accent-gold-border);
-}
-
-.pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--accent);
-}
-
 /* Token chip (atome) */
 .token-chip {
   font-size: 0.7rem;
@@ -129,10 +109,6 @@
 .error-text {
   font-size: 0.8rem;
   color: var(--danger-text);
-}
-
-.text-success {
-  color: var(--success);
 }
 
 /* Panels et champs (inputs) */
@@ -181,24 +157,6 @@
   color: var(--text-muted);
 }
 
-/* Nav button */
-.nav-button {
-  padding: 0.3rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background-color: transparent;
-  color: var(--text);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.nav-button:hover {
-  background-color: var(--bg-hover);
-  color: var(--text);
-  border-color: var(--nav-border-hover);
-}
-
 /* Skeletons */
 .skeleton {
   position: relative;
@@ -238,19 +196,6 @@
 
 .skeleton-line-small {
   width: 80px;
-}
-
-/* Token info (texte secondaire) */
-.token-info {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  word-break: break-all;
-}
-
-.token-info small {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  opacity: 0.9;
 }
 
 /* Toast (atome) • cadre de notification */

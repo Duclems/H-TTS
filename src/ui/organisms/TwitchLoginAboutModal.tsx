@@ -14,8 +14,6 @@ export const TwitchLoginAboutModal = ({ onClose }: Props) => {
       titleId="twitch-login-about-modal-title"
       title={t("twitchLogin.aboutPrivacyButton")}
       onClose={onClose}
-      contentClassName="twitch-login-about-modal"
-      mainClassName="twitch-login-about-main"
     >
       <AboutContent />
     </Modal>

@@ -58,7 +58,7 @@ const ALL_SUBSCRIPTION_TYPES: SubscriptionType[] = [
   "channel.channel_points_custom_reward.remove"
 ];
 
-export type EventSubHandlers = {
+type EventSubHandlers = {
   onRedemptionAdd?: (event: EventSubRedeemEvent) => void;
   onRedemptionUpdate?: (event: EventSubRedeemEvent) => void;
   onRewardAdd?: (event: EventSubRewardEvent) => void;

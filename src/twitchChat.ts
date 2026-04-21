@@ -11,7 +11,7 @@ type StartOptions = {
   channelLogin: string;
 };
 
-export type ParsedEmotePosition = {
+type ParsedEmotePosition = {
   start: number;
   end: number;
 };

@@ -184,17 +184,6 @@ img {
   white-space: nowrap;
 }
 
-.app-header-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.6rem;
-}
-
-.app-header-nav a {
-  text-decoration: none;
-}
-
 /* Boutons header (paramètres, ElevenLabs, etc.) */
 .header-settings-btn {
   width: 40px;
@@ -233,12 +222,6 @@ img {
 .header-settings-btn:hover {
   background-color: var(--bg-hover);
   color: var(--text);
-}
-
-.header-settings-btn-active {
-  background-color: var(--accent-soft);
-  border-color: var(--accent-gold-border);
-  color: var(--accent);
 }
 
 .header-settings-btn-eleven-error {

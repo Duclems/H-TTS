@@ -7,7 +7,7 @@ export type TwitchUser = {
   profile_image_url?: string;
 };
 
-export type TwitchCustomRewardImage = {
+type TwitchCustomRewardImage = {
   url_1x: string;
   url_2x: string;
   url_4x: string;
@@ -46,14 +46,14 @@ type HelixResponse<T> = {
   data: T[];
 };
 
-export type TwitchHelixOk<T> = { ok: true; data: T; status: number };
+type TwitchHelixOk<T> = { ok: true; data: T; status: number };
 export type TwitchHelixErr = {
   ok: false;
   status: number;
   retryAfterMs?: number;
   network?: boolean;
 };
-export type TwitchHelixResult<T> = TwitchHelixOk<T> | TwitchHelixErr;
+type TwitchHelixResult<T> = TwitchHelixOk<T> | TwitchHelixErr;
 
 function parseRetryAfterMs(res: Response): number | undefined {
   const raw = res.headers.get("Retry-After");

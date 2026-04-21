@@ -15,7 +15,9 @@
 .modal-content {
   width: 100%;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background-color: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: 0.9rem;
@@ -26,15 +28,7 @@
   max-width: 480px;
 }
 
-/* Modal paramètres / à propos : structure header + main + footer */
-.settings-modal-content.settings-modal-has-footer {
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  overflow: hidden;
-}
-
-.settings-modal-content.settings-modal-has-footer .settings-modal-header .card-title {
+.settings-modal-content .settings-modal-header .card-title {
   color: var(--text);
 }
 
@@ -65,13 +59,6 @@
 
 .settings-modal-footer:has(> .about-footer-row) {
   padding-top: 1rem;
-}
-
-.settings-modal-footer-title {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted);
 }
 
 .settings-modal-body {
@@ -264,13 +251,6 @@
   opacity: 0.8;
 }
 
-.twitch-login-details {
-  font-size: 0.7rem;
-  margin-top: 0.1rem;
-  margin-bottom: 0.2rem;
-  opacity: 0.8;
-}
-
 .twitch-login-about-button {
   margin-top: 0.2rem;
   align-self: flex-start;
@@ -309,25 +289,9 @@
   gap: 0.6rem;
 }
 
-.twitch-login-about-modal {
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  overflow: hidden;
-  padding-bottom: 0;
-}
-
-.twitch-login-about-main {
-  flex: 1;
-  overflow-y: auto;
-}
-
 .debug-modal {
   max-width: 640px;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 .debug-modal-filter {
@@ -566,19 +530,6 @@
   margin: 0.45rem 0 0;
   font-size: 0.8rem;
   color: var(--text);
-}
-
-.rewards-history-emotes {
-  margin-top: 0.35rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.rewards-history-emotes img {
-  width: 20px;
-  height: 20px;
-  display: block;
 }
 
 /* Splash (chargement initial des rewards) */

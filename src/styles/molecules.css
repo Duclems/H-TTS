@@ -27,30 +27,6 @@
   gap: 0.5rem;
 }
 
-.modal-header-hiarte-link {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  line-height: 0;
-  opacity: 0.9;
-  text-decoration: none;
-}
-
-.modal-header-hiarte-link:hover {
-  opacity: 1;
-}
-
-.modal-header-hiarte-logo {
-  height: 28px;
-  width: auto;
-  max-width: 88px;
-  display: block;
-  object-fit: contain;
-  -webkit-user-drag: none;
-  user-drag: none;
-  pointer-events: none;
-}
-
 .language-selector {
   display: flex;
   gap: 0.2rem;
