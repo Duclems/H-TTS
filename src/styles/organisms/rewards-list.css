@@ -1,0 +1,39 @@
+/* Liste des rewards et conteneur scrollable */
+.rewards-list {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.rewards-list li + li {
+  margin-top: 0.25rem;
+}
+
+.rewards-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-muted) transparent;
+}
+
+.rewards-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rewards-list-container::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-faint);
+  border-radius: 999px;
+}
+
+.rewards-list-container::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-narrow);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.rewards-list-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-narrow-hover);
+}

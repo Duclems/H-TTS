@@ -8,3 +8,4 @@ export const STORAGE_KEY_EMOTES_BY_REDEMPTION = "h_tts_emotes_by_redemption";
 export const STORAGE_KEY_REWARD_VOICE_CONFIGS = "h_tts_reward_voice_configs";
 export const STORAGE_KEY_REWARD_VOICE_LABELS = "h_tts_reward_voice_labels";
 export const STORAGE_KEY_LEGACY_ELEVEN_CONFIG = "h_tts_elevenlabs_config";
+export const STORAGE_KEY_ELEVEN_USER_INFO = "h_tts_elevenlabs_user_info";

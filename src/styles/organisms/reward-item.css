@@ -1,0 +1,50 @@
+/* Carte d'un reward (RewardsPage) */
+.rewards-reward-item-header {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rewards-reward-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--reward-swatch-fallback);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.rewards-reward-swatch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rewards-reward-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewards-reward-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.rewards-reward-cost {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.rewards-reward-settings-btn {
+  margin-top: 0;
+  width: auto;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.rewards-reward-prompt {
+  margin-top: 0.4rem;
+}

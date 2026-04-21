@@ -1,0 +1,53 @@
+/* Splash de chargement initial des rewards + empty states */
+.rewards-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 1rem 1.6rem;
+  gap: 0.6rem;
+}
+
+.rewards-splash-logo {
+  width: 112px;
+  height: 112px;
+  opacity: 0.95;
+}
+
+.rewards-create-btn {
+  margin-top: 0;
+}
+
+/* Empty state partagé (pas de rewards, historique vide) */
+.rewards-empty-state {
+  margin-top: 1.2rem;
+  border-radius: 0.9rem;
+  padding: 1.2rem 0.9rem;
+  border: 1px dashed var(--border);
+  background-color: var(--empty-state-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.rewards-empty-state-history {
+  margin-top: 0;
+  padding: 1.4rem 1rem;
+}
+
+.rewards-empty-state-logo {
+  width: 104px;
+  height: 104px;
+}
+
+.rewards-empty-state-logo-faded {
+  opacity: 0.9;
+}
+
+.rewards-empty-state-text {
+  text-align: center;
+  font-size: 0.8rem;
+  max-width: 260px;
+}

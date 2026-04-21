@@ -1,0 +1,140 @@
+/* Section À propos / Hiarte (contenu de la modal À propos) */
+.about-main-title {
+  font-size: 0.8rem;
+  margin: 0;
+  margin-bottom: 0.35rem;
+}
+
+.about-privacy-title {
+  font-size: 0.75rem;
+  margin: 0.25rem 0 0.25rem;
+  font-weight: 600;
+}
+
+.about-privacy-intro {
+  font-size: 0.72rem;
+  margin: 0.15rem 0 0.4rem;
+  color: var(--text-muted);
+  padding-right: 0.75rem;
+}
+
+.about-privacy-block {
+  margin-top: 0.4rem;
+}
+
+.about-privacy-heading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.about-privacy-body {
+  font-size: 0.75rem;
+  margin-top: 0.1rem;
+  white-space: pre-line;
+  color: var(--text-muted);
+  text-align: justify;
+  padding-right: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.about-hiarte {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.about-hiarte-logo-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+  align-items: center;
+  text-decoration: none;
+  opacity: 0.92;
+}
+
+.about-hiarte-logo-link:hover {
+  opacity: 1;
+}
+
+.about-hiarte-logo {
+  width: 40px;
+  height: 40px;
+  display: block;
+  flex-shrink: 0;
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+.about-hiarte-text {
+  font-size: 0.75rem;
+  margin-top: 0;
+  white-space: pre-line;
+  text-align: justify;
+  padding-right: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.about-hiarte-text-main {
+  font-size: 0.75rem;
+  margin: 0;
+  text-align: justify;
+  padding-right: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.about-link {
+  color: inherit;
+  text-decoration: underline dotted;
+}
+
+.about-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.about-footer-logo {
+  width: 48px;
+  height: 48px;
+  display: block;
+  flex-shrink: 0;
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+.about-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.about-footer-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.about-footer-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.about-footer-version {
+  font-size: 0.7rem;
+  color: var(--text);
+}
+
+.about-footer-tagline {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

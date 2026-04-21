@@ -1,0 +1,35 @@
+/* Bloc utilisateur ElevenLabs (avatar + meta) dans SettingsModal et tokenCard */
+.eleven-user-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.eleven-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.eleven-user-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.eleven-user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.eleven-user-credits {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.eleven-user-followers {
+  font-size: 0.75rem;
+  color: var(--text);
+}

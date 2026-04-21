@@ -5,6 +5,7 @@ import {
   saveElevenLabsConfig
 } from "../../elevenLabsConfig";
 import { fetchElevenUser, type ElevenUser } from "../../elevenLabsApi";
+import { STORAGE_KEY_ELEVEN_USER_INFO } from "../../storageKeys";
 import { useI18n } from "../context/I18nContext";
 import { useToast } from "../context/ToastContext";
 
@@ -14,6 +15,30 @@ export type ElevenUserInfo = {
   remainingCharacters: number | null;
   characterLimit: number | null;
 };
+
+function readCachedUserInfo(): ElevenUserInfo | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_ELEVEN_USER_INFO);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ElevenUserInfo;
+    if (!parsed || typeof parsed !== "object" || typeof parsed.name !== "string") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function persistUserInfo(info: ElevenUserInfo | null) {
+  try {
+    if (info) {
+      localStorage.setItem(STORAGE_KEY_ELEVEN_USER_INFO, JSON.stringify(info));
+    } else {
+      localStorage.removeItem(STORAGE_KEY_ELEVEN_USER_INFO);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 function userToInfo(user: ElevenUser, defaultName: string): ElevenUserInfo {
   const avatarUrl = user.profile_picture ?? user.image_url ?? null;
@@ -38,7 +63,7 @@ export function useElevenLabsForm({ onSaved }: Options = {}) {
   const { t } = useI18n();
   const { addToast } = useToast();
   const [apiKey, setApiKey] = useState("");
-  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<ElevenUserInfo | null>(() => readCachedUserInfo());
   const [loadingUser, setLoadingUser] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -54,6 +79,7 @@ export function useElevenLabsForm({ onSaved }: Options = {}) {
       if (!key.trim()) {
         if (cancelled()) return;
         setUserInfo(null);
+        persistUserInfo(null);
         setLoadingUser(false);
         setHasError(false);
         return;
@@ -67,13 +93,14 @@ export function useElevenLabsForm({ onSaved }: Options = {}) {
       if (cancelled()) return;
 
       if (!user) {
-        setUserInfo(null);
         setLoadingUser(false);
         setHasError(true);
         return;
       }
 
-      setUserInfo(userToInfo(user, tRef.current("eleven.defaultAccount")));
+      const info = userToInfo(user, tRef.current("eleven.defaultAccount"));
+      setUserInfo(info);
+      persistUserInfo(info);
       setLoadingUser(false);
       setHasError(false);
     },

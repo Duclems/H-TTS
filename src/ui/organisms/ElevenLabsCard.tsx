@@ -41,7 +41,7 @@ export const ElevenLabsCard = ({ apiKey, setApiKey, userInfo, loadingUser, hasEr
         />
       ) : null}
 
-      <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.6rem" : 0 }}>
+      <p className="card-text" style={{ marginTop: userInfo || loadingUser ? "0.35rem" : 0 }}>
         {t("eleven.intro")}
         <br />
         {t("eleven.getFromLink")}{" "}
@@ -55,14 +55,14 @@ export const ElevenLabsCard = ({ apiKey, setApiKey, userInfo, loadingUser, hasEr
         </a>
         .
       </p>
-      <p className="card-text" style={{ marginTop: "0.6rem" }}>
+      <p className="card-text" style={{ marginTop: "0.35rem" }}>
         {t("eleven.selectPermissions")}
       </p>
-      <TokenChipRow chips={permissionChips} style={{ marginTop: "0.4rem" }} />
-      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.35rem", opacity: 0.8 }}>
+      <TokenChipRow chips={permissionChips} style={{ marginTop: "0.25rem" }} />
+      <p className="card-text" style={{ fontSize: "0.7rem", marginTop: "0.25rem", opacity: 0.8 }}>
         {t("eleven.keyStoredNote")}
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.6rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.4rem" }}>
         <FormField
           id="eleven-api-key"
           label={t("eleven.apiKeyLabel")}
