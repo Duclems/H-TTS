@@ -20,7 +20,7 @@ const DEFAULT_REWARD_VOICE_CONFIG: RewardVoiceConfig = {
   speed: 1
 };
 
-const STORAGE_KEY = "h_tts_reward_voice_configs";
+import { STORAGE_KEY_REWARD_VOICE_CONFIGS as STORAGE_KEY } from "./storageKeys";
 
 function loadAll(): Record<string, RewardVoiceConfig> {
   try {

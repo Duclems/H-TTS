@@ -5,6 +5,7 @@ import {
   secureStorageGet,
   secureStorageSet
 } from "./secureStorageBridge";
+import { STORAGE_KEY_TWITCH_OAUTH_STATE as STATE_KEY } from "./storageKeys";
 
 const TWITCH_AUTHORIZE_URL = "https://id.twitch.tv/oauth2/authorize";
 
@@ -14,8 +15,6 @@ export type TwitchTokenResponse = {
   token_type: string;
   state?: string;
 };
-
-const STATE_KEY = "twitch_oauth_state";
 
 function generateRandomState(length = 32): string {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

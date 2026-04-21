@@ -3,11 +3,13 @@
  * Hors Electron (ex. navigateur seul sur le port Vite), repli localStorage de secours pour le dev.
  */
 
+import { STORAGE_KEY_LEGACY_ELEVEN_CONFIG } from "./storageKeys";
+
 export const SECURE_KEY_TWITCH_TOKEN = "hi_tts_secure_tw_token";
 export const SECURE_KEY_ELEVENLABS = "hi_tts_secure_eleven";
 
 const LEGACY_LOCAL_TWITCH = "twitch_oauth_token";
-const LEGACY_LOCAL_ELEVEN = "h_tts_elevenlabs_config";
+const LEGACY_LOCAL_ELEVEN = STORAGE_KEY_LEGACY_ELEVEN_CONFIG;
 
 function fallbackStorageKey(secureKey: string): string {
   return `hi_tts_fb_${secureKey}`;

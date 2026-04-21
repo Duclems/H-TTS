@@ -14,8 +14,10 @@ import { TokenChipRow } from "../molecules/TokenChipRow";
 import type { ChipItem } from "../molecules/TokenChipRow";
 import { useToast } from "../context/ToastContext";
 import { useI18n } from "../context/I18nContext";
-
-const LAST_USER_KEY = "h_tts_eleven_last_user";
+import {
+  STORAGE_KEY_ELEVEN_INVALID_KEY,
+  STORAGE_KEY_ELEVEN_LAST_USER as LAST_USER_KEY
+} from "../../storageKeys";
 
 type ElevenUserInfo = {
   name: string;
@@ -66,7 +68,7 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
         return;
       }
 
-      const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
+      const invalidKey = window.localStorage.getItem(STORAGE_KEY_ELEVEN_INVALID_KEY);
       if (invalidKey && invalidKey === cfgKey) {
         setUserInfo(null);
         saveLastUserInfo(null);
@@ -85,7 +87,7 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
         saveLastUserInfo(null);
         setLoadingUser(false);
         setHasError(true);
-        window.localStorage.setItem("h_tts_eleven_invalid_key", cfgKey);
+        window.localStorage.setItem(STORAGE_KEY_ELEVEN_INVALID_KEY, cfgKey);
         return;
       }
 
@@ -106,7 +108,7 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
       saveLastUserInfo(info);
       setLoadingUser(false);
       setHasError(false);
-      window.localStorage.removeItem("h_tts_eleven_invalid_key");
+      window.localStorage.removeItem(STORAGE_KEY_ELEVEN_INVALID_KEY);
     })();
 
     return () => {
@@ -125,11 +127,11 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
       saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(false);
-      window.localStorage.removeItem("h_tts_eleven_invalid_key");
+      window.localStorage.removeItem(STORAGE_KEY_ELEVEN_INVALID_KEY);
       return;
     }
 
-    const invalidKey = window.localStorage.getItem("h_tts_eleven_invalid_key");
+    const invalidKey = window.localStorage.getItem(STORAGE_KEY_ELEVEN_INVALID_KEY);
     if (invalidKey && invalidKey === trimmed) {
       setUserInfo(null);
       saveLastUserInfo(null);
@@ -146,7 +148,7 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
       saveLastUserInfo(null);
       setLoadingUser(false);
       setHasError(true);
-      window.localStorage.setItem("h_tts_eleven_invalid_key", trimmed);
+      window.localStorage.setItem(STORAGE_KEY_ELEVEN_INVALID_KEY, trimmed);
       return;
     }
 
@@ -167,7 +169,7 @@ export const ElevenLabsCard = ({ onSaved }: Props) => {
     saveLastUserInfo(info);
     setLoadingUser(false);
     setHasError(false);
-    window.localStorage.removeItem("h_tts_eleven_invalid_key");
+    window.localStorage.removeItem(STORAGE_KEY_ELEVEN_INVALID_KEY);
   };
 
   const permissionChips: ChipItem[] = [

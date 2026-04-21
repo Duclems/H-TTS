@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Menu, shell, dialog, nativeTheme, ipcMain, safeStorage } = require("electron");
 const path = require("path");
-const fs = require("fs");
+const fsp = require("fs/promises");
 const express = require("express");
 const { autoUpdater } = require("electron-updater");
 const net = require("net");
@@ -14,6 +14,11 @@ let serverStarted = false;
 let mainWindow = null;
 /** Version du correctif en cours de téléchargement (pour l’UI ; `releaseName` GitHub est souvent vide). */
 let pendingUpdateVersion = "";
+/** Handle du setInterval de revérification auto-update, pour le nettoyer au quit. */
+let autoUpdaterIntervalId = null;
+
+/** Fréquence de revérification des mises à jour quand l'app reste ouverte longtemps. */
+const AUTO_UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 heures
 
 /** Aligné sur `electron/preload.cjs` (ALLOWED_KEYS). */
 const SECURE_STORAGE_KEYS = new Set(["hi_tts_secure_tw_token", "hi_tts_secure_eleven"]);
@@ -22,20 +27,28 @@ function getSecretsFilePath() {
   return path.join(app.getPath("userData"), "hi-tts-secrets.json");
 }
 
-function readSecretsStore() {
+// I/O async pour ne pas bloquer le process main pendant les handlers IPC
+// (antivirus / partition lente peuvent faire durer un readFileSync plusieurs
+// centaines de ms, figeant l'UI Electron).
+async function readSecretsStore() {
   const p = getSecretsFilePath();
-  if (!fs.existsSync(p)) return {};
   try {
-    const raw = fs.readFileSync(p, "utf8");
+    const raw = await fsp.readFile(p, "utf8");
     return JSON.parse(raw);
-  } catch {
+  } catch (err) {
+    // ENOENT = fichier pas encore créé (premier lancement) → état vide normal.
+    if (err && err.code !== "ENOENT") {
+      // eslint-disable-next-line no-console
+      console.warn("[Hi-TTS] readSecretsStore fallback:", err.code || err.message);
+    }
     return {};
   }
 }
 
-function writeSecretsStore(store) {
-  fs.mkdirSync(path.dirname(getSecretsFilePath()), { recursive: true });
-  fs.writeFileSync(getSecretsFilePath(), JSON.stringify(store), "utf8");
+async function writeSecretsStore(store) {
+  const p = getSecretsFilePath();
+  await fsp.mkdir(path.dirname(p), { recursive: true });
+  await fsp.writeFile(p, JSON.stringify(store), "utf8");
 }
 
 /**
@@ -74,9 +87,9 @@ function registerLocaleIpc() {
 }
 
 function registerSecureStorageIpc() {
-  ipcMain.handle("secure-storage:get", (_event, key) => {
+  ipcMain.handle("secure-storage:get", async (_event, key) => {
     if (!SECURE_STORAGE_KEYS.has(key)) return null;
-    const store = readSecretsStore();
+    const store = await readSecretsStore();
     const packed = store[key];
     if (!packed) return null;
     try {
@@ -86,15 +99,15 @@ function registerSecureStorageIpc() {
     }
   });
 
-  ipcMain.handle("secure-storage:set", (_event, key, plainText) => {
+  ipcMain.handle("secure-storage:set", async (_event, key, plainText) => {
     if (!SECURE_STORAGE_KEYS.has(key)) return;
-    const store = readSecretsStore();
+    const store = await readSecretsStore();
     if (plainText === null || plainText === "") {
       delete store[key];
     } else {
       store[key] = packSecret(plainText);
     }
-    writeSecretsStore(store);
+    await writeSecretsStore(store);
   });
 
   ipcMain.handle("secure-storage:isEncryptionAvailable", () => safeStorage.isEncryptionAvailable());
@@ -370,11 +383,28 @@ function setupAutoUpdater() {
     console.log("[Hi-TTS] Aucune mise à jour disponible.");
   });
 
+  const runCheck = (reason) => {
+    autoUpdater.checkForUpdates().catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(`[Hi-TTS] Impossible de vérifier les mises à jour (${reason})`, error);
+    });
+  };
+
   // Vérifie au démarrage, déclenche les événements ci-dessus
-  autoUpdater.checkForUpdates().catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error("[Hi-TTS] Impossible de vérifier les mises à jour", error);
-  });
+  runCheck("boot");
+
+  // Revérification périodique : si l'utilisateur laisse l'app ouverte pendant
+  // des jours (cas TTS streaming), il recevra la prompt de MAJ sans redémarrer.
+  // On évite de relancer quand un téléchargement est déjà en cours / déjà
+  // téléchargé (`updateDownloaded` existe dès qu'un package est prêt à
+  // installer).
+  autoUpdaterIntervalId = setInterval(() => {
+    if (autoUpdater.updateInfoAndProvider?.info) {
+      // Update déjà détecté / en cours : pas besoin de repoller.
+      return;
+    }
+    runCheck("periodic");
+  }, AUTO_UPDATE_CHECK_INTERVAL_MS);
 }
 
 app.whenReady().then(() => {
@@ -398,6 +428,13 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
+  }
+});
+
+app.on("before-quit", () => {
+  if (autoUpdaterIntervalId !== null) {
+    clearInterval(autoUpdaterIntervalId);
+    autoUpdaterIntervalId = null;
   }
 });
 

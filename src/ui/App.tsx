@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TwitchLoginCard } from "./organisms/TwitchLoginCard";
 import { RewardsCard } from "./organisms/RewardsCard";
 import { getStoredToken, type TwitchTokenResponse } from "../twitchAuth";
@@ -14,6 +14,62 @@ import { HIARTE_HI_TTS_PROJECT_URL } from "../config";
 import { LoginPageHeader } from "./organisms/LoginPageHeader";
 
 const ELEVEN_CHECK_INTERVAL_MS = 10_000;
+
+type AppHeaderMainProps = {
+  title: string;
+  /** Sous-titre texte brut. Ignoré si `subtitleHtml` est fourni. */
+  subtitle?: string;
+  /**
+   * Sous-titre avec un sous-ensemble HTML whitelisté (`<strong>`, `<br>`).
+   * Contenu provient EXCLUSIVEMENT des fichiers de locales embarqués dans le
+   * bundle (`src/locales/*.json`) — donc contrôlé par nous, pas par
+   * l'utilisateur ou une source distante. Voir `renderTrustedSubtitle`.
+   */
+  subtitleHtml?: string;
+  credits: { remaining: number; limit: number } | null;
+  formatCredits: (value: number) => string;
+  creditsLabel: string;
+};
+
+/**
+ * Rend un sous-titre i18n pouvant contenir `<strong>` ou `<br>`. Comme ces
+ * chaînes viennent des JSON de locales intégrés au bundle (jamais d'une source
+ * externe), on se permet `dangerouslySetInnerHTML` pour préserver la mise en
+ * forme légère. Si un jour on charge des locales distantes (OTA, fichier
+ * utilisateur), il faudra remplacer cet appel par un mini-parseur qui ne laisse
+ * passer que la whitelist d'éléments.
+ */
+const renderTrustedSubtitle = (html: string) => (
+  <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: html }} />
+);
+
+const AppHeaderMain = ({
+  title,
+  subtitle,
+  subtitleHtml,
+  credits,
+  formatCredits,
+  creditsLabel
+}: AppHeaderMainProps) => (
+  <div className="app-header-main">
+    <div className="app-header-main-top">
+      <div className="app-title">{title}</div>
+      {credits && (
+        <div className="app-header-credits">
+          {creditsLabel}{" "}
+          <strong>
+            {formatCredits(credits.remaining)} / {formatCredits(credits.limit)}
+          </strong>
+        </div>
+      )}
+    </div>
+    {subtitleHtml
+      ? renderTrustedSubtitle(subtitleHtml)
+      : subtitle
+        ? <p className="app-subtitle">{subtitle}</p>
+        : null}
+  </div>
+);
 
 export const App = () => {
   const { t } = useI18n();
@@ -31,6 +87,7 @@ export const App = () => {
     null
   );
   const [debugOpen, setDebugOpen] = useState(false);
+  const mainRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -141,10 +198,7 @@ export const App = () => {
 
   const handleTabChange = (tab: "history" | "rewards") => {
     setRewardsTab(tab);
-    const main = document.querySelector<HTMLElement>(".app-main");
-    if (main) {
-      main.scrollTo({ top: 0, behavior: "auto" });
-    }
+    mainRef.current?.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const handleElevenLabsSaved = () => {
@@ -187,42 +241,28 @@ export const App = () => {
           ) : (
             <>
               {isTwitchConnected && rewardsTab === "history" && (
-                <div className="app-header-main">
-                  <div className="app-header-main-top">
-                    <div className="app-title">{t("app.history")}</div>
-                    {elevenCredits && (
-                      <div className="app-header-credits">
-                        {t("app.creditsRemaining")}{" "}
-                        <strong>
-                          {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                        </strong>
-                      </div>
-                    )}
-                  </div>
-                  <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: t("app.redeemsRefresh") }} />
-                </div>
+                <AppHeaderMain
+                  title={t("app.history")}
+                  subtitleHtml={t("app.redeemsRefresh")}
+                  credits={elevenCredits}
+                  formatCredits={formatCredits}
+                  creditsLabel={t("app.creditsRemaining")}
+                />
               )}
               {isTwitchConnected && rewardsTab === "rewards" && (
-                <div className="app-header-main">
-                  <div className="app-header-main-top">
-                    <div className="app-title">{t("app.rewardsManagement")}</div>
-                    {elevenCredits && (
-                      <div className="app-header-credits">
-                        {t("app.creditsRemaining")}{" "}
-                        <strong>
-                          {formatCredits(elevenCredits.remaining)} / {formatCredits(elevenCredits.limit)}
-                        </strong>
-                      </div>
-                    )}
-                  </div>
-                  <p className="app-subtitle">{t("app.rewardsSubtitle")}</p>
-                </div>
+                <AppHeaderMain
+                  title={t("app.rewardsManagement")}
+                  subtitle={t("app.rewardsSubtitle")}
+                  credits={elevenCredits}
+                  formatCredits={formatCredits}
+                  creditsLabel={t("app.creditsRemaining")}
+                />
               )}
             </>
           )}
         </div>
 
-        <main className="app-main">
+        <main className="app-main" ref={mainRef}>
           {!token && <TwitchLoginCard />}
           {token && (
             <RewardsCard

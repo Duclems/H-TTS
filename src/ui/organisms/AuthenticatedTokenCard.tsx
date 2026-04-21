@@ -8,8 +8,7 @@ import { Button } from "../atoms/Button";
 import { Skeleton } from "../atoms/Skeleton";
 import { TokenChipRow } from "../molecules/TokenChipRow";
 import { useI18n } from "../context/I18nContext";
-
-const TWITCH_LAST_PROFILE_KEY = "h_tts_twitch_last_profile";
+import { STORAGE_KEY_TWITCH_LAST_PROFILE as TWITCH_LAST_PROFILE_KEY } from "../../storageKeys";
 
 function saveLastTwitchProfile(user: TwitchUser, followersCount: number | null): void {
   try {

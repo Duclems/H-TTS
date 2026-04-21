@@ -1,12 +1,9 @@
-import tmi from "tmi.js";
+import tmi, { type TmiClient } from "tmi.js";
 import { logDebug } from "./debugLog";
 
 const IS_DEV = import.meta.env.DEV;
 
-// On tape en any pour rester compatible avec le runtime tmi.js côté navigateur/Electron
-// sans dépendre des typings externes.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let client: any | null = null;
+let client: TmiClient | null = null;
 let started = false;
 let startedChannel: string | null = null;
 
@@ -107,8 +104,7 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
   started = true;
   startedChannel = username;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  client = new (tmi as any).Client({
+  const newClient: TmiClient = new tmi.Client({
     options: { debug: false },
     connection: {
       secure: true,
@@ -116,16 +112,20 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     },
     channels: [username]
   });
+  client = newClient;
 
-  client.on("message", (channel: string, tags: any, message: string, self: boolean) => {
+  newClient.on("message", (channel, tags, message, self) => {
     if (self) return;
-    const parsedEmotes = parseEmotesFromTmi(message, tags?.emotes);
+    const displayName = tags["display-name"];
+    const userLogin = tags.username;
+    const rewardId = tags["custom-reward-id"];
+    const parsedEmotes = parseEmotesFromTmi(message, tags.emotes);
     const payload: ChatMessageWithEmotes = {
       channel,
-      userDisplayName: tags["display-name"],
-      userLogin: tags.username,
+      userDisplayName: typeof displayName === "string" ? displayName : undefined,
+      userLogin: typeof userLogin === "string" ? userLogin : undefined,
       message,
-      rewardId: typeof tags["custom-reward-id"] === "string" ? tags["custom-reward-id"] : undefined,
+      rewardId: typeof rewardId === "string" ? rewardId : undefined,
       parsedEmotes,
       timestamp: Date.now()
     };
@@ -157,7 +157,7 @@ export function startTwitchChatLogger({ channelLogin }: StartOptions): void {
     }
   });
 
-  client
+  newClient
     .connect()
     .then(() => {
       logDebug({
@@ -200,13 +200,9 @@ export function stopTwitchChatLogger(): void {
 
   if (previousClient) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      const result = previousClient.disconnect();
-      if (result && typeof result.catch === "function") {
-        result.catch(() => {
-          /* disconnection error is not actionable */
-        });
-      }
+      previousClient.disconnect().catch(() => {
+        /* disconnection error is not actionable */
+      });
     } catch {
       /* ignore */
     }

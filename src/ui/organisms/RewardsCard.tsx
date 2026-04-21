@@ -31,6 +31,12 @@ import { loadAllRewardVoiceConfigs } from "../../rewardVoiceConfig";
 import { RewardVoiceModal } from "./RewardVoiceModal";
 import { useI18n } from "../context/I18nContext";
 import { logDebug } from "../../debugLog";
+import {
+  STORAGE_KEY_REDEEM_AUDIO_COMPLETED as AUDIO_COMPLETED_KEY,
+  STORAGE_KEY_REDEEM_FULFILL_COMPLETED as FULFILL_COMPLETED_KEY,
+  STORAGE_KEY_RECENT_FULFILLED_REDEMPTIONS as RECENT_FULFILLED_KEY,
+  STORAGE_KEY_EMOTES_BY_REDEMPTION as EMOTES_CACHE_KEY
+} from "../../storageKeys";
 
 type Props = {
   token: TwitchTokenResponse;
@@ -68,9 +74,6 @@ function rewardsActiveForPoll(all: TwitchCustomReward[]): TwitchCustomReward[] {
   return all.filter((r) => r.is_enabled);
 }
 
-const AUDIO_COMPLETED_KEY = "h_tts_redeem_audio_completed_ids";
-const FULFILL_COMPLETED_KEY = "h_tts_redeem_fulfill_completed_ids";
-const RECENT_FULFILLED_KEY = "h_tts_recent_fulfilled_redemptions";
 const RECENT_FULFILLED_MAX = 5;
 
 /** Évite plusieurs appels ElevenLabs pour le même redeem si l’effet se relance pendant le `await` (poll, Strict Mode, etc.). */
@@ -199,7 +202,6 @@ function computeEmoteMatch(
   return { emotes: [] };
 }
 
-const EMOTES_CACHE_KEY = "h_tts_emotes_by_redemption";
 const CHAT_BUFFER_MAX = 200;
 
 /**

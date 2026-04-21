@@ -11,14 +11,13 @@ import { Button } from "../atoms/Button";
 import { ModalHeader } from "../molecules/ModalHeader";
 import { useToast } from "../context/ToastContext";
 import { useI18n } from "../context/I18nContext";
+import { STORAGE_KEY_REWARD_VOICE_LABELS as VOICE_LABEL_CACHE_KEY } from "../../storageKeys";
 
 type Props = {
   rewardId: string;
   rewardTitle: string;
   onClose: () => void;
 };
-
-const VOICE_LABEL_CACHE_KEY = "h_tts_reward_voice_labels";
 
 export const RewardVoiceModal = ({ rewardId, rewardTitle, onClose }: Props) => {
   const { addToast } = useToast();
