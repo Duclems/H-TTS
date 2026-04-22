@@ -1,26 +1,19 @@
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, isValidElement, type ReactNode } from "react";
 import { useI18n } from "../context/I18nContext";
 
 type TabId = "history" | "rewards";
 
 type HeaderCreditsProps = {
   title: string;
-  subtitle?: string;
-  subtitleHtml?: string;
+  subtitle?: ReactNode;
   credits: { remaining: number; limit: number } | null;
   formatCredits: (value: number) => string;
   creditsLabel: string;
 };
 
-// Subtitle HTML is sourced exclusively from bundled locale files.
-const renderTrustedSubtitle = (html: string) => (
-  <p className="app-subtitle" dangerouslySetInnerHTML={{ __html: html }} />
-);
-
 export const AppHeaderMain = ({
   title,
   subtitle,
-  subtitleHtml,
   credits,
   formatCredits,
   creditsLabel
@@ -37,11 +30,11 @@ export const AppHeaderMain = ({
         </div>
       )}
     </div>
-    {subtitleHtml
-      ? renderTrustedSubtitle(subtitleHtml)
-      : subtitle
-        ? <p className="app-subtitle">{subtitle}</p>
-        : null}
+    {subtitle == null || subtitle === false ? null : isValidElement(subtitle) ? (
+      subtitle
+    ) : (
+      <p className="app-subtitle">{subtitle}</p>
+    )}
   </div>
 );
 

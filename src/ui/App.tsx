@@ -132,11 +132,19 @@ export const App = () => {
     );
   }
 
+  const historySubtitle = (
+    <p className="app-subtitle">
+      {t("app.redeemsRefreshPart1")}
+      <strong>{t("app.redeemsRefreshEmphasis")}</strong>
+      {t("app.redeemsRefreshPart2")}
+    </p>
+  );
+
   const header =
     activeTab === "history" ? (
       <AppHeaderMain
         title={t("app.history")}
-        subtitleHtml={t("app.redeemsRefresh")}
+        subtitle={historySubtitle}
         credits={elevenHealth.credits}
         formatCredits={formatCredits}
         creditsLabel={t("app.creditsRemaining")}

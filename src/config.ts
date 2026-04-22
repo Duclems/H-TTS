@@ -2,7 +2,8 @@ export const HIARTE_HI_TTS_PROJECT_URL = "https://www.hiarte.fr/projects/hi-tts/
 
 export const TWITCH_CLIENT_ID = import.meta.env.VITE_TWITCH_CLIENT_ID as string;
 export const TWITCH_SCOPES =
-  (import.meta.env.VITE_TWITCH_SCOPES as string) ?? "user:read:email";
+  (import.meta.env.VITE_TWITCH_SCOPES as string) ??
+  "channel:read:redemptions channel:manage:redemptions moderator:read:followers chat:read";
 
 if (!TWITCH_CLIENT_ID) {
   // eslint-disable-next-line no-console

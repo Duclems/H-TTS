@@ -34,11 +34,12 @@ cp .env.example .env
 
 Puis remplis :
 
-- **`VITE_TWITCH_CLIENT_ID`** : ton client id Twitch (obtenu depuis le portail développeur, configuré en **Client Type: Public** pour autoriser le Device Code Flow).
-- **`VITE_TWITCH_SCOPES`** : scopes Twitch requis, par ex. :
-  - `user:read:email`
-  - `channel:read:redemptions`
-  - `channel:manage:redemptions`
+- **`VITE_TWITCH_CLIENT_ID`** : ton client id Twitch (obtenu depuis le portail développeur, configuré en **Client Type: Public** pour autoriser le Device Code Flow). Ce Client-Id est **public par design** dans un flow OAuth public : il peut être versionné dans `.env.example` / commité, il n'y a pas de risque à l'exposer (il n'y a *pas* de client secret associé à un client public).
+- **`VITE_TWITCH_SCOPES`** : scopes Twitch requis, strictement minimaux :
+  - `channel:read:redemptions` — lecture des redemptions (historique / polling de secours)
+  - `channel:manage:redemptions` — marquer les redemptions comme fulfilled
+  - `moderator:read:followers` — compteur followers
+  - `chat:read` — IRC tmi.js (association reward ↔ message chat)
 
 Référence Twitch : [Docs Authentication](https://dev.twitch.tv/docs/authentication/).
 
@@ -63,6 +64,14 @@ Durcissement de navigation dans `electron/navigationGuard.cjs` :
 - `setWindowOpenHandler` : idem, `deny` par défaut.
 - `will-attach-webview` : webviews désactivées.
 - Permissions navigateur (micro, géoloc, notifications…) : deny global.
+- `setWindowOpenHandler` : `deny` systématique, `shell.openExternal` n'est invoqué que sur `http(s):` / `mailto:` pour éviter qu'un lien malveillant déclenche un protocole custom (`file:`, URI handler tiers…).
+
+Une **Content-Security-Policy** est injectée côté session Electron (`windowManager.cjs`, `onHeadersReceived`) et varie selon le mode :
+
+- **Prod** (build packagé) : CSP stricte — `default-src 'self'`, pas de `unsafe-inline` sur `script-src`, images limitées à `self` + `data:` + `static-cdn.jtvnw.net`, média en `blob:` (pour l'audio ElevenLabs), `connect-src` limité aux API Twitch/ElevenLabs et aux WebSockets EventSub + tmi.js, et `object-src` / `base-uri` / `frame-ancestors` à `'none'`.
+- **Dev** : même base, mais `'unsafe-inline' 'unsafe-eval'` sur `script-src` et `ws://localhost:*` sur `connect-src` pour laisser passer le preamble React Fast Refresh et le HMR Vite.
+
+> `backgroundThrottling: false` est activé sur la `BrowserWindow` pour que l'EventSub WebSocket et la lecture audio continuent quand la fenêtre est cachée / minimisée. C'est un choix assumé : il augmente marginalement la consommation batterie en arrière-plan par rapport au throttling par défaut de Chromium.
 
 ### 4. Structure Atomik React
 
@@ -127,8 +136,9 @@ Dans ce cas :
 
 ### 6. Sécurité
 
-- Le **`client_id`** n’est pas secret, il peut être exposé dans le front.
-- Ne mets **jamais** de **client secret** dans `.env` côté front.
-- Le token est stocké dans `localStorage` pour simplicité de démo ; pour une vraie app en prod, réfléchis aux risques (XSS, etc.) et éventuellement déplace la logique sensible côté backend.
+- Le **`client_id`** n'est **pas secret**, il est public par design pour un client OAuth public (Device Code Flow). Il peut être exposé dans le front / committé dans `.env.example`.
+- Ne mets **jamais** de **client secret** dans `.env` côté front — le Client Type doit rester `Public` sur le portail Twitch (aucun secret n'est généré).
+- Le token OAuth Twitch et la clé API ElevenLabs **ne sont pas** dans `localStorage` : ils sont persistés par le process main Electron via `safeStorage` (chiffrement OS : DPAPI / Keychain / libsecret). Le renderer n'y accède que via l'IPC `hiTtsSecureStorage` exposé en `contextIsolation`.
+- CSP, bloqueurs de navigation et handlers de permissions décrits ci-dessus limitent la surface d'attaque renderer même en cas de XSS résiduelle.
 
 

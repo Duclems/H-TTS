@@ -12,6 +12,10 @@ function setupAutoUpdater({ getWindow }) {
   if (isDev) return;
 
   autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.fullChangelog = false;
 
   autoUpdater.on("error", (error) => {
     const win = getWindow();

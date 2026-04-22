@@ -2,7 +2,9 @@
   "app": {
     "history": "Historique",
     "creditsRemaining": "Crédits restants",
-    "redeemsRefresh": "Les redeems arrivent <strong>en temps réel</strong> et sont joués dès leur réception.",
+    "redeemsRefreshPart1": "Les redeems arrivent ",
+    "redeemsRefreshEmphasis": "en temps réel",
+    "redeemsRefreshPart2": " et sont joués dès leur réception.",
     "rewardsManagement": "Gestion des rewards",
     "rewardsSubtitle": "Crée et paramètrer ici vos rewards Hi-TTS utilisés pour déclencher le TTS sur ton stream.",
     "home": "Accueil",
