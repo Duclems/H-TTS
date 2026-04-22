@@ -51,6 +51,7 @@ export function useInitialTwitchLoad({
     let cancelled = false;
 
     const onTwitchChatMessage = (msg: ChatMessageWithEmotes) => {
+      if (cancelled) return;
       const buffer = chatMessagesRef.current;
       if (buffer.length >= CHAT_BUFFER_MAX) buffer.shift();
       buffer.push(msg);
@@ -58,6 +59,12 @@ export function useInitialTwitchLoad({
         setChatVersion((v) => v + 1);
       }
     };
+
+    // Add/remove du listener volontairement faits de manière synchrone en
+    // dehors du `run()` async : comme ça le couple registre/désenregistre
+    // est toujours symétrique, même si `cancelled` est déclenché entre deux
+    // awaits de `run()` (notamment en React.StrictMode dev qui mount→unmount→remount).
+    addTwitchChatListener(onTwitchChatMessage);
 
     const run = async () => {
       try {
@@ -75,8 +82,6 @@ export function useInitialTwitchLoad({
 
         startTwitchChatLogger({ channelLogin: user.login });
         if (cancelled) return;
-
-        addTwitchChatListener(onTwitchChatMessage);
 
         let rewardsData: TwitchCustomReward[] | null = null;
         let lastRewardsErr: TwitchHelixErr | null = null;

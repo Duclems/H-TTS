@@ -10,6 +10,7 @@ import {
   getCachedElevenLabsApiKey,
   hydrateElevenLabsFromSecureStorage
 } from "../elevenLabsConfig";
+import { PageErrorBoundary } from "./atoms/ErrorBoundary";
 import { ToastProvider } from "./context/ToastContext";
 import { TwitchRewardsProvider } from "./context/TwitchRewardsContext";
 import { useI18n } from "./context/I18nContext";
@@ -175,14 +176,16 @@ export const App = () => {
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenAbout={() => setAboutOpen(true)}
         >
-          {activeTab === "history" ? (
-            <HistoryPage />
-          ) : (
-            <RewardsPage
-              token={token}
-              onMissingRewardVoiceChange={setHasMissingRewardVoice}
-            />
-          )}
+          <PageErrorBoundary key={activeTab} source={activeTab}>
+            {activeTab === "history" ? (
+              <HistoryPage />
+            ) : (
+              <RewardsPage
+                token={token}
+                onMissingRewardVoiceChange={setHasMissingRewardVoice}
+              />
+            )}
+          </PageErrorBoundary>
         </AppShellAuthenticated>
 
         {settingsOpen && (

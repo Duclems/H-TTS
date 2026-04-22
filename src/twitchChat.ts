@@ -37,17 +37,20 @@ export type ChatMessageWithEmotes = {
   timestamp: number;
 };
 
-const listeners: ((msg: ChatMessageWithEmotes) => void)[] = [];
+// `Set` plutôt qu'un `Array` : garantit que `addTwitchChatListener` est
+// idempotent (le même callback enregistré deux fois ne sera appelé qu'une
+// fois), ce qui protège contre le double-mount de `useEffect` en
+// React.StrictMode dev. L'ordre d'itération d'un `Set` est préservé par
+// insertion, donc le comportement observable reste identique à l'ancien
+// tableau tant qu'on n'enregistre pas le même listener deux fois.
+const listeners = new Set<(msg: ChatMessageWithEmotes) => void>();
 
 export function addTwitchChatListener(listener: (msg: ChatMessageWithEmotes) => void): void {
-  listeners.push(listener);
+  listeners.add(listener);
 }
 
 export function removeTwitchChatListener(listener: (msg: ChatMessageWithEmotes) => void): void {
-  const idx = listeners.indexOf(listener);
-  if (idx >= 0) {
-    listeners.splice(idx, 1);
-  }
+  listeners.delete(listener);
 }
 
 function parseEmotesFromTmi(message: string, emotesTag: unknown): ParsedEmote[] {

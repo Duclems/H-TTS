@@ -139,5 +139,18 @@
     "encryptionUnavailableTitle": "OS encryption unavailable",
     "encryptionUnavailableTwitch": "The OS secure storage isn't accessible: your Twitch token is written in plain text inside the app data folder. Configure a system keyring, or avoid using this account on this machine.",
     "encryptionUnavailableEleven": "The OS secure storage isn't accessible: your ElevenLabs API key is written in plain text inside the app data folder. Configure a system keyring, or revoke the key after use."
+  },
+  "errorBoundary": {
+    "globalTitle": "Oops, something went wrong",
+    "globalDescription": "The app hit an unexpected problem and couldn't continue. Reload the window to try again.",
+    "pageTitle": "This screen failed to render",
+    "pageDescription": "Something went wrong while showing this page. You can retry or switch to another tab.",
+    "retry": "Retry",
+    "reload": "Reload the app",
+    "details": "Technical details"
+  },
+  "a11y": {
+    "loading": "Loading…",
+    "loadingRewards": "Loading rewards…"
   }
 }
